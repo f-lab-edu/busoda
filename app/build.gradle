@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace 'com.chaeny.busoda'
-    compileSdk 35
+    compileSdk rootProject.compileSdkVersion
 
     buildFeatures {
         viewBinding = true
@@ -13,8 +13,8 @@ android {
 
     defaultConfig {
         applicationId "com.chaeny.busoda"
-        minSdk 31
-        targetSdk 35
+        minSdk rootProject.minSdkVersion
+        targetSdk rootProject.targetSdkVersion
         versionCode 1
         versionName "1.0"
 

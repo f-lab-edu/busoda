@@ -5,10 +5,10 @@ plugins {
 
 android {
     namespace 'com.chaeny.busoda.stopdetail'
-    compileSdk 35
+    compileSdk rootProject.compileSdkVersion
 
     defaultConfig {
-        minSdk 31
+        minSdk rootProject.minSdkVersion
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
