@@ -7,6 +7,10 @@ android {
     namespace 'com.chaeny.busoda.stopdetail'
     compileSdk rootProject.compileSdkVersion
 
+    buildFeatures {
+        viewBinding = true
+    }
+
     defaultConfig {
         minSdk rootProject.minSdkVersion
 
