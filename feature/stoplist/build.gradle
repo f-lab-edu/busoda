@@ -34,6 +34,8 @@ android {
 }
 
 dependencies {
+    implementation "androidx.navigation:navigation-fragment-ktx:$rootProject.navigationVersion"
+    implementation "androidx.navigation:navigation-ui-ktx:$rootProject.navigationVersion"
 
     implementation libs.androidx.core.ktx
     implementation libs.androidx.appcompat
