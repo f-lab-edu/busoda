@@ -4,6 +4,8 @@ buildscript {
         compileSdkVersion = 35
         minSdkVersion = 31
         targetSdkVersion = 35
+
+        navigationVersion = '2.8.5'
     }
 }
 
