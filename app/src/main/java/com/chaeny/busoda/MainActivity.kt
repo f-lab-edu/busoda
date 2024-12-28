@@ -3,7 +3,7 @@ package com.chaeny.busoda
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.chaeny.busoda.databinding.ActivityMainBinding
-import com.chaeny.busoda.stoplist.StopListFragment
+import com.chaeny.busoda.stopdetail.StopDetailFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -15,7 +15,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         supportFragmentManager.beginTransaction()
-            .replace(binding.container.id, StopListFragment())
+            .replace(binding.container.id, StopDetailFragment())
             .commit()
     }
 
