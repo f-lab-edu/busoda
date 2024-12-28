@@ -26,17 +26,18 @@ class StopListFragment : Fragment() {
 
     private fun initButtonAction() {
         binding.sendLeftButton.setOnClickListener {
-            navigateToStopDetail()
+            navigateToStopDetail("🚌")
         }
 
         binding.sendArriveButton.setOnClickListener {
-            navigateToStopDetail()
+            navigateToStopDetail("🚍")
         }
     }
 
-    private fun navigateToStopDetail() {
+    private fun navigateToStopDetail(data: String) {
+        val uri = "android-app://com.chaeny.busoda/fragment_stop_detail?data=$data".toUri()
         val request = NavDeepLinkRequest.Builder
-            .fromUri("android-app://com.chaeny.busoda/fragment_stop_detail".toUri())
+            .fromUri(uri)
             .build()
         findNavController().navigate(request)
     }

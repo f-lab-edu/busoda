@@ -9,13 +9,20 @@ import com.chaeny.busoda.stopdetail.databinding.FragmentStopDetailBinding
 
 class StopDetailFragment : Fragment() {
 
+    private lateinit var binding: FragmentStopDetailBinding
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binding = FragmentStopDetailBinding.inflate(inflater, container, false)
+        binding = FragmentStopDetailBinding.inflate(inflater, container, false)
+        initDataReceiver()
         return binding.root
+    }
+
+    private fun initDataReceiver() {
+        binding.stopDetailTextView.text = arguments?.getString("data") ?: "No Data"
     }
 
 }
