@@ -7,10 +7,6 @@ android {
     namespace 'com.chaeny.busoda'
     compileSdk rootProject.compileSdkVersion
 
-    buildFeatures {
-        viewBinding = true
-    }
-
     defaultConfig {
         applicationId "com.chaeny.busoda"
         minSdk rootProject.minSdkVersion
