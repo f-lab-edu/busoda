@@ -6,11 +6,10 @@
     tools:context=".StopDetailFragment">
 
     <TextView
-        android:id="@+id/stop_list_text_view"
+        android:id="@+id/stop_detail_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="bus stop detail"
         android:textSize="50sp" />
 
 </FrameLayout>

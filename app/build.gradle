@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace 'com.chaeny.busoda'
-    compileSdk rootProject.compileSdkVersion
+    compileSdk libs.versions.compileSdk.get().toInteger()
 
     defaultConfig {
         applicationId "com.chaeny.busoda"
-        minSdk rootProject.minSdkVersion
-        targetSdk rootProject.targetSdkVersion
+        minSdk libs.versions.minSdk.get().toInteger()
+        targetSdk libs.versions.targetSdk.get().toInteger()
         versionCode 1
         versionName "1.0"
 
@@ -33,8 +33,8 @@ android {
 }
 
 dependencies {
-    implementation "androidx.navigation:navigation-fragment-ktx:$rootProject.navigationVersion"
-    implementation "androidx.navigation:navigation-ui-ktx:$rootProject.navigationVersion"
+    implementation libs.navigation.fragment
+    implementation libs.navigation.ui
 
     implementation libs.androidx.core.ktx
     implementation libs.androidx.appcompat
