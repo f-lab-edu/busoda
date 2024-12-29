@@ -5,14 +5,14 @@ plugins {
 
 android {
     namespace 'com.chaeny.busoda.stopdetail'
-    compileSdk rootProject.compileSdkVersion
+    compileSdk libs.versions.compileSdk.get().toInteger()
 
     buildFeatures {
         viewBinding = true
     }
 
     defaultConfig {
-        minSdk rootProject.minSdkVersion
+        minSdk libs.versions.minSdk.get().toInteger()
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -34,8 +34,8 @@ android {
 }
 
 dependencies {
-    implementation "androidx.navigation:navigation-fragment-ktx:$rootProject.navigationVersion"
-    implementation "androidx.navigation:navigation-ui-ktx:$rootProject.navigationVersion"
+    implementation libs.navigation.fragment
+    implementation libs.navigation.ui
 
     implementation libs.androidx.core.ktx
     implementation libs.androidx.appcompat
