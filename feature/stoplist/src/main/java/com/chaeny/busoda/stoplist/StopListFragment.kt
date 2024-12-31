@@ -21,7 +21,14 @@ class StopListFragment : Fragment() {
         binding = FragmentStopListBinding.inflate(inflater, container, false)
         val adapter = StopListAdapter()
         binding.stopList.adapter = adapter
-        adapter.submitList(viewModel.dummyData)
+        subscribeUi(adapter)
+        viewModel.removeLastStop()
         return binding.root
+    }
+
+    private fun subscribeUi(adapter: StopListAdapter) {
+        viewModel.dummyData.observe(viewLifecycleOwner) { stops ->
+            adapter.submitList(stops)
+        }
     }
 }
