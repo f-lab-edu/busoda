@@ -27,7 +27,7 @@ class StopListFragment : Fragment() {
     }
 
     private fun subscribeUi(adapter: StopListAdapter) {
-        viewModel.dummyData.observe(viewLifecycleOwner) { stops ->
+        viewModel.busStops.observe(viewLifecycleOwner) { stops ->
             adapter.submitList(stops)
         }
     }

@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.chaeny.busoda.stoplist.databinding.ListItemStopBinding
 
-internal class StopListAdapter : ListAdapter<List<String>, StopListAdapter.BusStopViewHolder>(BusStopDiffCallback()) {
+internal class StopListAdapter : ListAdapter<BusStop, StopListAdapter.BusStopViewHolder>(BusStopDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BusStopViewHolder {
         return BusStopViewHolder(
@@ -24,23 +24,23 @@ internal class StopListAdapter : ListAdapter<List<String>, StopListAdapter.BusSt
     }
 
     class BusStopViewHolder(private val binding: ListItemStopBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(stopData: List<String>) {
+        fun bind(stopData: BusStop) {
             with(binding) {
-                textStopId.text = stopData[0]
-                textStopName.text = stopData[1]
-                textNextStop.text = stopData[2]
+                textStopId.text = stopData.stopId
+                textStopName.text = stopData.stopName
+                textNextStop.text = stopData.nextStopName
             }
         }
     }
 }
 
-private class BusStopDiffCallback : DiffUtil.ItemCallback<List<String>>() {
+private class BusStopDiffCallback : DiffUtil.ItemCallback<BusStop>() {
 
-    override fun areItemsTheSame(oldItem: List<String>, newItem: List<String>): Boolean {
-        return oldItem[0] == newItem[0]
+    override fun areItemsTheSame(oldItem: BusStop, newItem: BusStop): Boolean {
+        return oldItem.stopId == newItem.stopId
     }
 
-    override fun areContentsTheSame(oldItem: List<String>, newItem: List<String>): Boolean {
+    override fun areContentsTheSame(oldItem: BusStop, newItem: BusStop): Boolean {
         return oldItem == newItem
     }
 }
