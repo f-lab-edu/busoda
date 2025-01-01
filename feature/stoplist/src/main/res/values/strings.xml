@@ -4,4 +4,5 @@
     <string name="stop_name">정류소이름</string>
     <string name="stop_id">정류소ID</string>
     <string name="next_stop">다음정류소이름</string>
+    <string name="remove_stop">정류소 지우기</string>
 </resources>

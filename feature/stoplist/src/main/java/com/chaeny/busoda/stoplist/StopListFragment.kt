@@ -22,13 +22,19 @@ class StopListFragment : Fragment() {
         val adapter = StopListAdapter()
         binding.stopList.adapter = adapter
         subscribeUi(adapter)
-        viewModel.removeLastStop()
+        initButtonAction()
         return binding.root
     }
 
     private fun subscribeUi(adapter: StopListAdapter) {
         viewModel.busStops.observe(viewLifecycleOwner) { stops ->
             adapter.submitList(stops)
+        }
+    }
+
+    private fun initButtonAction() {
+        binding.removeStopButton.setOnClickListener {
+            viewModel.removeLastStop()
         }
     }
 }

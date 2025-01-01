@@ -8,11 +8,19 @@
     android:gravity="center"
     android:orientation="vertical">
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/remove_stop_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="30dp"
+        android:text="@string/remove_stop"
+        android:textColor="?attr/colorOnSecondary"
+        app:backgroundTint="@android:color/white" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/stop_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="50dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/list_item_stop" />
 
