@@ -25,10 +25,11 @@ internal class StopListAdapter : ListAdapter<BusStop, StopListAdapter.BusStopVie
 
     class BusStopViewHolder(private val binding: ListItemStopBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(stopData: BusStop) {
+            val formattedNextStopName = binding.root.context.getString(R.string.direction, stopData.nextStopName)
             with(binding) {
                 textStopId.text = stopData.stopId
                 textStopName.text = stopData.stopName
-                textNextStop.text = stopData.formatNextStopName()
+                textNextStop.text = formattedNextStopName
             }
         }
     }
