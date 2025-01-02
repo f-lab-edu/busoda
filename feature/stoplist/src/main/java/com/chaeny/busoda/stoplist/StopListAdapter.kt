@@ -28,7 +28,7 @@ internal class StopListAdapter : ListAdapter<BusStop, StopListAdapter.BusStopVie
             with(binding) {
                 textStopId.text = stopData.stopId
                 textStopName.text = stopData.stopName
-                textNextStop.text = stopData.nextStopName
+                textNextStop.text = stopData.formatNextStopName()
             }
         }
     }
