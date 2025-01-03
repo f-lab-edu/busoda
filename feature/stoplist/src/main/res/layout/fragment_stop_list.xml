@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical">
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/send_left_button"
+        android:id="@+id/remove_stop_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        android:text="@string/left"
+        android:layout_margin="30dp"
+        android:text="@string/remove_stop"
         android:textColor="?attr/colorOnSecondary"
-        app:backgroundTint="?attr/colorPrimary" />
+        app:backgroundTint="@android:color/white" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/send_arrive_button"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/stop_list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        android:text="@string/arrive"
-        android:textColor="?attr/colorOnSecondary"
-        app:backgroundTint="?attr/colorPrimary" />
+        android:layout_height="match_parent"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/list_item_stop" />
 
 </LinearLayout>
