@@ -17,12 +17,7 @@ class StopDetailFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentStopDetailBinding.inflate(inflater, container, false)
-        initDataReceiver()
         return binding.root
-    }
-
-    private fun initDataReceiver() {
-        binding.stopDetailTextView.text = arguments?.getString("data") ?: "No Data"
     }
 
 }

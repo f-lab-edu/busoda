@@ -1,5 +1,4 @@
 <resources>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="first_bus">첫번째 버스 :</string>
     <string name="second_bus">두번째 버스 :</string>
 </resources>
