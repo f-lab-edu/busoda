@@ -7,6 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.chaeny.busoda.stoplist.databinding.FragmentStopListBinding
+import androidx.core.net.toUri
+import androidx.navigation.NavDeepLinkRequest
+import androidx.navigation.fragment.findNavController
 
 class StopListFragment : Fragment() {
 
@@ -36,5 +39,17 @@ class StopListFragment : Fragment() {
         binding.removeStopButton.setOnClickListener {
             viewModel.removeLastStop()
         }
+
+        binding.moveStopButton.setOnClickListener {
+            navigateToStopDetail()
+        }
+    }
+
+    private fun navigateToStopDetail() {
+        val uri = "android-app://com.chaeny.busoda/fragment_stop_detail"
+        val request = NavDeepLinkRequest.Builder
+            .fromUri(uri.toUri())
+            .build()
+        findNavController().navigate(request)
     }
 }

@@ -5,5 +5,6 @@
     <string name="stop_id">정류소ID</string>
     <string name="next_stop">다음정류소이름</string>
     <string name="remove_stop">정류소 지우기</string>
+    <string name="move_stop">정류소 상세 정보</string>
     <string name="direction">%1$s 방면</string>
 </resources>
