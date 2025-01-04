@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="30dp"
+    android:layout_marginBottom="15dp"
+    app:cardBackgroundColor="@android:color/white"
+    app:cardCornerRadius="15dp"
+    app:cardElevation="1dp"
+    app:cardPreventCornerOverlap="false">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp">
+
+        <TextView
+            android:id="@+id/text_bus_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="604" />
+
+        <TextView
+            android:id="@+id/text_next_stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="@id/text_bus_number"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="화곡본동시장 방면" />
+
+        <TextView
+            android:id="@+id/text_first_bus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:text="@string/first_bus"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text_bus_number" />
+
+        <TextView
+            android:id="@+id/text_second_bus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/second_bus"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="@id/text_first_bus"
+            app:layout_constraintTop_toBottomOf="@id/text_first_bus" />
+
+        <TextView
+            android:id="@+id/text_first_arrival_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/text_first_bus"
+            app:layout_constraintStart_toEndOf="@id/text_first_bus"
+            tools:text="2분 38초 후" />
+
+        <TextView
+            android:id="@+id/text_first_position"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@id/text_first_bus"
+            app:layout_constraintStart_toEndOf="@id/text_first_arrival_time"
+            tools:text="1번째 전" />
+
+        <TextView
+            android:id="@+id/text_first_congestion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@id/text_first_bus"
+            app:layout_constraintStart_toEndOf="@id/text_first_position"
+            tools:text="보통"
+            tools:textColor="@android:color/holo_green_dark" />
+
+        <TextView
+            android:id="@+id/text_second_arrival_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/text_second_bus"
+            app:layout_constraintStart_toStartOf="@id/text_first_arrival_time"
+            tools:text="16분 18초 후" />
+
+        <TextView
+            android:id="@+id/text_second_position"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@id/text_second_bus"
+            app:layout_constraintStart_toStartOf="@id/text_first_position"
+            tools:text="9번째 전" />
+
+        <TextView
+            android:id="@+id/text_second_congestion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@id/text_second_bus"
+            app:layout_constraintStart_toStartOf="@id/text_first_congestion"
+            tools:text="혼잡"
+            tools:textColor="@android:color/holo_red_dark" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>
