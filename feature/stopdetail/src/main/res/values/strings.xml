@@ -1,4 +1,5 @@
 <resources>
     <string name="first_bus">첫번째 버스 :</string>
     <string name="second_bus">두번째 버스 :</string>
+    <string name="way">방면</string>
 </resources>
