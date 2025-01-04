@@ -42,7 +42,7 @@
             android:id="@+id/text_first_bus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
+            android:layout_marginStart="5dp"
             android:layout_marginTop="10dp"
             android:text="@string/first_bus"
             android:textColor="@android:color/black"
@@ -123,7 +123,7 @@
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="@id/text_second_bus"
             app:layout_constraintStart_toStartOf="@id/text_first_congestion"
-            tools:text="혼잡"
+            tools:text="매우혼잡"
             tools:textColor="@android:color/holo_red_dark" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
