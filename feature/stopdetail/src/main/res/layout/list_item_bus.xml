@@ -15,6 +15,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clipToPadding="false"
         android:padding="20dp">
 
         <TextView
@@ -24,9 +25,9 @@
             android:textColor="@android:color/black"
             android:textSize="20sp"
             android:textStyle="bold"
-            app:layout_constraintWidth_percent="0.25"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.25"
             tools:text="심야A21" />
 
         <TextView
@@ -39,9 +40,9 @@
             android:maxLines="1"
             android:textColor="@android:color/black"
             android:textSize="15sp"
-            app:layout_constraintWidth_percent="0.6"
             app:layout_constraintBottom_toBottomOf="@id/text_bus_number"
             app:layout_constraintEnd_toStartOf="@id/text_direction"
+            app:layout_constraintWidth_percent="0.6"
             tools:text="강서구청사거리.서울디지털대학교" />
 
         <TextView
@@ -63,9 +64,9 @@
             android:text="@string/first_bus"
             android:textColor="@android:color/black"
             android:textSize="14sp"
-            app:layout_constraintWidth_percent="0.3"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/text_bus_number" />
+            app:layout_constraintTop_toBottomOf="@id/text_bus_number"
+            app:layout_constraintWidth_percent="0.3" />
 
         <TextView
             android:id="@+id/text_second_bus"
@@ -75,9 +76,9 @@
             android:text="@string/second_bus"
             android:textColor="@android:color/black"
             android:textSize="14sp"
-            app:layout_constraintWidth_percent="0.3"
             app:layout_constraintStart_toStartOf="@id/text_first_bus"
-            app:layout_constraintTop_toBottomOf="@id/text_first_bus" />
+            app:layout_constraintTop_toBottomOf="@id/text_first_bus"
+            app:layout_constraintWidth_percent="0.3" />
 
         <TextView
             android:id="@+id/text_first_arrival_time"
@@ -86,9 +87,9 @@
             android:textColor="@android:color/black"
             android:textSize="14sp"
             android:textStyle="bold"
-            app:layout_constraintWidth_percent="0.25"
             app:layout_constraintBottom_toBottomOf="@id/text_first_bus"
             app:layout_constraintStart_toEndOf="@id/text_first_bus"
+            app:layout_constraintWidth_percent="0.25"
             tools:text="2분 38초 후" />
 
         <TextView
@@ -98,9 +99,9 @@
             android:layout_marginStart="10dp"
             android:textColor="@android:color/black"
             android:textSize="14sp"
-            app:layout_constraintWidth_percent="0.2"
             app:layout_constraintBottom_toBottomOf="@id/text_first_bus"
             app:layout_constraintStart_toEndOf="@id/text_first_arrival_time"
+            app:layout_constraintWidth_percent="0.2"
             tools:text="1번째 전" />
 
         <TextView
@@ -109,9 +110,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:textSize="14sp"
-            app:layout_constraintWidth_percent="0.2"
             app:layout_constraintBottom_toBottomOf="@id/text_first_bus"
             app:layout_constraintStart_toEndOf="@id/text_first_position"
+            app:layout_constraintWidth_percent="0.2"
             tools:text="보통"
             tools:textColor="@android:color/holo_green_dark" />
 
@@ -122,9 +123,9 @@
             android:textColor="@android:color/black"
             android:textSize="14sp"
             android:textStyle="bold"
-            app:layout_constraintWidth_percent="0.25"
             app:layout_constraintBottom_toBottomOf="@id/text_second_bus"
             app:layout_constraintStart_toStartOf="@id/text_first_arrival_time"
+            app:layout_constraintWidth_percent="0.25"
             tools:text="16분 18초 후" />
 
         <TextView
@@ -133,9 +134,9 @@
             android:layout_height="wrap_content"
             android:textColor="@android:color/black"
             android:textSize="14sp"
-            app:layout_constraintWidth_percent="0.2"
             app:layout_constraintBottom_toBottomOf="@id/text_second_bus"
             app:layout_constraintStart_toStartOf="@id/text_first_position"
+            app:layout_constraintWidth_percent="0.2"
             tools:text="9번째 전" />
 
         <TextView
@@ -143,9 +144,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textSize="14sp"
-            app:layout_constraintWidth_percent="0.2"
             app:layout_constraintBottom_toBottomOf="@id/text_second_bus"
             app:layout_constraintStart_toStartOf="@id/text_first_congestion"
+            app:layout_constraintWidth_percent="0.2"
             tools:text="매우혼잡"
             tools:textColor="@android:color/holo_red_dark" />
 
