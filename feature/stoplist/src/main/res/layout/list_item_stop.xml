@@ -35,17 +35,18 @@
 
         <TextView
             android:id="@+id/text_stop_id"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textColor="@android:color/system_neutral1_600"
             android:textSize="14sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/text_stop_name"
+            app:layout_constraintWidth_percent="0.3"
             tools:text="@string/stop_id" />
 
         <TextView
             android:id="@+id/text_next_stop"
-            android:layout_width="250dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:gravity="right"
@@ -54,6 +55,7 @@
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/text_stop_name"
+            app:layout_constraintWidth_percent="0.7"
             tools:text="@string/next_stop" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>
