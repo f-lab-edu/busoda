@@ -29,17 +29,17 @@ internal class StopListAdapter : ListAdapter<BusStop, StopListAdapter.BusStopVie
     class BusStopViewHolder(private val binding: ListItemStopBinding) : RecyclerView.ViewHolder(binding.root) {
 
         init {
-            navigateToStopDetail()
+            binding.root.setOnClickListener {
+                navigateToStopDetail()
+            }
         }
 
         private fun navigateToStopDetail() {
-            binding.root.setOnClickListener {
-                val uri = "android-app://com.chaeny.busoda/fragment_stop_detail"
-                val request = NavDeepLinkRequest.Builder
-                    .fromUri(uri.toUri())
-                    .build()
-                binding.root.findNavController().navigate(request)
-            }
+            val uri = "android-app://com.chaeny.busoda/fragment_stop_detail"
+            val request = NavDeepLinkRequest.Builder
+                .fromUri(uri.toUri())
+                .build()
+            binding.root.findNavController().navigate(request)
         }
 
         private fun BusStop.formatNextStopName(): String {
