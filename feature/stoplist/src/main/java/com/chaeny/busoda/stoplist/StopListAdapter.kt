@@ -2,6 +2,9 @@ package com.chaeny.busoda.stoplist
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.net.toUri
+import androidx.navigation.NavDeepLinkRequest
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -24,6 +27,20 @@ internal class StopListAdapter : ListAdapter<BusStop, StopListAdapter.BusStopVie
     }
 
     class BusStopViewHolder(private val binding: ListItemStopBinding) : RecyclerView.ViewHolder(binding.root) {
+
+        init {
+            navigateToStopDetail()
+        }
+
+        private fun navigateToStopDetail() {
+            binding.root.setOnClickListener {
+                val uri = "android-app://com.chaeny.busoda/fragment_stop_detail"
+                val request = NavDeepLinkRequest.Builder
+                    .fromUri(uri.toUri())
+                    .build()
+                binding.root.findNavController().navigate(request)
+            }
+        }
 
         private fun BusStop.formatNextStopName(): String {
             return binding.root.context.getString(R.string.direction, nextStopName)
