@@ -22,6 +22,7 @@ class StopDetailFragment : Fragment() {
         val adapter = StopDetailAdapter()
         binding.busList.adapter = adapter
         subscribeUi(adapter)
+        initDataReceiver()
         return binding.root
     }
 
@@ -34,5 +35,10 @@ class StopDetailFragment : Fragment() {
             }
             binding.listLoadingBar.visibility = View.GONE
         }
+    }
+
+    private fun initDataReceiver() {
+        binding.textBusStop.text =
+            arguments?.getString("stopName") ?: binding.root.context.getString(R.string.unknown)
     }
 }

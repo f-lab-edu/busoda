@@ -10,7 +10,12 @@
         android:name="com.chaeny.busoda.stopdetail.StopDetailFragment"
         tools:layout="@layout/fragment_stop_detail">
 
-        <deepLink app:uri="android-app://com.chaeny.busoda/fragment_stop_detail" />
+        <deepLink
+            app:uri="android-app://com.chaeny.busoda/fragment_stop_detail?stopName={stopName}" />
+
+        <argument
+            android:name="stopName"
+            app:argType="string" />
     </fragment>
 
 </navigation>

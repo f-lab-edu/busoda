@@ -30,12 +30,12 @@ internal class StopListAdapter : ListAdapter<BusStop, StopListAdapter.BusStopVie
 
         init {
             binding.root.setOnClickListener {
-                navigateToStopDetail()
+                navigateToStopDetail(binding.textStopName.text.toString())
             }
         }
 
-        private fun navigateToStopDetail() {
-            val uri = "android-app://com.chaeny.busoda/fragment_stop_detail"
+        private fun navigateToStopDetail(stopName: String) {
+            val uri = "android-app://com.chaeny.busoda/fragment_stop_detail?stopName=$stopName"
             val request = NavDeepLinkRequest.Builder
                 .fromUri(uri.toUri())
                 .build()
