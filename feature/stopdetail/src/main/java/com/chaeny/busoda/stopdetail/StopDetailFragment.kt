@@ -30,9 +30,7 @@ class StopDetailFragment : Fragment() {
         binding.listLoadingBar.visibility = View.VISIBLE
 
         viewModel.busInfos.observe(viewLifecycleOwner) { buses ->
-            buses?.let {
-                adapter.submitList(it)
-            }
+            adapter.submitList(buses)
             binding.listLoadingBar.visibility = View.GONE
         }
     }
