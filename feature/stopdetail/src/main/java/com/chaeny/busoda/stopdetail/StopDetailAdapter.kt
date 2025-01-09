@@ -28,12 +28,6 @@ internal class StopDetailAdapter : ListAdapter<Bus, StopDetailAdapter.BusDetailV
             with(binding) {
                 textBusNumber.text = busData.busNumber
                 textNextStop.text = busData.nextStopName
-                textFirstArrivalTime.text = busData.firstArrivalTime
-                textFirstPosition.text = busData.firstPosition
-                textFirstCongestion.text = busData.firstCongestion
-                textSecondArrivalTime.text = busData.secondArrivalTime
-                textSecondPosition.text = busData.secondPosition
-                textSecondCongestion.text = busData.secondCongestion
             }
         }
     }

@@ -55,100 +55,21 @@
             app:layout_constraintBottom_toBottomOf="@id/text_bus_number"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <TextView
-            android:id="@+id/text_first_bus"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="10dp"
-            android:text="@string/first_bus"
-            android:textColor="@android:color/black"
-            android:textSize="14sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/text_bus_number"
-            app:layout_constraintWidth_percent="0.3" />
-
-        <TextView
-            android:id="@+id/text_second_bus"
-            android:layout_width="0dp"
+        <com.chaeny.busoda.stopdetail.ArrivalInfoView
+            android:id="@+id/first_arrival_info_view"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="@string/second_bus"
-            android:textColor="@android:color/black"
-            android:textSize="14sp"
-            app:layout_constraintStart_toStartOf="@id/text_first_bus"
-            app:layout_constraintTop_toBottomOf="@id/text_first_bus"
-            app:layout_constraintWidth_percent="0.3" />
+            app:layout_constraintStart_toStartOf="@+id/text_bus_number"
+            app:layout_constraintTop_toBottomOf="@id/text_bus_number" />
 
-        <TextView
-            android:id="@+id/text_first_arrival_time"
-            android:layout_width="0dp"
+        <com.chaeny.busoda.stopdetail.ArrivalInfoView
+            android:id="@+id/second_arrival_info_view"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@android:color/black"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@id/text_first_bus"
-            app:layout_constraintStart_toEndOf="@id/text_first_bus"
-            app:layout_constraintWidth_percent="0.25"
-            tools:text="2분 38초 후" />
-
-        <TextView
-            android:id="@+id/text_first_position"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:textColor="@android:color/black"
-            android:textSize="14sp"
-            app:layout_constraintBottom_toBottomOf="@id/text_first_bus"
-            app:layout_constraintStart_toEndOf="@id/text_first_arrival_time"
-            app:layout_constraintWidth_percent="0.2"
-            tools:text="1번째 전" />
-
-        <TextView
-            android:id="@+id/text_first_congestion"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:textSize="14sp"
-            app:layout_constraintBottom_toBottomOf="@id/text_first_bus"
-            app:layout_constraintStart_toEndOf="@id/text_first_position"
-            app:layout_constraintWidth_percent="0.2"
-            tools:text="보통"
-            tools:textColor="@android:color/holo_green_dark" />
-
-        <TextView
-            android:id="@+id/text_second_arrival_time"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:textColor="@android:color/black"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@id/text_second_bus"
-            app:layout_constraintStart_toStartOf="@id/text_first_arrival_time"
-            app:layout_constraintWidth_percent="0.25"
-            tools:text="16분 18초 후" />
-
-        <TextView
-            android:id="@+id/text_second_position"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:textColor="@android:color/black"
-            android:textSize="14sp"
-            app:layout_constraintBottom_toBottomOf="@id/text_second_bus"
-            app:layout_constraintStart_toStartOf="@id/text_first_position"
-            app:layout_constraintWidth_percent="0.2"
-            tools:text="9번째 전" />
-
-        <TextView
-            android:id="@+id/text_second_congestion"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            app:layout_constraintBottom_toBottomOf="@id/text_second_bus"
-            app:layout_constraintStart_toStartOf="@id/text_first_congestion"
-            app:layout_constraintWidth_percent="0.2"
-            tools:text="매우혼잡"
-            tools:textColor="@android:color/holo_red_dark" />
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toStartOf="@+id/text_bus_number"
+            app:layout_constraintTop_toBottomOf="@id/first_arrival_info_view" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>
