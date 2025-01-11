@@ -33,10 +33,13 @@ internal class StopDetailAdapter : ListAdapter<Bus, StopDetailAdapter.BusDetailV
         }
 
         private fun bindArrivalInfos(busData: Bus, binding: ListItemBusBinding) {
-            busData.arrivalInfos.forEachIndexed { index, info ->
-                when (index) {
-                    0 -> binding.firstArrivalInfoView.bindArrivalInfo(info, index)
-                    1 -> binding.secondArrivalInfoView.bindArrivalInfo(info, index)
+            val customViews = listOf(binding.firstArrivalInfoView, binding.secondArrivalInfoView)
+
+            customViews.forEachIndexed { index, view ->
+                if (index < busData.arrivalInfos.size) {
+                    view.bindArrivalInfo(busData.arrivalInfos[index], index)
+                } else {
+                    view.bindEmptyInfo(index)
                 }
             }
         }

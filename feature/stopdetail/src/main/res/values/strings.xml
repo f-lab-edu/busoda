@@ -2,4 +2,6 @@
     <string name="nth_bus">%1$d번째 버스:</string>
     <string name="way">방면</string>
     <string name="unknown">알수없음</string>
+    <string name="no_info">도착정보없음</string>
+    <string name="no_data"> </string>
 </resources>

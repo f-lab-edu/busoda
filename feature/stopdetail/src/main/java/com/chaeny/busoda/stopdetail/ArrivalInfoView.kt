@@ -23,4 +23,14 @@ class ArrivalInfoView @JvmOverloads constructor(
             textCongestion.text = arrivalInfo.congestion
         }
     }
+
+    internal fun bindEmptyInfo(position: Int) {
+        bindArrivalInfo(
+            BusArrivalInfo(
+                context.getString(R.string.no_info),
+                context.getString(R.string.no_data),
+                context.getString(R.string.no_data)
+            ), position
+        )
+    }
 }

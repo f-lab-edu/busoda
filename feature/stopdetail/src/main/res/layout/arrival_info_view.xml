@@ -15,12 +15,13 @@
         android:paddingStart="5dp"
         android:textColor="@android:color/black"
         android:textSize="14sp"
-        tools:text="@string/second_bus" />
+        tools:text="첫번째 버스:" />
 
     <TextView
         android:id="@+id/text_arrival_time"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
         android:layout_weight="2"
         android:gravity="right"
         android:textColor="@android:color/black"
