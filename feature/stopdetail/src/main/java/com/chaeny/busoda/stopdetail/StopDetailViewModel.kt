@@ -25,16 +25,25 @@ internal class StopDetailViewModel : ViewModel() {
 
     private fun getDummyData() = listOf(
         Bus(
-            "604", "화곡본동시장", "2분 38초", "2번째 전", "보통",
-            "16분 18초", "9번째 전", "혼잡"
+            "604", "화곡본동시장",
+            listOf(
+                BusArrivalInfo("2분 38초", "2번째 전", "보통"),
+                BusArrivalInfo("16분 18초", "9번째 전", "혼잡")
+            )
         ),
         Bus(
-            "5712", "화곡본동시장", "3분 48초", "3번째 전", "여유",
-            "17분 19초", "10번째 전", "혼잡"
+            "5712", "화곡본동시장",
+            listOf(
+                BusArrivalInfo("3분 48초", "3번째 전", "여유"),
+                BusArrivalInfo("17분 19초", "10번째 전", "혼잡")
+            )
         ),
         Bus(
-            "652", "화곡역1번출구", "4분 58초", "4번째 전", "보통",
-            "18분 20초", "11번째 전", "매우혼잡"
+            "652", "화곡역1번출구",
+            listOf(
+                BusArrivalInfo("4분 58초", "4번째 전", "보통"),
+                BusArrivalInfo("18분 20초", "11번째 전", "매우혼잡")
+            )
         )
     )
 }

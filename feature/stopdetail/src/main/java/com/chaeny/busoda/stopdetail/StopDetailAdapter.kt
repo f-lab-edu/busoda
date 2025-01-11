@@ -29,6 +29,16 @@ internal class StopDetailAdapter : ListAdapter<Bus, StopDetailAdapter.BusDetailV
                 textBusNumber.text = busData.busNumber
                 textNextStop.text = busData.nextStopName
             }
+            bindArrivalInfos(busData, binding)
+        }
+
+        private fun bindArrivalInfos(busData: Bus, binding: ListItemBusBinding) {
+            busData.arrivalInfos.forEachIndexed { index, info ->
+                when (index) {
+                    0 -> binding.firstArrivalInfoView.bindArrivalInfo(info, index)
+                    1 -> binding.secondArrivalInfoView.bindArrivalInfo(info, index)
+                }
+            }
         }
     }
 }
