@@ -9,9 +9,7 @@ class ArrivalInfoView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr) {
-
-    override fun onFinishInflate() {
-        super.onFinishInflate()
+    init {
         inflate(context, R.layout.arrival_info_view, this)
     }
 }
