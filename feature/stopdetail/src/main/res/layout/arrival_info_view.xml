@@ -9,18 +9,20 @@
 
     <TextView
         android:id="@+id/text_info_title"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
+        android:layout_weight="2"
+        android:paddingStart="5dp"
         android:textColor="@android:color/black"
         android:textSize="14sp"
-        tools:text="@string/first_bus" />
+        tools:text="@string/second_bus" />
 
     <TextView
         android:id="@+id/text_arrival_time"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
+        android:layout_weight="2"
+        android:gravity="right"
         android:textColor="@android:color/black"
         android:textSize="14sp"
         android:textStyle="bold"
@@ -28,18 +30,20 @@
 
     <TextView
         android:id="@+id/text_position"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
+        android:layout_weight="1.5"
+        android:gravity="right"
         android:textColor="@android:color/black"
         android:textSize="14sp"
         tools:text="11번째 전" />
 
     <TextView
         android:id="@+id/text_congestion"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
+        android:layout_weight="1.5"
+        android:gravity="right"
         android:textSize="14sp"
         tools:text="매우혼잡" />
 
