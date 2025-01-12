@@ -28,12 +28,6 @@ internal class StopListAdapter : ListAdapter<BusStop, StopListAdapter.BusStopVie
 
     class BusStopViewHolder(private val binding: ListItemStopBinding) : RecyclerView.ViewHolder(binding.root) {
 
-        init {
-            binding.root.setOnClickListener {
-                navigateToStopDetail(binding.textStopName.text.toString())
-            }
-        }
-
         private fun navigateToStopDetail(stopName: String) {
             val uri = "android-app://com.chaeny.busoda/fragment_stop_detail?stopName=$stopName"
             val request = NavDeepLinkRequest.Builder
@@ -51,6 +45,9 @@ internal class StopListAdapter : ListAdapter<BusStop, StopListAdapter.BusStopVie
                 textStopId.text = stopData.stopId
                 textStopName.text = stopData.stopName
                 textNextStop.text = stopData.formatNextStopName()
+                root.setOnClickListener {
+                    navigateToStopDetail(stopData.stopName)
+                }
             }
         }
     }
