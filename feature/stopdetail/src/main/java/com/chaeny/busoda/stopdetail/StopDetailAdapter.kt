@@ -33,14 +33,9 @@ internal class StopDetailAdapter : ListAdapter<Bus, StopDetailAdapter.BusDetailV
         }
 
         private fun bindArrivalInfos(busData: Bus, binding: ListItemBusBinding) {
-            val customViews = listOf(binding.firstArrivalInfoView, binding.secondArrivalInfoView)
-
-            customViews.forEachIndexed { index, view ->
-                if (index < busData.arrivalInfos.size) {
-                    view.bindArrivalInfo(busData.arrivalInfos[index], index)
-                } else {
-                    view.bindEmptyInfo(index)
-                }
+            with(binding) {
+                firstArrivalInfoView.bindArrivalInfo(busData.arrivalInfos.getOrNull(0), 0)
+                secondArrivalInfoView.bindArrivalInfo(busData.arrivalInfos.getOrNull(1), 1)
             }
         }
     }

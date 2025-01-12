@@ -15,16 +15,20 @@ class ArrivalInfoView @JvmOverloads constructor(
     private val layoutInflater = LayoutInflater.from(context)
     private var binding = ArrivalInfoViewBinding.inflate(layoutInflater, this, true)
 
-    internal fun bindArrivalInfo(arrivalInfo: BusArrivalInfo, position: Int) {
-        with(binding) {
-            textInfoTitle.text = context.getString(R.string.nth_bus, position + 1)
-            textArrivalTime.text = arrivalInfo.arrivalTime
-            textPosition.text = arrivalInfo.position
-            textCongestion.text = arrivalInfo.congestion
+    internal fun bindArrivalInfo(arrivalInfo: BusArrivalInfo?, position: Int) {
+        if (arrivalInfo != null) {
+            with(binding) {
+                textInfoTitle.text = context.getString(R.string.nth_bus, position + 1)
+                textArrivalTime.text = arrivalInfo.arrivalTime
+                textPosition.text = arrivalInfo.position
+                textCongestion.text = arrivalInfo.congestion
+            }
+        } else {
+            bindEmptyInfo(position)
         }
     }
 
-    internal fun bindEmptyInfo(position: Int) {
+    private fun bindEmptyInfo(position: Int) {
         bindArrivalInfo(
             BusArrivalInfo(
                 context.getString(R.string.no_info),
