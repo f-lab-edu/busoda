@@ -22,7 +22,7 @@ class StopDetailFragment : Fragment() {
         val adapter = StopDetailAdapter()
         binding.busList.adapter = adapter
         subscribeUi(adapter)
-        initDataReceiver()
+        bindReceivedData()
         return binding.root
     }
 
@@ -37,8 +37,8 @@ class StopDetailFragment : Fragment() {
         }
     }
 
-    private fun initDataReceiver() {
+    private fun bindReceivedData() {
         binding.textBusStop.text =
-            arguments?.getString("stopName") ?: binding.root.context.getString(R.string.unknown)
+            viewModel.stopName ?: binding.root.context.getString(R.string.unknown)
     }
 }

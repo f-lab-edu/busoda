@@ -2,16 +2,18 @@ package com.chaeny.busoda.stopdetail
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-internal class StopDetailViewModel : ViewModel() {
+internal class StopDetailViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
 
     private val dummyData = MutableLiveData<List<Bus>>()
-    val busInfos: LiveData<List<Bus>> = dummyData
     private var isLoading = false
+    val busInfos: LiveData<List<Bus>> = dummyData
+    val stopName: String? = savedStateHandle.get(BUS_STOP_NAME)
 
     init {
         asyncDataLoad()
@@ -51,4 +53,8 @@ internal class StopDetailViewModel : ViewModel() {
     )
 
     fun isLoading() = isLoading
+
+    companion object {
+        private const val BUS_STOP_NAME = "stopName"
+    }
 }
