@@ -29,12 +29,11 @@ class ArrivalInfoView @JvmOverloads constructor(
     }
 
     private fun bindEmptyInfo(position: Int) {
-        bindArrivalInfo(
-            BusArrivalInfo(
-                context.getString(R.string.no_info),
-                context.getString(R.string.no_data),
-                context.getString(R.string.no_data)
-            ), position
-        )
+        with(binding) {
+            textInfoTitle.text = context.getString(R.string.nth_bus, position + 1)
+            textArrivalTime.text = context.getString(R.string.no_info)
+            textPosition.text = context.getString(R.string.no_data)
+            textCongestion.text = context.getString(R.string.no_data)
+        }
     }
 }
