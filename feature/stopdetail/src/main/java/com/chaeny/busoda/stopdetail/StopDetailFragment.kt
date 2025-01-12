@@ -27,7 +27,9 @@ class StopDetailFragment : Fragment() {
     }
 
     private fun subscribeUi(adapter: StopDetailAdapter) {
-        binding.listLoadingBar.visibility = View.VISIBLE
+        if(viewModel.isLoading()) {
+            binding.listLoadingBar.visibility = View.VISIBLE
+        }
 
         viewModel.busInfos.observe(viewLifecycleOwner) { buses ->
             adapter.submitList(buses)

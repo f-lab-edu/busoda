@@ -11,15 +11,18 @@ internal class StopDetailViewModel : ViewModel() {
 
     private val dummyData = MutableLiveData<List<Bus>>()
     val busInfos: LiveData<List<Bus>> = dummyData
+    private var isLoading = false
 
     init {
         asyncDataLoad()
     }
 
     private fun asyncDataLoad() {
+        isLoading = true
         viewModelScope.launch {
             delay(3000)
             dummyData.postValue(getDummyData())
+            isLoading = false
         }
     }
 
@@ -46,4 +49,6 @@ internal class StopDetailViewModel : ViewModel() {
             )
         )
     )
+
+    fun isLoading() = isLoading
 }
