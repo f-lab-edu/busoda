@@ -11,9 +11,10 @@ import kotlinx.coroutines.launch
 internal class StopDetailViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
 
     private val dummyData = MutableLiveData<List<Bus>>()
+    private val stopNameData = MutableLiveData<String>(savedStateHandle.get(BUS_STOP_NAME))
     private var isLoading = false
     val busInfos: LiveData<List<Bus>> = dummyData
-    val stopName: String? = savedStateHandle.get(BUS_STOP_NAME)
+    val stopName: LiveData<String> = stopNameData
 
     init {
         asyncDataLoad()
