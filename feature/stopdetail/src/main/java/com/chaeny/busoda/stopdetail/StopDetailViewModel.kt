@@ -11,8 +11,10 @@ import kotlinx.coroutines.launch
 internal class StopDetailViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
 
     private val dummyData = MutableLiveData<List<Bus>>(emptyList())
+    private val stopIdData = MutableLiveData<String>(savedStateHandle.get(BUS_STOP_ID))
     private val stopNameData = MutableLiveData<String>(savedStateHandle.get(BUS_STOP_NAME))
     val busInfos: LiveData<List<Bus>> = dummyData
+    val stopId : LiveData<String> = stopIdData
     val stopName: LiveData<String> = stopNameData
 
     init {
@@ -51,6 +53,7 @@ internal class StopDetailViewModel(savedStateHandle: SavedStateHandle) : ViewMod
     )
 
     companion object {
+        private const val BUS_STOP_ID = "stopId"
         private const val BUS_STOP_NAME = "stopName"
     }
 }

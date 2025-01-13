@@ -38,8 +38,12 @@ class StopDetailFragment : Fragment() {
     }
 
     private fun bindReceivedData() {
+        viewModel.stopId.observe(viewLifecycleOwner) { stopId ->
+            binding.textBusStopId.text = stopId
+        }
+
         viewModel.stopName.observe(viewLifecycleOwner) { stopName ->
-            binding.textBusStop.text = stopName
+            binding.textBusStopName.text = stopName
         }
     }
 }
