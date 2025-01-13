@@ -10,9 +10,8 @@ import kotlinx.coroutines.launch
 
 internal class StopDetailViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
 
-    private val dummyData = MutableLiveData<List<Bus>>()
+    private val dummyData = MutableLiveData<List<Bus>>(emptyList())
     private val stopNameData = MutableLiveData<String>(savedStateHandle.get(BUS_STOP_NAME))
-    private var isLoading = false
     val busInfos: LiveData<List<Bus>> = dummyData
     val stopName: LiveData<String> = stopNameData
 
@@ -21,11 +20,9 @@ internal class StopDetailViewModel(savedStateHandle: SavedStateHandle) : ViewMod
     }
 
     private fun asyncDataLoad() {
-        isLoading = true
         viewModelScope.launch {
             delay(3000)
             dummyData.postValue(getDummyData())
-            isLoading = false
         }
     }
 
@@ -52,8 +49,6 @@ internal class StopDetailViewModel(savedStateHandle: SavedStateHandle) : ViewMod
             )
         )
     )
-
-    fun isLoading() = isLoading
 
     companion object {
         private const val BUS_STOP_NAME = "stopName"

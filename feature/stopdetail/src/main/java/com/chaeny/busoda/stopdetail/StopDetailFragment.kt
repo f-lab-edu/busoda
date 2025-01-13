@@ -27,13 +27,13 @@ class StopDetailFragment : Fragment() {
     }
 
     private fun subscribeUi(adapter: StopDetailAdapter) {
-        if(viewModel.isLoading()) {
-            binding.listLoadingBar.visibility = View.VISIBLE
-        }
-
         viewModel.busInfos.observe(viewLifecycleOwner) { buses ->
-            adapter.submitList(buses)
-            binding.listLoadingBar.visibility = View.GONE
+            if (buses.isEmpty()) {
+                binding.listLoadingBar.visibility = View.VISIBLE
+            } else {
+                adapter.submitList(buses)
+                binding.listLoadingBar.visibility = View.GONE
+            }
         }
     }
 
