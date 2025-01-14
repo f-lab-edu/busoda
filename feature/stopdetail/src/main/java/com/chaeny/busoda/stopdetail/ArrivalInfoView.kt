@@ -13,7 +13,7 @@ class ArrivalInfoView @JvmOverloads constructor(
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
     private val layoutInflater = LayoutInflater.from(context)
-    private var binding = ArrivalInfoViewBinding.inflate(layoutInflater, this, true)
+    private var binding = ArrivalInfoViewBinding.inflate(layoutInflater, this)
 
     internal fun bindArrivalInfo(arrivalInfo: BusArrivalInfo?, position: Int) {
         if (arrivalInfo != null) {

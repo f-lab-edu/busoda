@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<merge
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    tools:background="?attr/colorPrimary">
+    tools:background="?attr/colorPrimary"
+    tools:parentTag="LinearLayout">
 
     <TextView
         android:id="@+id/text_info_title"
@@ -48,4 +49,4 @@
         android:textSize="14sp"
         tools:text="매우혼잡" />
 
-</LinearLayout>
+</merge>
