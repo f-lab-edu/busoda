@@ -33,6 +33,7 @@ class StopDetailFragment : Fragment() {
         }
 
         viewModel.busInfos.observe(viewLifecycleOwner) { buses ->
+            binding.textBusStopName.text = buses.first().stopName
             adapter.submitList(buses)
         }
     }
@@ -40,10 +41,6 @@ class StopDetailFragment : Fragment() {
     private fun bindReceivedData() {
         viewModel.stopId.observe(viewLifecycleOwner) { stopId ->
             binding.textBusStopId.text = stopId
-        }
-
-        viewModel.stopName.observe(viewLifecycleOwner) { stopName ->
-            binding.textBusStopName.text = stopName
         }
     }
 }
