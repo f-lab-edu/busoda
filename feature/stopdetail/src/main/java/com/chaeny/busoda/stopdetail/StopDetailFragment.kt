@@ -33,7 +33,8 @@ class StopDetailFragment : Fragment() {
         }
 
         viewModel.busInfos.observe(viewLifecycleOwner) { buses ->
-            binding.textBusStopName.text = buses.first().stopName
+            binding.textBusStopName.text =
+                buses.firstOrNull()?.stopName ?: binding.root.context.getString(R.string.no_info)
             adapter.submitList(buses)
         }
     }
