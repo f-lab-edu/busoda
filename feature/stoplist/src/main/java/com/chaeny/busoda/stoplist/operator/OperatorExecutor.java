@@ -9,7 +9,7 @@ public class OperatorExecutor {
             throw new IllegalArgumentException("모두 입력해주세요.");
         }
 
-        if (args.length > 4) {
+        if (args.length > 3) {
             throw new IllegalArgumentException("5 x 5 형식으로 입력해주세요");
         }
 
