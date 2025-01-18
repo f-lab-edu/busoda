@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OperatorExecutor {
-    public int main(String[] args) {
+    public int executeOperation(String[] args) {
         if (args.length < 3) {
             throw new IllegalArgumentException("모두 입력해주세요.");
         }
