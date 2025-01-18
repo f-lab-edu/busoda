@@ -11,6 +11,6 @@ public class OperatorExecutorTest {
     public void testPlusOperator() {
         String[] args = {"2", "+", "2"};
         int result = operatorExecutor.executeOperation(args);
-        assertEquals(result, 4);
+        assertEquals(4, result);
     }
 }
