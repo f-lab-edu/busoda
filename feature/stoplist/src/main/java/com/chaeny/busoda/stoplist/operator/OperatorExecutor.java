@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OperatorExecutor {
-    public static void main(String[] args) {
+    public int main(String[] args) {
         if (args.length < 3) {
             throw new IllegalArgumentException("모두 입력해주세요.");
         }
@@ -29,14 +29,9 @@ public class OperatorExecutor {
             allowedOperators.append(op.getOperator()).append(" ");
 
             if (op.getOperator().equals(operatorSymbol)) {
-                getValue(op.operate(a, b));
-                return;
+                return op.operate(a, b);
             }
         }
         throw new IllegalArgumentException("허용되는 연산자는 " + allowedOperators + "가 있습니다.");
-    }
-
-    public static int getValue(int result) {
-        return result;
     }
 }
