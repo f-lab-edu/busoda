@@ -3,60 +3,57 @@ package com.chaeny.busoda.stoplist.operator;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+import org.junit.function.ThrowingRunnable;
 
 public class OperatorExecutorTest {
 
     OperatorExecutor operatorExe = new OperatorExecutor();
 
+    private int getResult(String... args) {
+        return operatorExe.executeOperation(args);
+    }
+
+    private ThrowingRunnable getThrowingOperation(String... args) {
+        return () -> operatorExe.executeOperation(args);
+    }
+
     @Test
     public void testPlusOperator() {
-        String[] args = {"2", "+", "2"};
-        int result = operatorExe.executeOperation(args);
-        assertEquals(4, result);
+        assertEquals(4, getResult("2", "+", "2"));
     }
 
     @Test
     public void testMinusOperator() {
-        String[] args = {"3", "-", "1"};
-        int result = operatorExe.executeOperation(args);
-        assertEquals(2, result);
+        assertEquals(2, getResult("3", "-", "1"));
     }
 
     @Test
     public void testMultiplyOperator() {
-        String[] args = {"4", "x", "5"};
-        int result = operatorExe.executeOperation(args);
-        assertEquals(20, result);
+        assertEquals(20, getResult("4", "x", "5"));
     }
 
     @Test
     public void testDivideOperator() {
-        String[] args = {"10", "/", "2"};
-        int result = operatorExe.executeOperation(args);
-        assertEquals(5, result);
+        assertEquals(5, getResult("10", "/", "2"));
     }
 
     @Test
     public void testDivideOperatorByZero() {
-        String[] args = {"10", "/", "0"};
-        assertThrows(IllegalArgumentException.class, () -> operatorExe.executeOperation(args));
+        assertThrows(IllegalArgumentException.class, getThrowingOperation("10", "/", "0"));
     }
 
     @Test
     public void testMissingArguments() {
-        String[] args = {"10", "x"};
-        assertThrows(IllegalArgumentException.class, () -> operatorExe.executeOperation(args));
+        assertThrows(IllegalArgumentException.class, getThrowingOperation("10", "x"));
     }
 
     @Test
     public void testExtraArguments() {
-        String[] args = {"10", "x", "9", "x"};
-        assertThrows(IllegalArgumentException.class, () -> operatorExe.executeOperation(args));
+        assertThrows(IllegalArgumentException.class, getThrowingOperation("10", "x", "9", "x"));
     }
 
     @Test
     public void testNotAllowedOperator() {
-        String[] args = {"10", "*", "9"};
-        assertThrows(IllegalArgumentException.class, () -> operatorExe.executeOperation(args));
+        assertThrows(IllegalArgumentException.class, getThrowingOperation("10", "*", "9"));
     }
 }
