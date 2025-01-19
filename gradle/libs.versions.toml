@@ -11,6 +11,7 @@ compileSdk = "35"
 minSdk = "31"
 targetSdk = "35"
 navigation = "2.8.5"
+coreTesting = "2.2.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -21,6 +22,7 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 navigation-fragment = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigation" }
 navigation-ui = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigation" }
+core-testing = { group = "androidx.arch.core", name = "core-testing", version.ref = "coreTesting" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
