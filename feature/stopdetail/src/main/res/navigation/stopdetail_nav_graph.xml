@@ -11,10 +11,10 @@
         tools:layout="@layout/fragment_stop_detail">
 
         <deepLink
-            app:uri="android-app://com.chaeny.busoda/fragment_stop_detail?data={data}" />
+            app:uri="android-app://com.chaeny.busoda/fragment_stop_detail?stopId={stopId}" />
 
         <argument
-            android:name="data"
+            android:name="stopId"
             app:argType="string" />
     </fragment>
 

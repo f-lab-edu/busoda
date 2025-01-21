@@ -6,10 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.chaeny.busoda.stopdetail.databinding.FragmentStopDetailBinding
+import androidx.fragment.app.viewModels
 
 class StopDetailFragment : Fragment() {
 
     private lateinit var binding: FragmentStopDetailBinding
+    private val viewModel: StopDetailViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -17,12 +19,32 @@ class StopDetailFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentStopDetailBinding.inflate(inflater, container, false)
-        initDataReceiver()
+        val adapter = StopDetailAdapter()
+        binding.busList.adapter = adapter
+        subscribeUi(adapter)
+        bindReceivedData()
         return binding.root
     }
 
-    private fun initDataReceiver() {
-        binding.stopDetailTextView.text = arguments?.getString("data") ?: "No Data"
+    private fun subscribeUi(adapter: StopDetailAdapter) {
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.listLoadingBar.visibility =
+                if (isLoading) View.VISIBLE else View.GONE
+        }
+
+        viewModel.busInfos.observe(viewLifecycleOwner) { buses ->
+            with(binding) {
+                textBusStopId.visibility = View.VISIBLE
+                textBusStopName.text = buses.firstOrNull()?.stopName
+                    ?: binding.root.context.getString(R.string.no_info)
+            }
+            adapter.submitList(buses)
+        }
     }
 
+    private fun bindReceivedData() {
+        viewModel.stopId.observe(viewLifecycleOwner) { stopId ->
+            binding.textBusStopId.text = stopId
+        }
+    }
 }
