@@ -5,7 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import com.chaeny.busoda.stopdetail.util.MainCoroutineScopeRule
 import com.chaeny.busoda.stopdetail.util.getOrAwaitValue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Before
@@ -32,16 +32,31 @@ class StopDetailViewModelTest {
 
     @Test
     fun whenInitialized_busInfosIsNull() {
-        assertNull(viewModel.busInfos.value)
+        val busInfos = viewModel.busInfos.value
+        assertNull(busInfos)
     }
 
     @ExperimentalCoroutinesApi
     @Test
     fun whenAsyncDataLoadCalled_UpdatesBusInfos() = runTest {
-        advanceTimeBy(3500)
+        advanceUntilIdle()
         val busInfos = viewModel.busInfos.getOrAwaitValue()
         val stopName = busInfos.firstOrNull()?.stopName
         assertEquals(EXPECTED_STOP_NAME, stopName)
+    }
+
+    @Test
+    fun whenDataLoadingStarted_IsLoadingIsTrue() {
+        val isLoading = viewModel.isLoading.getOrAwaitValue()
+        assertTrue(isLoading)
+    }
+
+    @ExperimentalCoroutinesApi
+    @Test
+    fun whenDataLoadingCompleted_IsLoadingIsFalse() = runTest {
+        advanceUntilIdle()
+        val isLoading = viewModel.isLoading.getOrAwaitValue()
+        assertFalse(isLoading)
     }
 
     companion object {
