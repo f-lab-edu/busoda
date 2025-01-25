@@ -38,7 +38,7 @@ class StopDetailViewModelTest {
 
     @ExperimentalCoroutinesApi
     @Test
-    fun whenAsyncDataLoadCalled_UpdatesBusInfos() = runTest {
+    fun whenAsyncDataLoadCalled_stopNameEqualsExpectedValue() = runTest {
         advanceUntilIdle()
         val busInfos = viewModel.busInfos.getOrAwaitValue()
         assertTrue("BusInfos should not be empty", busInfos.isNotEmpty())
