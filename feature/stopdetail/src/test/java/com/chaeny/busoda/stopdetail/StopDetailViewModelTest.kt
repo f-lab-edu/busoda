@@ -84,6 +84,12 @@ class StopDetailViewModelTest {
         assertFalse(isLoading)
     }
 
+    @Test
+    fun whenInitialized_stopIdEqualsExpectedValue() {
+        val stopId = viewModel.stopId.getOrAwaitValue()
+        assertEquals(TEST_STOP_ID, stopId)
+    }
+
     companion object {
         private const val STOP_ID_KEY = "stopId"
         private const val TEST_STOP_ID = "16206"
