@@ -41,6 +41,8 @@ class StopDetailViewModelTest {
     fun whenAsyncDataLoadCalled_UpdatesBusInfos() = runTest {
         advanceUntilIdle()
         val busInfos = viewModel.busInfos.getOrAwaitValue()
+        assertTrue("BusInfos should not be empty", busInfos.isNotEmpty())
+
         val stopName = busInfos.first().stopName
         assertEquals(EXPECTED_STOP_NAME, stopName)
     }
@@ -63,10 +65,11 @@ class StopDetailViewModelTest {
     fun whenBusArrivalInfoLoaded_infosContainExpectedValues() = runTest {
         advanceUntilIdle()
         val busInfos = viewModel.busInfos.getOrAwaitValue()
-        val arrivalInfo = busInfos.first().arrivalInfos.first()
+        assertTrue("BusInfos should not be empty", busInfos.isNotEmpty())
 
-        assertTrue(arrivalInfo.arrivalTime.contains("분"))
-        assertTrue(arrivalInfo.position.contains("전"))
+        val arrivalInfo = busInfos.first().arrivalInfos.first()
+        assertTrue(EXPECTED_TIME_UNIT in arrivalInfo.arrivalTime)
+        assertTrue(EXPECTED_POSITION_UNIT in arrivalInfo.position)
         assertTrue(arrivalInfo.congestion in CONGESTION_VALUES)
     }
 
@@ -94,6 +97,8 @@ class StopDetailViewModelTest {
         private const val STOP_ID_KEY = "stopId"
         private const val TEST_STOP_ID = "16206"
         private const val EXPECTED_STOP_NAME = "화곡역4번출구"
+        private const val EXPECTED_TIME_UNIT = "분"
+        private const val EXPECTED_POSITION_UNIT = "번째"
         private val CONGESTION_VALUES = listOf("여유", "보통", "혼잡", "매우혼잡")
     }
 }
