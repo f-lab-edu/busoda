@@ -2,15 +2,13 @@ package com.chaeny.busoda.stoplist
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.net.toUri
-import androidx.navigation.NavDeepLinkRequest
-import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.chaeny.busoda.stoplist.databinding.ListItemStopBinding
 
-internal class StopListAdapter : ListAdapter<BusStop, StopListAdapter.BusStopViewHolder>(BusStopDiffCallback()) {
+internal class StopListAdapter(private val viewModel: StopListViewModel) :
+    ListAdapter<BusStop, StopListAdapter.BusStopViewHolder>(BusStopDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BusStopViewHolder {
         return BusStopViewHolder(
@@ -18,7 +16,8 @@ internal class StopListAdapter : ListAdapter<BusStop, StopListAdapter.BusStopVie
                 LayoutInflater.from(parent.context),
                 parent,
                 false
-            )
+            ),
+            viewModel
         )
     }
 
@@ -26,15 +25,9 @@ internal class StopListAdapter : ListAdapter<BusStop, StopListAdapter.BusStopVie
         holder.bind(getItem(position))
     }
 
-    class BusStopViewHolder(private val binding: ListItemStopBinding) : RecyclerView.ViewHolder(binding.root) {
-
-        private fun navigateToStopDetail(stopId: String) {
-            val uri = "android-app://com.chaeny.busoda/fragment_stop_detail?stopId=$stopId"
-            val request = NavDeepLinkRequest.Builder
-                .fromUri(uri.toUri())
-                .build()
-            binding.root.findNavController().navigate(request)
-        }
+    class BusStopViewHolder(
+        private val binding: ListItemStopBinding, private val viewModel: StopListViewModel
+    ) : RecyclerView.ViewHolder(binding.root) {
 
         private fun BusStop.formatNextStopName(): String {
             return binding.root.context.getString(R.string.direction, nextStopName)
@@ -46,7 +39,7 @@ internal class StopListAdapter : ListAdapter<BusStop, StopListAdapter.BusStopVie
                 textStopName.text = stopData.stopName
                 textNextStop.text = stopData.formatNextStopName()
                 root.setOnClickListener {
-                    navigateToStopDetail(stopData.stopId)
+                    viewModel.handleBusStopClick(stopData.stopId)
                 }
             }
         }

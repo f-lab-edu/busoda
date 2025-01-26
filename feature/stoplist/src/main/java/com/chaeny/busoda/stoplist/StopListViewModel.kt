@@ -8,8 +8,10 @@ internal class StopListViewModel : ViewModel() {
 
     private val dummyData = MutableLiveData(getDummyData())
     private val _removeCompleted = MutableLiveData<Event<Int>>()
+    private val _busStopClicked = MutableLiveData<Event<String>>()
     val busStops: LiveData<List<BusStop>> = dummyData
     val removeCompleted: LiveData<Event<Int>> = _removeCompleted
+    val busStopClicked: LiveData<Event<String>> = _busStopClicked
 
     fun removeLastStop() {
         val currentStops = dummyData.value
@@ -18,6 +20,10 @@ internal class StopListViewModel : ViewModel() {
         }
         dummyData.value = currentStops.dropLast(1)
         _removeCompleted.value = Event(R.string.remove_stop_completed)
+    }
+
+    fun handleBusStopClick(stopId: String) {
+        _busStopClicked.value = Event(stopId)
     }
 
     private fun getDummyData() = listOf(

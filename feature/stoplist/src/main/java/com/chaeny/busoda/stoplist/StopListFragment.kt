@@ -6,7 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
+import androidx.navigation.NavDeepLinkRequest
+import androidx.navigation.fragment.findNavController
 import com.chaeny.busoda.stoplist.databinding.FragmentStopListBinding
 
 class StopListFragment : Fragment() {
@@ -20,11 +23,12 @@ class StopListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentStopListBinding.inflate(inflater, container, false)
-        val adapter = StopListAdapter()
+        val adapter = StopListAdapter(viewModel)
         binding.stopList.adapter = adapter
         subscribeUi(adapter)
         setupRemoveButton()
         subscribeRemoveEvent()
+        subscribeStopClickEvent()
         return binding.root
     }
 
@@ -41,6 +45,22 @@ class StopListFragment : Fragment() {
                 Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    private fun subscribeStopClickEvent() {
+        viewModel.busStopClicked.observe(viewLifecycleOwner) { event ->
+            event.getContentIfNotHandled()?.let { stopId ->
+                navigateToStopDetail(stopId)
+            }
+        }
+    }
+
+    private fun navigateToStopDetail(stopId: String) {
+        val uri = "android-app://com.chaeny.busoda/fragment_stop_detail?stopId=$stopId"
+        val request = NavDeepLinkRequest.Builder
+            .fromUri(uri.toUri())
+            .build()
+        findNavController().navigate(request)
     }
 
     private fun setupRemoveButton() {
