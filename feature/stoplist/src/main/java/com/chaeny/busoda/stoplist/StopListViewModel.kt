@@ -19,9 +19,13 @@ internal class StopListViewModel : ViewModel() {
 
     val busStops: LiveData<List<BusStop>> = dummyData
 
+    private val _removeCompleted = MutableLiveData<Event<String>>()
+    val removeCompleted: LiveData<Event<String>> = _removeCompleted
+
     fun removeLastStop() {
         dummyData.value?.dropLast(1).also {
             dummyData.value = it
+            _removeCompleted.value = Event("정류장이 삭제되었습니다")
         }
     }
 }
