@@ -12,10 +12,12 @@ internal class StopListViewModel : ViewModel() {
     val removeCompleted: LiveData<Event<Int>> = _removeCompleted
 
     fun removeLastStop() {
-        dummyData.value?.dropLast(1).also {
-            dummyData.value = it
-            _removeCompleted.value = Event(R.string.remove_stop_completed)
+        val currentStops = dummyData.value
+        if (currentStops.isNullOrEmpty()) {
+            return
         }
+        dummyData.value = currentStops.dropLast(1)
+        _removeCompleted.value = Event(R.string.remove_stop_completed)
     }
 
     private fun getDummyData() = listOf(
