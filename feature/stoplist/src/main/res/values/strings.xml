@@ -6,4 +6,5 @@
     <string name="next_stop">다음정류소이름</string>
     <string name="remove_stop">정류소 지우기</string>
     <string name="direction">%1$s 방면</string>
+    <string name="remove_stop_completed">정류장이 삭제되었습니다</string>
 </resources>

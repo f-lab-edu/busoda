@@ -23,8 +23,8 @@ class StopListFragment : Fragment() {
         val adapter = StopListAdapter()
         binding.stopList.adapter = adapter
         subscribeUi(adapter)
-        initButtonAction()
-        subscribeToEvents()
+        setupRemoveButton()
+        subscribeRemoveEvent()
         return binding.root
     }
 
@@ -34,15 +34,16 @@ class StopListFragment : Fragment() {
         }
     }
 
-    private fun subscribeToEvents() {
-        viewModel.removeCompleted.observe(viewLifecycleOwner) { clickEvent ->
-            clickEvent.getContentIfNotHandled()?.let { message ->
+    private fun subscribeRemoveEvent() {
+        viewModel.removeCompleted.observe(viewLifecycleOwner) { event ->
+            event.getContentIfNotHandled()?.let { resId ->
+                val message = getString(resId)
                 Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    private fun initButtonAction() {
+    private fun setupRemoveButton() {
         binding.removeStopButton.setOnClickListener {
             viewModel.removeLastStop()
         }
