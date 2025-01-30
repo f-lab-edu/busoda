@@ -23,7 +23,9 @@ class StopListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentStopListBinding.inflate(inflater, container, false)
-        val adapter = StopListAdapter(viewModel)
+        val adapter = StopListAdapter { stopId ->
+            viewModel.handleBusStopClick(stopId)
+        }
         binding.stopList.adapter = adapter
         subscribeUi(adapter)
         setupRemoveButton()

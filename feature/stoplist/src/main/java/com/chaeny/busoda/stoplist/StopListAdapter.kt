@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.chaeny.busoda.stoplist.databinding.ListItemStopBinding
 
-internal class StopListAdapter(private val viewModel: StopListViewModel) :
+internal class StopListAdapter(private val handleBusStopClick: (String) -> Unit) :
     ListAdapter<BusStop, StopListAdapter.BusStopViewHolder>(BusStopDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BusStopViewHolder {
@@ -17,7 +17,7 @@ internal class StopListAdapter(private val viewModel: StopListViewModel) :
                 parent,
                 false
             ),
-            viewModel
+            handleBusStopClick
         )
     }
 
@@ -26,7 +26,7 @@ internal class StopListAdapter(private val viewModel: StopListViewModel) :
     }
 
     class BusStopViewHolder(
-        private val binding: ListItemStopBinding, private val viewModel: StopListViewModel
+        private val binding: ListItemStopBinding, private val handleBusStopClick: (String) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
         private fun BusStop.formatNextStopName(): String {
@@ -39,7 +39,7 @@ internal class StopListAdapter(private val viewModel: StopListViewModel) :
                 textStopName.text = stopData.stopName
                 textNextStop.text = stopData.formatNextStopName()
                 root.setOnClickListener {
-                    viewModel.handleBusStopClick(stopData.stopId)
+                    handleBusStopClick(stopData.stopId)
                 }
             }
         }
