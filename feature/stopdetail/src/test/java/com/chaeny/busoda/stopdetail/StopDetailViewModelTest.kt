@@ -31,14 +31,14 @@ class StopDetailViewModelTest {
     }
 
     @Test
-    fun whenInitialized_busInfosIsNull() {
+    fun `when initialized then busInfos should be null`() {
         val busInfos = viewModel.busInfos.value
         assertNull(busInfos)
     }
 
     @ExperimentalCoroutinesApi
     @Test
-    fun whenAsyncDataLoadCalled_stopNameEqualsExpectedValue() = runTest {
+    fun `when asyncDataLoad called then stopName should equal expected value`() = runTest {
         advanceUntilIdle()
         val busInfos = viewModel.busInfos.getOrAwaitValue()
         assertTrue("BusInfos should not be empty", busInfos.isNotEmpty())
@@ -49,7 +49,7 @@ class StopDetailViewModelTest {
 
     @ExperimentalCoroutinesApi
     @Test
-    fun whenStopIdIsInvalid_busInfosIsEmpty() = runTest {
+    fun `when stopId invalid then busInfos should be empty`() = runTest {
         val invalidStopId = "0"
         val savedStateHandle = SavedStateHandle()
         savedStateHandle.set(STOP_ID_KEY, invalidStopId)
@@ -62,7 +62,7 @@ class StopDetailViewModelTest {
 
     @ExperimentalCoroutinesApi
     @Test
-    fun whenBusArrivalInfoLoaded_infosContainExpectedValues() = runTest {
+    fun `when bus arrival info loaded then should contain expected values`() = runTest {
         advanceUntilIdle()
         val busInfos = viewModel.busInfos.getOrAwaitValue()
         assertTrue("BusInfos should not be empty", busInfos.isNotEmpty())
@@ -73,22 +73,18 @@ class StopDetailViewModelTest {
         assertTrue(arrivalInfo.congestion in CONGESTION_VALUES)
     }
 
-    @Test
-    fun whenDataLoadingStarted_IsLoadingIsTrue() {
-        val isLoading = viewModel.isLoading.getOrAwaitValue()
-        assertTrue(isLoading)
-    }
-
     @ExperimentalCoroutinesApi
     @Test
-    fun whenDataLoadingCompleted_IsLoadingIsFalse() = runTest {
+    fun `when data loading starts and completes then isLoading should be true then false`() = runTest {
+        var isLoading = viewModel.isLoading.getOrAwaitValue()
+        assertTrue(isLoading)
         advanceUntilIdle()
-        val isLoading = viewModel.isLoading.getOrAwaitValue()
+        isLoading = viewModel.isLoading.getOrAwaitValue()
         assertFalse(isLoading)
     }
 
     @Test
-    fun whenInitialized_stopIdEqualsExpectedValue() {
+    fun `when initialized then stopId should match expected value`() {
         val stopId = viewModel.stopId.getOrAwaitValue()
         assertEquals(TEST_STOP_ID, stopId)
     }
