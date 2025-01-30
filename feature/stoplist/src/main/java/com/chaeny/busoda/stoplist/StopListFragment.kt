@@ -42,11 +42,20 @@ class StopListFragment : Fragment() {
 
     private fun subscribeRemoveEvent() {
         viewModel.removeCompleted.observe(viewLifecycleOwner) { event ->
-            event.getContentIfNotHandled()?.let { resId ->
-                val message = getString(resId)
-                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+            event.getContentIfNotHandled()?.let { result ->
+                showToast(getRemoveMessage(result))
             }
         }
+    }
+
+    private fun getRemoveMessage(result: RemoveResult): String {
+        return when (result) {
+            RemoveResult.SUCCESS -> getString(R.string.remove_stop_completed)
+        }
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 
     private fun subscribeStopClickEvent() {

@@ -7,10 +7,10 @@ import androidx.lifecycle.ViewModel
 internal class StopListViewModel : ViewModel() {
 
     private val dummyData = MutableLiveData(getDummyData())
-    private val _removeCompleted = MutableLiveData<Event<Int>>()
+    private val _removeCompleted = MutableLiveData<Event<RemoveResult>>()
     private val _busStopClicked = MutableLiveData<Event<String>>()
     val busStops: LiveData<List<BusStop>> = dummyData
-    val removeCompleted: LiveData<Event<Int>> = _removeCompleted
+    val removeCompleted: LiveData<Event<RemoveResult>> = _removeCompleted
     val busStopClicked: LiveData<Event<String>> = _busStopClicked
 
     fun removeLastStop() {
@@ -19,7 +19,7 @@ internal class StopListViewModel : ViewModel() {
             return
         }
         dummyData.value = currentStops.dropLast(1)
-        _removeCompleted.value = Event(R.string.remove_stop_completed)
+        _removeCompleted.value = Event(RemoveResult.SUCCESS)
     }
 
     fun handleBusStopClick(stopId: String) {
