@@ -23,9 +23,7 @@ class StopListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentStopListBinding.inflate(inflater, container, false)
-        val adapter = StopListAdapter { stopId ->
-            viewModel.handleBusStopClick(stopId)
-        }
+        val adapter = StopListAdapter(viewModel::handleBusStopClick)
         binding.stopList.adapter = adapter
         subscribeUi(adapter)
         setupRemoveButton()
@@ -43,13 +41,13 @@ class StopListFragment : Fragment() {
     private fun subscribeRemoveEvent() {
         viewModel.removeCompleted.observe(viewLifecycleOwner) { event ->
             event.getContentIfNotHandled()?.let { result ->
-                showToast(getRemoveMessage(result))
+                showToast(result.getRemoveMessage())
             }
         }
     }
 
-    private fun getRemoveMessage(result: RemoveResult): String {
-        return when (result) {
+    private fun RemoveResult.getRemoveMessage(): String {
+        return when (this) {
             RemoveResult.SUCCESS -> getString(R.string.remove_stop_completed)
         }
     }
