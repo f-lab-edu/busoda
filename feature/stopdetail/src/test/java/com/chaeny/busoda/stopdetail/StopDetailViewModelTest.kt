@@ -31,19 +31,17 @@ class StopDetailViewModelTest {
     }
 
     @Test
-    fun `when initialized then busInfos should be null`() {
-        val busInfos = viewModel.busInfos.value
-        assertNull(busInfos)
+    fun `when initialized then stopDetail should be null`() {
+        val stopDetail = viewModel.stopDetail.value
+        assertNull(stopDetail)
     }
 
     @ExperimentalCoroutinesApi
     @Test
     fun `when asyncDataLoad called then stopName should equal expected value`() = runTest {
         advanceUntilIdle()
-        val busInfos = viewModel.busInfos.getOrAwaitValue()
-        assertTrue("BusInfos should not be empty", busInfos.isNotEmpty())
-
-        val stopName = busInfos.first().stopName
+        val stopName = viewModel.stopDetail.getOrAwaitValue().stopName
+        assertTrue("stopName should not be empty", stopName.isNotEmpty())
         assertEquals(EXPECTED_STOP_NAME, stopName)
     }
 
@@ -56,7 +54,7 @@ class StopDetailViewModelTest {
         viewModel = StopDetailViewModel(savedStateHandle)
 
         advanceUntilIdle()
-        val busInfos = viewModel.busInfos.getOrAwaitValue()
+        val busInfos = viewModel.stopDetail.getOrAwaitValue().busInfos
         assertTrue(busInfos.isEmpty())
     }
 
@@ -64,7 +62,7 @@ class StopDetailViewModelTest {
     @Test
     fun `when bus arrival info loaded then should contain expected values`() = runTest {
         advanceUntilIdle()
-        val busInfos = viewModel.busInfos.getOrAwaitValue()
+        val busInfos = viewModel.stopDetail.getOrAwaitValue().busInfos
         assertTrue("BusInfos should not be empty", busInfos.isNotEmpty())
 
         val arrivalInfo = busInfos.first().arrivalInfos.first()
