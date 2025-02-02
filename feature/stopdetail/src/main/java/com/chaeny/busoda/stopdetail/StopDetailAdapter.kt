@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.chaeny.busoda.stopdetail.databinding.ListItemBusBinding
 
-internal class StopDetailAdapter : ListAdapter<Bus, StopDetailAdapter.BusDetailViewHolder>(BusDetailDiffCallback()) {
+internal class StopDetailAdapter : ListAdapter<BusInfo, StopDetailAdapter.BusDetailViewHolder>(BusDetailDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BusDetailViewHolder {
         return BusDetailViewHolder(
@@ -24,7 +24,7 @@ internal class StopDetailAdapter : ListAdapter<Bus, StopDetailAdapter.BusDetailV
     }
 
     class BusDetailViewHolder(private val binding: ListItemBusBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(busData: Bus) {
+        fun bind(busData: BusInfo) {
             with(binding) {
                 textBusNumber.text = busData.busNumber
                 textNextStop.text = busData.nextStopName
@@ -32,7 +32,7 @@ internal class StopDetailAdapter : ListAdapter<Bus, StopDetailAdapter.BusDetailV
             bindArrivalInfos(busData, binding)
         }
 
-        private fun bindArrivalInfos(busData: Bus, binding: ListItemBusBinding) {
+        private fun bindArrivalInfos(busData: BusInfo, binding: ListItemBusBinding) {
             with(binding) {
                 firstArrivalInfoView.bindArrivalInfo(busData.arrivalInfos.getOrNull(0), 0)
                 secondArrivalInfoView.bindArrivalInfo(busData.arrivalInfos.getOrNull(1), 1)
@@ -41,12 +41,12 @@ internal class StopDetailAdapter : ListAdapter<Bus, StopDetailAdapter.BusDetailV
     }
 }
 
-private class BusDetailDiffCallback : DiffUtil.ItemCallback<Bus>() {
-    override fun areItemsTheSame(oldItem: Bus, newItem: Bus): Boolean {
+private class BusDetailDiffCallback : DiffUtil.ItemCallback<BusInfo>() {
+    override fun areItemsTheSame(oldItem: BusInfo, newItem: BusInfo): Boolean {
         return oldItem.busNumber == newItem.busNumber
     }
 
-    override fun areContentsTheSame(oldItem: Bus, newItem: Bus): Boolean {
+    override fun areContentsTheSame(oldItem: BusInfo, newItem: BusInfo): Boolean {
         return oldItem == newItem
     }
 }

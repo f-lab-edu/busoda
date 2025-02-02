@@ -32,13 +32,14 @@ class StopDetailFragment : Fragment() {
                 if (isLoading) View.VISIBLE else View.GONE
         }
 
-        viewModel.busInfos.observe(viewLifecycleOwner) { buses ->
+        viewModel.stopDetail.observe(viewLifecycleOwner) { stopDetail ->
             with(binding) {
                 textBusStopId.visibility = View.VISIBLE
-                textBusStopName.text = buses.firstOrNull()?.stopName
-                    ?: binding.root.context.getString(R.string.no_info)
+                textBusStopName.text = stopDetail.stopName.ifEmpty {
+                    requireContext().getString(R.string.no_info)
+                }
             }
-            adapter.submitList(buses)
+            adapter.submitList(stopDetail.busInfos)
         }
     }
 
