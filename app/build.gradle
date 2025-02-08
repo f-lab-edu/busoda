@@ -51,7 +51,3 @@ dependencies {
     implementation project(":feature:stoplist")
     implementation project(":feature:stopdetail")
 }
-
-kapt {
-    correctErrorTypes true
-}
