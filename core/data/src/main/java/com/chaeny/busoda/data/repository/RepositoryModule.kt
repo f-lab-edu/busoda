@@ -1,7 +1,5 @@
-package com.chaeny.busoda.stoplist
+package com.chaeny.busoda.data.repository
 
-import com.chaeny.busoda.data.repository.BusStopRepository
-import com.chaeny.busoda.data.repository.DummyBusStopRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
