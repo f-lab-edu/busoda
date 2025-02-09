@@ -13,4 +13,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindBusStopRepository(implementation: DummyBusStopRepository): BusStopRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindBusStopDetailRepository(implementation: DummyBusStopDetailRepository): BusStopDetailRepository
 }
