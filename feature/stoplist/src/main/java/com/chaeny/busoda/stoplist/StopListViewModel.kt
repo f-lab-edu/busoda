@@ -3,11 +3,12 @@ package com.chaeny.busoda.stoplist
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.chaeny.busoda.data.repository.BusStopRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-internal class StopListViewModel @Inject constructor() : ViewModel() {
+internal class StopListViewModel @Inject constructor(private val repository: BusStopRepository) : ViewModel() {
 
     private val dummyData = MutableLiveData(getDummyData())
     private val _removeCompleted = MutableLiveData<Event<RemoveResult>>()

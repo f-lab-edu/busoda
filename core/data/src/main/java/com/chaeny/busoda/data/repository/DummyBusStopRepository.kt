@@ -1,8 +1,9 @@
 package com.chaeny.busoda.data.repository
 
 import com.chaeny.busoda.model.BusStop
+import javax.inject.Inject
 
-class DummyBusStopRepository : BusStopRepository {
+class DummyBusStopRepository @Inject constructor() : BusStopRepository {
     override fun getBusStops() = listOf(
         BusStop("16206", "화곡역4번출구", "화곡본동시장"),
         BusStop("16146", "화곡본동시장", "한국폴리텍1.서울강서대학교"),
