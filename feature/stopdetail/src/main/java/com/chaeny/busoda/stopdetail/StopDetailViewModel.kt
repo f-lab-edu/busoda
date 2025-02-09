@@ -5,6 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.chaeny.busoda.model.BusArrivalInfo
+import com.chaeny.busoda.model.BusInfo
+import com.chaeny.busoda.model.BusStopDetail
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 

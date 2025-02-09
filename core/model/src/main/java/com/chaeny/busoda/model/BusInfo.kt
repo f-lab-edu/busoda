@@ -1,6 +1,6 @@
-package com.chaeny.busoda.stopdetail
+package com.chaeny.busoda.model
 
-internal data class BusInfo(
+data class BusInfo(
     val busNumber: String,
     val nextStopName: String,
     val arrivalInfos: List<BusArrivalInfo>

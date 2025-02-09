@@ -1,6 +1,6 @@
-package com.chaeny.busoda.stopdetail
+package com.chaeny.busoda.model
 
-internal data class BusArrivalInfo(
+data class BusArrivalInfo(
     val arrivalTime: String,
     val position: String,
     val congestion: String
