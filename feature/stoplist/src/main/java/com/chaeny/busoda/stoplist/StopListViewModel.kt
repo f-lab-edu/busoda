@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.chaeny.busoda.data.repository.BusStopRepository
+import com.chaeny.busoda.model.BusStop
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 

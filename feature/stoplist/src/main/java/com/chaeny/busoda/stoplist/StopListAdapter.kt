@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.chaeny.busoda.model.BusStop
 import com.chaeny.busoda.stoplist.databinding.ListItemStopBinding
 
 internal class StopListAdapter(private val handleBusStopClick: (String) -> Unit) :
