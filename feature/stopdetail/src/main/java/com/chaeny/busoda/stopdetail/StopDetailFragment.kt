@@ -7,7 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import com.chaeny.busoda.stopdetail.databinding.FragmentStopDetailBinding
 import androidx.fragment.app.viewModels
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class StopDetailFragment : Fragment() {
 
     private lateinit var binding: FragmentStopDetailBinding
