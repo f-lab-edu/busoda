@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.model.BusStopDetail
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -32,7 +31,6 @@ internal class StopDetailViewModel @Inject constructor(
     private fun asyncDataLoad() {
         isLoadingData.value = true
         viewModelScope.launch {
-            delay(3000)
             dummyData.value = busStopDetailRepository.getBusStopDetail(stopIdData.value!!)
             isLoadingData.value = false
         }

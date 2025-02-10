@@ -3,6 +3,7 @@ package com.chaeny.busoda.data.repository
 import com.chaeny.busoda.model.BusArrivalInfo
 import com.chaeny.busoda.model.BusInfo
 import com.chaeny.busoda.model.BusStopDetail
+import kotlinx.coroutines.delay
 import javax.inject.Inject
 
 class DummyBusStopDetailRepository @Inject constructor() : BusStopDetailRepository {
@@ -112,7 +113,8 @@ class DummyBusStopDetailRepository @Inject constructor() : BusStopDetailReposito
         )
     )
 
-    override fun getBusStopDetail(stopId: String): BusStopDetail {
+    override suspend fun getBusStopDetail(stopId: String): BusStopDetail {
+        delay(3000)
         return dummyData[stopId] ?: BusStopDetail("", emptyList())
     }
 }
