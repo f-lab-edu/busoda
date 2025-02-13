@@ -117,4 +117,9 @@ class DummyBusStopDetailRepository @Inject constructor() : BusStopDetailReposito
         delay(3000)
         return dummyData[stopId] ?: BusStopDetail("", emptyList())
     }
+
+    override fun getNextStopName(stopId: String): String {
+        val firstBusInfo = dummyData[stopId]?.busInfos?.firstOrNull()
+        return firstBusInfo?.nextStopName ?: ""
+    }
 }
