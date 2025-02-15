@@ -6,5 +6,5 @@ interface BusStopDetailRepository {
 
     suspend fun getBusStopDetail(stopId: String): BusStopDetail
 
-    fun getNextStopName(stopId: String): String
+    suspend fun getNextStopName(stopId: String): String
 }
