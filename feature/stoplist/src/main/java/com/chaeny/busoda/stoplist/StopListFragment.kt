@@ -38,6 +38,11 @@ class StopListFragment : Fragment() {
     }
 
     private fun subscribeUi(adapter: StopListAdapter) {
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.stopListLoadingBar.visibility =
+                if (isLoading) View.VISIBLE else View.GONE
+        }
+
         viewModel.busStops.observe(viewLifecycleOwner) { stops ->
             adapter.submitList(stops)
         }

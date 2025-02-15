@@ -22,15 +22,18 @@ internal class StopListViewModel @Inject constructor(
     private val dummyData = MutableLiveData<List<BusStop>>()
     private val _removeCompleted = MutableLiveData<Event<RemoveResult>>()
     private val _busStopClicked = MutableLiveData<Event<String>>()
+    private val _isLoading = MutableLiveData<Boolean>()
     val busStops: LiveData<List<BusStop>> = dummyData
     val removeCompleted: LiveData<Event<RemoveResult>> = _removeCompleted
     val busStopClicked: LiveData<Event<String>> = _busStopClicked
+    val isLoading: LiveData<Boolean> = _isLoading
 
     init {
         loadBusStops()
     }
 
     private fun loadBusStops() {
+        _isLoading.value = true
         val stops = busStopRepository.getBusStops()
         val jobs = mutableListOf<Job>()
 
@@ -43,6 +46,7 @@ internal class StopListViewModel @Inject constructor(
             }
             jobs.joinAll()
             dummyData.value = stops
+            _isLoading.value = false
         }
     }
 
