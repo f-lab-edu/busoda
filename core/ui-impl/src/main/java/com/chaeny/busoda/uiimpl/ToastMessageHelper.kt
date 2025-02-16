@@ -1,4 +1,4 @@
-package com.chaeny.busoda.stopdetail
+package com.chaeny.busoda.uiimpl
 
 import android.content.Context
 import android.widget.Toast
