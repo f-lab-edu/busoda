@@ -36,9 +36,9 @@ internal class StopListViewModel @Inject constructor(
         _isLoading.value = true
         val stops = busStopRepository.getBusStops()
         viewModelScope.launch {
-            val updatedStops = stops.map {
+            val updatedStops = stops.map { stop ->
                 async {
-                    it.copy(nextStopName = busStopDetailRepository.getNextStopName(it.stopId))
+                    stop.copy(nextStopName = busStopDetailRepository.getNextStopName(stop.stopId))
                 }
             }.awaitAll()
             dummyData.value = updatedStops
