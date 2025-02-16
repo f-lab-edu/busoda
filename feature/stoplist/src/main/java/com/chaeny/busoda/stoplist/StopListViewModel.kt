@@ -8,8 +8,8 @@ import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.data.repository.BusStopRepository
 import com.chaeny.busoda.model.BusStop
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -35,17 +35,13 @@ internal class StopListViewModel @Inject constructor(
     private fun loadBusStops() {
         _isLoading.value = true
         val stops = busStopRepository.getBusStops()
-        val jobs = mutableListOf<Job>()
-
         viewModelScope.launch {
-            stops.forEach { stop ->
-                val job = launch {
-                    stop.nextStopName = busStopDetailRepository.getNextStopName(stop.stopId)
+            val updatedStops = stops.map {
+                async {
+                    it.copy(nextStopName = busStopDetailRepository.getNextStopName(it.stopId))
                 }
-                jobs.add(job)
-            }
-            jobs.joinAll()
-            dummyData.value = stops
+            }.awaitAll()
+            dummyData.value = updatedStops
             _isLoading.value = false
         }
     }
