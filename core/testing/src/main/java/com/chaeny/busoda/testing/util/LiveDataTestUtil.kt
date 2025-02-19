@@ -1,4 +1,4 @@
-package com.chaeny.busoda.stoplist.util
+package com.chaeny.busoda.testing.util
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer

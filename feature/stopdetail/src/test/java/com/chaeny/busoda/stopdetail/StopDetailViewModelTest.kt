@@ -6,8 +6,8 @@ import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.model.BusArrivalInfo
 import com.chaeny.busoda.model.BusInfo
 import com.chaeny.busoda.model.BusStopDetail
-import com.chaeny.busoda.stopdetail.util.MainCoroutineScopeRule
-import com.chaeny.busoda.stopdetail.util.getOrAwaitValue
+import com.chaeny.busoda.testing.util.MainCoroutineScopeRule
+import com.chaeny.busoda.testing.util.getOrAwaitValue
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi

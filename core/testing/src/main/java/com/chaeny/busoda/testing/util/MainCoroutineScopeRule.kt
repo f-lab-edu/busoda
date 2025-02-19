@@ -1,4 +1,4 @@
-package com.chaeny.busoda.stoplist.util
+package com.chaeny.busoda.testing.util
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

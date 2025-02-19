@@ -4,8 +4,8 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.data.repository.BusStopRepository
 import com.chaeny.busoda.model.BusStop
-import com.chaeny.busoda.stoplist.util.MainCoroutineScopeRule
-import com.chaeny.busoda.stoplist.util.getOrAwaitValue
+import com.chaeny.busoda.testing.util.getOrAwaitValue
+import com.chaeny.busoda.testing.util.MainCoroutineScopeRule
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
