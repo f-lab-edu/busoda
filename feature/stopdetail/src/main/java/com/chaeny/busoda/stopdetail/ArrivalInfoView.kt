@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
+import com.chaeny.busoda.model.BusArrivalInfo
 import com.chaeny.busoda.stopdetail.databinding.ArrivalInfoViewBinding
 
 class ArrivalInfoView @JvmOverloads constructor(

@@ -7,7 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import com.chaeny.busoda.stopdetail.databinding.FragmentStopDetailBinding
 import androidx.fragment.app.viewModels
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class StopDetailFragment : Fragment() {
 
     private lateinit var binding: FragmentStopDetailBinding
@@ -28,17 +30,18 @@ class StopDetailFragment : Fragment() {
 
     private fun subscribeUi(adapter: StopDetailAdapter) {
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            binding.listLoadingBar.visibility =
+            binding.busListLoadingBar.visibility =
                 if (isLoading) View.VISIBLE else View.GONE
         }
 
-        viewModel.busInfos.observe(viewLifecycleOwner) { buses ->
+        viewModel.stopDetail.observe(viewLifecycleOwner) { stopDetail ->
             with(binding) {
                 textBusStopId.visibility = View.VISIBLE
-                textBusStopName.text = buses.firstOrNull()?.stopName
-                    ?: binding.root.context.getString(R.string.no_info)
+                textBusStopName.text = stopDetail.stopName.ifEmpty {
+                    requireContext().getString(R.string.no_info)
+                }
             }
-            adapter.submitList(buses)
+            adapter.submitList(stopDetail.busInfos)
         }
     }
 

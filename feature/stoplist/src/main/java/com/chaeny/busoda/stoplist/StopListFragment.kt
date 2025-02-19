@@ -5,17 +5,22 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.fragment.findNavController
 import com.chaeny.busoda.stoplist.databinding.FragmentStopListBinding
+import com.chaeny.busoda.ui.MessageHelper
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class StopListFragment : Fragment() {
 
     private lateinit var binding: FragmentStopListBinding
     private val viewModel: StopListViewModel by viewModels()
+    @Inject
+    lateinit var messageHelper: MessageHelper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,6 +38,11 @@ class StopListFragment : Fragment() {
     }
 
     private fun subscribeUi(adapter: StopListAdapter) {
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.stopListLoadingBar.visibility =
+                if (isLoading) View.VISIBLE else View.GONE
+        }
+
         viewModel.busStops.observe(viewLifecycleOwner) { stops ->
             adapter.submitList(stops)
         }
@@ -41,7 +51,7 @@ class StopListFragment : Fragment() {
     private fun subscribeRemoveEvent() {
         viewModel.removeCompleted.observe(viewLifecycleOwner) { event ->
             event.getContentIfNotHandled()?.let { result ->
-                showToast(result.getRemoveMessage())
+                messageHelper.showMessage(requireContext(), result.getRemoveMessage())
             }
         }
     }
@@ -50,10 +60,6 @@ class StopListFragment : Fragment() {
         return when (this) {
             RemoveResult.SUCCESS -> getString(R.string.remove_stop_completed)
         }
-    }
-
-    private fun showToast(message: String) {
-        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 
     private fun subscribeStopClickEvent() {

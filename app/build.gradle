@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.kapt)
 }
 
 android {
@@ -33,6 +35,9 @@ android {
 }
 
 dependencies {
+    implementation libs.hilt.android
+    kapt libs.hilt.compiler
+
     implementation libs.navigation.fragment
     implementation libs.navigation.ui
 
@@ -45,4 +50,5 @@ dependencies {
 
     implementation project(":feature:stoplist")
     implementation project(":feature:stopdetail")
+    implementation project(":core:ui-impl")
 }
