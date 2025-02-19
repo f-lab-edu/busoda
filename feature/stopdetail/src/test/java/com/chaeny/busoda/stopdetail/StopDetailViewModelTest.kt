@@ -9,6 +9,7 @@ import com.chaeny.busoda.model.BusStopDetail
 import com.chaeny.busoda.testing.util.MainCoroutineScopeRule
 import com.chaeny.busoda.testing.util.getOrAwaitValue
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.*
@@ -27,57 +28,52 @@ class StopDetailViewModelTest {
 
     private lateinit var viewModel: StopDetailViewModel
     private lateinit var repository: BusStopDetailRepository
+    private lateinit var savedStateHandle: SavedStateHandle
 
     @Before
-    fun initViewModel() {
-        val savedStateHandle = SavedStateHandle()
+    fun setup() {
+        repository = mockk()
+        savedStateHandle = SavedStateHandle()
         savedStateHandle.set(STOP_ID_KEY, TEST_STOP_ID)
-        repository = mockk {
-            coEvery { getBusStopDetail(TEST_STOP_ID) } returns TEST_STOP_DETAIL
-        }
+    }
+
+    private fun initViewModel() {
+        coEvery { repository.getBusStopDetail(TEST_STOP_ID) } returns TEST_STOP_DETAIL
         viewModel = StopDetailViewModel(repository, savedStateHandle)
     }
 
     @Test
-    fun `when asyncDataLoad called then stopName should equal expected value`() {
-        val stopName = viewModel.stopDetail.getOrAwaitValue().stopName
-        assertTrue("stopName should not be empty", stopName.isNotEmpty())
-        assertEquals(EXPECTED_STOP_NAME, stopName)
+    fun `when asyncDataLoad called then stopDetail should equal expected value`() {
+        initViewModel()
+        val stopDetail = viewModel.stopDetail.getOrAwaitValue()
+        assertEquals(TEST_STOP_DETAIL, stopDetail)
     }
 
     @Test
-    fun `when stopId invalid then busInfos should be empty`() {
+    fun `when stopId invalid then stopDetail should equal expected value`() {
         val invalidStopId = "0"
-        val savedStateHandle = SavedStateHandle()
         savedStateHandle.set(STOP_ID_KEY, invalidStopId)
-        repository = mockk {
-            coEvery { getBusStopDetail(invalidStopId) } returns EMPTY_STOP_DETAIL
-        }
+        coEvery { repository.getBusStopDetail(invalidStopId) } returns EMPTY_STOP_DETAIL
         viewModel = StopDetailViewModel(repository, savedStateHandle)
 
-        val busInfos = viewModel.stopDetail.getOrAwaitValue().busInfos
-        assertTrue(busInfos.isEmpty())
-    }
-
-    @Test
-    fun `when bus arrival info loaded then should contain expected values`() {
-        val busInfos = viewModel.stopDetail.getOrAwaitValue().busInfos
-        assertTrue("BusInfos should not be empty", busInfos.isNotEmpty())
-
-        val arrivalInfo = busInfos.first().arrivalInfos.first()
-        assertTrue(EXPECTED_TIME_UNIT in arrivalInfo.arrivalTime)
-        assertTrue(EXPECTED_POSITION_UNIT in arrivalInfo.position)
-        assertTrue(arrivalInfo.congestion in CONGESTION_VALUES)
+        val stopDetail = viewModel.stopDetail.getOrAwaitValue()
+        assertEquals(EMPTY_STOP_DETAIL, stopDetail)
     }
 
     @Test
     fun `when data loading completes then isLoading should be false`() {
+        initViewModel()
+        coVerify {
+            repository.getBusStopDetail(any())
+        }
+
         val isLoading = viewModel.isLoading.getOrAwaitValue()
         assertFalse(isLoading)
     }
 
     @Test
     fun `when initialized then stopId should match expected value`() {
+        initViewModel()
         val stopId = viewModel.stopId.getOrAwaitValue()
         assertEquals(TEST_STOP_ID, stopId)
     }
@@ -85,10 +81,6 @@ class StopDetailViewModelTest {
     companion object {
         private const val STOP_ID_KEY = "stopId"
         private const val TEST_STOP_ID = "16206"
-        private const val EXPECTED_STOP_NAME = "화곡역4번출구"
-        private const val EXPECTED_TIME_UNIT = "분"
-        private const val EXPECTED_POSITION_UNIT = "번째"
-        private val CONGESTION_VALUES = listOf("여유", "보통", "혼잡", "매우혼잡")
         private val EMPTY_STOP_DETAIL = BusStopDetail("", emptyList())
         private val TEST_STOP_DETAIL = BusStopDetail(
             "화곡역4번출구", listOf(
