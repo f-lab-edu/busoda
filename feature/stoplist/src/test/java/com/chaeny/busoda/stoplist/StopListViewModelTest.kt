@@ -34,13 +34,6 @@ class StopListViewModelTest {
         busStopDetailRepository = mockk()
     }
 
-    private fun initViewModel() {
-        coEvery { busStopRepository.getBusStops() } returns TEST_BUS_STOPS
-        coEvery { busStopDetailRepository.getNextStopName("16206") } returns "화곡본동시장"
-        coEvery { busStopDetailRepository.getNextStopName("16146") } returns "한국폴리텍1.서울강서대학교"
-        viewModel = StopListViewModel(busStopRepository, busStopDetailRepository)
-    }
-
     private fun initViewModel(
         busStops: List<BusStop>, nextStopNames: Map<String, String>
     ): StopListViewModel {
@@ -76,7 +69,7 @@ class StopListViewModelTest {
 
     @Test
     fun `when data loading completes then isLoading should be false`() {
-        initViewModel()
+        initViewModel(TEST_BUS_STOPS, TEST_NEXT_STOP_NAMES)
         coVerify {
             busStopRepository.getBusStops()
             busStopDetailRepository.getNextStopName(any())
@@ -87,7 +80,7 @@ class StopListViewModelTest {
 
     @Test
     fun `when stop selected then should emit event with correct expected value`() {
-        initViewModel()
+        initViewModel(TEST_BUS_STOPS, TEST_NEXT_STOP_NAMES)
         viewModel.handleBusStopClick(EXPECTED_STOP_ID)
         val clickEvent = viewModel.busStopClicked.getOrAwaitValue()
         assertEquals(EXPECTED_STOP_ID, clickEvent.getContentIfNotHandled())
@@ -95,7 +88,7 @@ class StopListViewModelTest {
 
     @Test
     fun `when last stop removed then should decrease size and emit success`() {
-        initViewModel()
+        initViewModel(TEST_BUS_STOPS, TEST_NEXT_STOP_NAMES)
         val expectedSize = viewModel.busStops.getOrAwaitValue().size - 1
         viewModel.removeLastStop()
         val busStopsSize = viewModel.busStops.getOrAwaitValue().size
@@ -110,6 +103,10 @@ class StopListViewModelTest {
         private val TEST_BUS_STOPS = listOf(
             BusStop("16206", "화곡역4번출구"),
             BusStop("16146", "화곡본동시장")
+        )
+        private val TEST_NEXT_STOP_NAMES = mapOf(
+            "16206" to "화곡본동시장",
+            "16146" to "한국폴리텍1.서울강서대학교"
         )
     }
 }
