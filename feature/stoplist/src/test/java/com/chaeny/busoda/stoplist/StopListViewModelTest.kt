@@ -41,11 +41,37 @@ class StopListViewModelTest {
         viewModel = StopListViewModel(busStopRepository, busStopDetailRepository)
     }
 
+    private fun initViewModel(
+        busStops: List<BusStop>, nextStopNames: Map<String, String>
+    ): StopListViewModel {
+        coEvery { busStopRepository.getBusStops() } returns busStops
+        nextStopNames.forEach { (stopId, nextStop) ->
+            coEvery { busStopDetailRepository.getNextStopName(stopId) } returns nextStop
+        }
+        return StopListViewModel(busStopRepository, busStopDetailRepository)
+    }
+
     @Test
     fun `when initialized then busStops should include nextStopName`() {
-        initViewModel()
+        val inputBusStops = listOf(
+            BusStop("16206", "화곡역4번출구"),
+            BusStop("16146", "화곡본동시장")
+        )
+        val nextStopNames = mapOf(
+            "16206" to "화곡본동시장",
+            "16146" to "한국폴리텍1.서울강서대학교"
+        )
+        viewModel = initViewModel(inputBusStops, nextStopNames)
+        coVerify(exactly = inputBusStops.size) {
+            busStopDetailRepository.getNextStopName(any())
+        }
+
         val busStops = viewModel.busStops.getOrAwaitValue()
-        assertEquals(EXPECTED_BUS_STOPS, busStops)
+        val expectedBusStops = listOf(
+            BusStop("16206", "화곡역4번출구", "화곡본동시장"),
+            BusStop("16146", "화곡본동시장", "한국폴리텍1.서울강서대학교")
+        )
+        assertEquals(expectedBusStops, busStops)
     }
 
     @Test
@@ -55,7 +81,6 @@ class StopListViewModelTest {
             busStopRepository.getBusStops()
             busStopDetailRepository.getNextStopName(any())
         }
-
         val isLoading = viewModel.isLoading.getOrAwaitValue()
         assertFalse(isLoading)
     }
@@ -85,10 +110,6 @@ class StopListViewModelTest {
         private val TEST_BUS_STOPS = listOf(
             BusStop("16206", "화곡역4번출구"),
             BusStop("16146", "화곡본동시장")
-        )
-        private val EXPECTED_BUS_STOPS = listOf(
-            BusStop("16206", "화곡역4번출구", "화곡본동시장"),
-            BusStop("16146", "화곡본동시장", "한국폴리텍1.서울강서대학교")
         )
     }
 }
