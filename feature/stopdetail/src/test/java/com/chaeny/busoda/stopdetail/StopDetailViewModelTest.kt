@@ -34,17 +34,20 @@ class StopDetailViewModelTest {
     fun setup() {
         repository = mockk()
         savedStateHandle = SavedStateHandle()
-        savedStateHandle.set(STOP_ID_KEY, TEST_STOP_ID)
     }
 
-    private fun initViewModel() {
-        coEvery { repository.getBusStopDetail(TEST_STOP_ID) } returns TEST_STOP_DETAIL
-        viewModel = StopDetailViewModel(repository, savedStateHandle)
+    private fun initViewModel(
+        stopId: String = TEST_STOP_ID,
+        stopDetail: BusStopDetail = TEST_STOP_DETAIL
+    ): StopDetailViewModel {
+        savedStateHandle.set("stopId", stopId)
+        coEvery { repository.getBusStopDetail(stopId) } returns stopDetail
+        return StopDetailViewModel(repository, savedStateHandle)
     }
 
     @Test
     fun `when asyncDataLoad called then stopDetail should equal expected value`() {
-        initViewModel()
+        viewModel = initViewModel()
         val stopDetail = viewModel.stopDetail.getOrAwaitValue()
         assertEquals(TEST_STOP_DETAIL, stopDetail)
     }
@@ -52,9 +55,7 @@ class StopDetailViewModelTest {
     @Test
     fun `when stopId invalid then stopDetail should equal expected value`() {
         val invalidStopId = "0"
-        savedStateHandle.set(STOP_ID_KEY, invalidStopId)
-        coEvery { repository.getBusStopDetail(invalidStopId) } returns EMPTY_STOP_DETAIL
-        viewModel = StopDetailViewModel(repository, savedStateHandle)
+        viewModel = initViewModel(stopId = invalidStopId, stopDetail = EMPTY_STOP_DETAIL)
 
         val stopDetail = viewModel.stopDetail.getOrAwaitValue()
         assertEquals(EMPTY_STOP_DETAIL, stopDetail)
@@ -62,7 +63,7 @@ class StopDetailViewModelTest {
 
     @Test
     fun `when data loading completes then isLoading should be false`() {
-        initViewModel()
+        viewModel = initViewModel()
         coVerify {
             repository.getBusStopDetail(any())
         }
@@ -73,13 +74,12 @@ class StopDetailViewModelTest {
 
     @Test
     fun `when initialized then stopId should match expected value`() {
-        initViewModel()
+        viewModel = initViewModel()
         val stopId = viewModel.stopId.getOrAwaitValue()
         assertEquals(TEST_STOP_ID, stopId)
     }
 
     companion object {
-        private const val STOP_ID_KEY = "stopId"
         private const val TEST_STOP_ID = "16206"
         private val EMPTY_STOP_DETAIL = BusStopDetail("", emptyList())
         private val TEST_STOP_DETAIL = BusStopDetail(
