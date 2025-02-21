@@ -35,16 +35,10 @@ class StopListViewModelTest {
     }
 
     private fun initViewModel(
-        busStops: List<BusStop> = listOf(
-            BusStop("16206", "화곡역4번출구"),
-            BusStop("16146", "화곡본동시장")
-        ),
-        nextStopNames: Map<String, String> = mapOf(
-            "16206" to "화곡본동시장",
-            "16146" to "한국폴리텍1.서울강서대학교"
-        )
+        initialBusStops: List<BusStop> = TEST_BUS_STOPS,
+        nextStopNames: Map<String, String> = TEST_NEXT_STOP_NAMES
     ): StopListViewModel {
-        coEvery { busStopRepository.getBusStops() } returns busStops
+        coEvery { busStopRepository.getBusStops() } returns initialBusStops
         nextStopNames.forEach { (stopId, nextStop) ->
             coEvery { busStopDetailRepository.getNextStopName(stopId) } returns nextStop
         }
@@ -52,8 +46,8 @@ class StopListViewModelTest {
     }
 
     @Test
-    fun `when initialized then busStops should include nextStopName`() {
-        val inputBusStops = listOf(
+    fun `when initialized then updatedBusStops should include nextStopName`() {
+        val initialBusStops = listOf(
             BusStop("16206", "화곡역4번출구"),
             BusStop("16146", "화곡본동시장")
         )
@@ -61,17 +55,17 @@ class StopListViewModelTest {
             "16206" to "화곡본동시장",
             "16146" to "한국폴리텍1.서울강서대학교"
         )
-        viewModel = initViewModel(inputBusStops, nextStopNames)
-        coVerify(exactly = inputBusStops.size) {
+        viewModel = initViewModel(initialBusStops, nextStopNames)
+        coVerify(exactly = initialBusStops.size) {
             busStopDetailRepository.getNextStopName(any())
         }
 
-        val busStops = viewModel.busStops.getOrAwaitValue()
+        val updatedBusStops = viewModel.busStops.getOrAwaitValue()
         val expectedBusStops = listOf(
             BusStop("16206", "화곡역4번출구", "화곡본동시장"),
             BusStop("16146", "화곡본동시장", "한국폴리텍1.서울강서대학교")
         )
-        assertEquals(expectedBusStops, busStops)
+        assertEquals(expectedBusStops, updatedBusStops)
     }
 
     @Test
@@ -107,5 +101,13 @@ class StopListViewModelTest {
 
     companion object {
         private const val EXPECTED_STOP_ID = "16206"
+        private val TEST_BUS_STOPS = listOf(
+            BusStop("16206", "화곡역4번출구"),
+            BusStop("16146", "화곡본동시장")
+        )
+        private val TEST_NEXT_STOP_NAMES = mapOf(
+            "16206" to "화곡본동시장",
+            "16146" to "한국폴리텍1.서울강서대학교"
+        )
     }
 }
