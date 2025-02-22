@@ -40,25 +40,30 @@ class StopDetailViewModelTest {
         stopId: String = TEST_STOP_ID,
         stopDetail: BusStopDetail = TEST_STOP_DETAIL
     ): StopDetailViewModel {
-        savedStateHandle.set("stopId", stopId)
-        coEvery { repository.getBusStopDetail(stopId) } returns stopDetail
+        stubBusStopDetail(stopId, stopDetail)
+        savedStateHandle.set(STOP_ID_KEY, stopId)
         return StopDetailViewModel(repository, savedStateHandle)
     }
 
+    private fun stubBusStopDetail(stopId: String, stopDetail: BusStopDetail) {
+        coEvery { repository.getBusStopDetail(stopId) } returns stopDetail
+    }
+
     @Test
-    fun `when asyncDataLoad called then stopDetail should equal expected value`() {
-        viewModel = initViewModel()
-        val stopDetail = viewModel.stopDetail.getOrAwaitValue()
-        assertEquals(TEST_STOP_DETAIL, stopDetail)
+    fun `when asyncDataLoad called then stopId and stopDetail should equal expected value`() {
+        viewModel = initViewModel(stopId = TEST_STOP_ID, stopDetail = TEST_STOP_DETAIL)
+        val observedStopId = viewModel.stopId.getOrAwaitValue()
+        assertEquals(TEST_STOP_ID, observedStopId)
+
+        val observedStopDetail = viewModel.stopDetail.getOrAwaitValue()
+        assertEquals(TEST_STOP_DETAIL, observedStopDetail)
     }
 
     @Test
     fun `when stopId invalid then stopDetail should equal expected value`() {
-        val invalidStopId = "0"
-        viewModel = initViewModel(stopId = invalidStopId, stopDetail = EMPTY_STOP_DETAIL)
-
-        val stopDetail = viewModel.stopDetail.getOrAwaitValue()
-        assertEquals(EMPTY_STOP_DETAIL, stopDetail)
+        viewModel = initViewModel(stopId = INVALID_STOP_ID, stopDetail = EMPTY_STOP_DETAIL)
+        val observedStopDetail = viewModel.stopDetail.getOrAwaitValue()
+        assertEquals(EMPTY_STOP_DETAIL, observedStopDetail)
     }
 
     @Test
@@ -67,20 +72,14 @@ class StopDetailViewModelTest {
         coVerify {
             repository.getBusStopDetail(any())
         }
-
         val isLoading = viewModel.isLoading.getOrAwaitValue()
         assertFalse(isLoading)
     }
 
-    @Test
-    fun `when initialized then stopId should match expected value`() {
-        viewModel = initViewModel()
-        val stopId = viewModel.stopId.getOrAwaitValue()
-        assertEquals(TEST_STOP_ID, stopId)
-    }
-
     companion object {
+        private const val STOP_ID_KEY = "stopId"
         private const val TEST_STOP_ID = "16206"
+        private const val INVALID_STOP_ID = "0"
         private val EMPTY_STOP_DETAIL = BusStopDetail("", emptyList())
         private val TEST_STOP_DETAIL = BusStopDetail(
             "화곡역4번출구", listOf(

@@ -34,14 +34,14 @@ class StopListViewModelTest {
         busStopDetailRepository = mockk()
     }
 
-        private fun initViewModel(
-            initialBusStops: List<BusStop> = TEST_BUS_STOPS,
-            nextStopNames: Map<String, String> = TEST_NEXT_STOP_NAMES
-        ): StopListViewModel {
-            stubBusStopRepository(initialBusStops)
-            stubBusStopDetailRepository(nextStopNames)
-            return StopListViewModel(busStopRepository, busStopDetailRepository)
-        }
+    private fun initViewModel(
+        initialBusStops: List<BusStop> = TEST_BUS_STOPS,
+        nextStopNames: Map<String, String> = TEST_NEXT_STOP_NAMES
+    ): StopListViewModel {
+        stubBusStopRepository(initialBusStops)
+        stubBusStopDetailRepository(nextStopNames)
+        return StopListViewModel(busStopRepository, busStopDetailRepository)
+    }
 
     private fun stubBusStopRepository(busStops: List<BusStop>) {
         coEvery { busStopRepository.getBusStops() } returns busStops
