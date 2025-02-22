@@ -2,15 +2,20 @@ package com.chaeny.busoda.stopdetail
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.SavedStateHandle
-import com.chaeny.busoda.stopdetail.util.MainCoroutineScopeRule
-import com.chaeny.busoda.stopdetail.util.getOrAwaitValue
+import com.chaeny.busoda.data.repository.BusStopDetailRepository
+import com.chaeny.busoda.model.BusArrivalInfo
+import com.chaeny.busoda.model.BusInfo
+import com.chaeny.busoda.model.BusStopDetail
+import com.chaeny.busoda.testing.util.MainCoroutineScopeRule
+import com.chaeny.busoda.testing.util.getOrAwaitValue
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.runTest
-import org.junit.Rule
-import org.junit.Before
-import org.junit.Test
 import org.junit.Assert.*
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
 
 class StopDetailViewModelTest {
 
@@ -22,79 +27,68 @@ class StopDetailViewModelTest {
     val coroutineScope = MainCoroutineScopeRule()
 
     private lateinit var viewModel: StopDetailViewModel
+    private lateinit var repository: BusStopDetailRepository
+    private lateinit var savedStateHandle: SavedStateHandle
 
     @Before
-    fun initViewModel() {
-        val savedStateHandle = SavedStateHandle()
-        savedStateHandle.set(STOP_ID_KEY, TEST_STOP_ID)
-        viewModel = StopDetailViewModel(savedStateHandle)
+    fun setup() {
+        repository = mockk()
+        savedStateHandle = SavedStateHandle()
+    }
+
+    private fun initViewModel(
+        stopId: String = TEST_STOP_ID,
+        stopDetail: BusStopDetail = TEST_STOP_DETAIL
+    ): StopDetailViewModel {
+        stubBusStopDetail(stopId, stopDetail)
+        savedStateHandle.set(STOP_ID_KEY, stopId)
+        return StopDetailViewModel(repository, savedStateHandle)
+    }
+
+    private fun stubBusStopDetail(stopId: String, stopDetail: BusStopDetail) {
+        coEvery { repository.getBusStopDetail(stopId) } returns stopDetail
     }
 
     @Test
-    fun `when initialized then busInfos should be null`() {
-        val busInfos = viewModel.busInfos.value
-        assertNull(busInfos)
+    fun `when asyncDataLoad called then stopId and stopDetail should equal expected value`() {
+        viewModel = initViewModel(TEST_STOP_ID, TEST_STOP_DETAIL)
+        val observedStopId = viewModel.stopId.getOrAwaitValue()
+        assertEquals(TEST_STOP_ID, observedStopId)
+
+        val observedStopDetail = viewModel.stopDetail.getOrAwaitValue()
+        assertEquals(TEST_STOP_DETAIL, observedStopDetail)
     }
 
-    @ExperimentalCoroutinesApi
     @Test
-    fun `when asyncDataLoad called then stopName should equal expected value`() = runTest {
-        advanceUntilIdle()
-        val busInfos = viewModel.busInfos.getOrAwaitValue()
-        assertTrue("BusInfos should not be empty", busInfos.isNotEmpty())
-
-        val stopName = busInfos.first().stopName
-        assertEquals(EXPECTED_STOP_NAME, stopName)
+    fun `when stopId invalid then stopDetail should equal expected value`() {
+        viewModel = initViewModel(INVALID_STOP_ID, EMPTY_STOP_DETAIL)
+        val observedStopDetail = viewModel.stopDetail.getOrAwaitValue()
+        assertEquals(EMPTY_STOP_DETAIL, observedStopDetail)
     }
 
-    @ExperimentalCoroutinesApi
     @Test
-    fun `when stopId invalid then busInfos should be empty`() = runTest {
-        val invalidStopId = "0"
-        val savedStateHandle = SavedStateHandle()
-        savedStateHandle.set(STOP_ID_KEY, invalidStopId)
-        viewModel = StopDetailViewModel(savedStateHandle)
-
-        advanceUntilIdle()
-        val busInfos = viewModel.busInfos.getOrAwaitValue()
-        assertTrue(busInfos.isEmpty())
-    }
-
-    @ExperimentalCoroutinesApi
-    @Test
-    fun `when bus arrival info loaded then should contain expected values`() = runTest {
-        advanceUntilIdle()
-        val busInfos = viewModel.busInfos.getOrAwaitValue()
-        assertTrue("BusInfos should not be empty", busInfos.isNotEmpty())
-
-        val arrivalInfo = busInfos.first().arrivalInfos.first()
-        assertTrue(EXPECTED_TIME_UNIT in arrivalInfo.arrivalTime)
-        assertTrue(EXPECTED_POSITION_UNIT in arrivalInfo.position)
-        assertTrue(arrivalInfo.congestion in CONGESTION_VALUES)
-    }
-
-    @ExperimentalCoroutinesApi
-    @Test
-    fun `when data loading starts and completes then isLoading should be true then false`() = runTest {
-        var isLoading = viewModel.isLoading.getOrAwaitValue()
-        assertTrue(isLoading)
-        advanceUntilIdle()
-        isLoading = viewModel.isLoading.getOrAwaitValue()
+    fun `when data loading completes then isLoading should be false`() {
+        viewModel = initViewModel()
+        coVerify {
+            repository.getBusStopDetail(any())
+        }
+        val isLoading = viewModel.isLoading.getOrAwaitValue()
         assertFalse(isLoading)
-    }
-
-    @Test
-    fun `when initialized then stopId should match expected value`() {
-        val stopId = viewModel.stopId.getOrAwaitValue()
-        assertEquals(TEST_STOP_ID, stopId)
     }
 
     companion object {
         private const val STOP_ID_KEY = "stopId"
         private const val TEST_STOP_ID = "16206"
-        private const val EXPECTED_STOP_NAME = "화곡역4번출구"
-        private const val EXPECTED_TIME_UNIT = "분"
-        private const val EXPECTED_POSITION_UNIT = "번째"
-        private val CONGESTION_VALUES = listOf("여유", "보통", "혼잡", "매우혼잡")
+        private const val INVALID_STOP_ID = "0"
+        private val EMPTY_STOP_DETAIL = BusStopDetail("", emptyList())
+        private val TEST_STOP_DETAIL = BusStopDetail(
+            "화곡역4번출구", listOf(
+                BusInfo(
+                    "604", "화곡본동시장", listOf(
+                        BusArrivalInfo("2분 38초", "2번째 전", "보통")
+                    )
+                )
+            )
+        )
     }
 }

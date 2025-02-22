@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.kapt)
 }
 
 android {
@@ -34,6 +36,9 @@ android {
 }
 
 dependencies {
+    implementation libs.hilt.android
+    kapt libs.hilt.compiler
+
     implementation libs.navigation.fragment
     implementation libs.navigation.ui
 
@@ -42,6 +47,13 @@ dependencies {
     implementation libs.material
     testImplementation libs.junit
     testImplementation libs.core.testing
+    testImplementation libs.coroutines.test
+    testImplementation libs.mockk
     androidTestImplementation libs.androidx.junit
     androidTestImplementation libs.androidx.espresso.core
+
+    implementation project(":core:data")
+    implementation project(":core:model")
+    implementation project(":core:ui")
+    testImplementation project(":core:testing")
 }
