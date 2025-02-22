@@ -51,7 +51,7 @@ class StopDetailViewModelTest {
 
     @Test
     fun `when asyncDataLoad called then stopId and stopDetail should equal expected value`() {
-        viewModel = initViewModel(stopId = TEST_STOP_ID, stopDetail = TEST_STOP_DETAIL)
+        viewModel = initViewModel(TEST_STOP_ID, TEST_STOP_DETAIL)
         val observedStopId = viewModel.stopId.getOrAwaitValue()
         assertEquals(TEST_STOP_ID, observedStopId)
 
@@ -61,7 +61,7 @@ class StopDetailViewModelTest {
 
     @Test
     fun `when stopId invalid then stopDetail should equal expected value`() {
-        viewModel = initViewModel(stopId = INVALID_STOP_ID, stopDetail = EMPTY_STOP_DETAIL)
+        viewModel = initViewModel(INVALID_STOP_ID, EMPTY_STOP_DETAIL)
         val observedStopDetail = viewModel.stopDetail.getOrAwaitValue()
         assertEquals(EMPTY_STOP_DETAIL, observedStopDetail)
     }
