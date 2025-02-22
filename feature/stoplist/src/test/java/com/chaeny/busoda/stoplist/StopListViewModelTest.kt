@@ -34,15 +34,29 @@ class StopListViewModelTest {
         busStopDetailRepository = mockk()
     }
 
-    private fun initViewModel(
-        initialBusStops: List<BusStop> = TEST_BUS_STOPS,
-        nextStopNames: Map<String, String> = TEST_NEXT_STOP_NAMES
-    ): StopListViewModel {
-        coEvery { busStopRepository.getBusStops() } returns initialBusStops
+        private fun initViewModel(
+            initialBusStops: List<BusStop> = TEST_BUS_STOPS,
+            nextStopNames: Map<String, String> = TEST_NEXT_STOP_NAMES
+        ): StopListViewModel {
+            stubBusStopRepository(initialBusStops)
+            stubBusStopDetailRepository(nextStopNames)
+            return StopListViewModel(busStopRepository, busStopDetailRepository)
+        }
+
+    private fun stubBusStopRepository(busStops: List<BusStop>) {
+        coEvery { busStopRepository.getBusStops() } returns busStops
+    }
+
+    private fun stubBusStopDetailRepository(nextStopNames: Map<String, String>) {
         nextStopNames.forEach { (stopId, nextStop) ->
             coEvery { busStopDetailRepository.getNextStopName(stopId) } returns nextStop
         }
-        return StopListViewModel(busStopRepository, busStopDetailRepository)
+    }
+
+    private fun verifyGetNextStopNameCalls(expectedCalls: Int) {
+        coVerify(exactly = expectedCalls) {
+            busStopDetailRepository.getNextStopName(any())
+        }
     }
 
     @Test
@@ -56,9 +70,7 @@ class StopListViewModelTest {
             "16146" to "한국폴리텍1.서울강서대학교"
         )
         viewModel = initViewModel(initialBusStops, nextStopNames)
-        coVerify(exactly = initialBusStops.size) {
-            busStopDetailRepository.getNextStopName(any())
-        }
+        verifyGetNextStopNameCalls(initialBusStops.size)
 
         val updatedBusStops = viewModel.busStops.getOrAwaitValue()
         val expectedBusStops = listOf(
