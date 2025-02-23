@@ -16,6 +16,8 @@ coroutines = "1.7.3"
 hilt = "2.52"
 mockk = "1.13.16"
 retrofit = "2.11.0"
+okhttp = "4.12.0"
+tikxml = "0.8.13"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -29,6 +31,12 @@ coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
+okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
+tikxml-annotation = { group = "com.tickaroo.tikxml", name = "annotation", version.ref = "tikxml" }
+tikxml-core = { group = "com.tickaroo.tikxml", name = "core", version.ref = "tikxml" }
+tikxml-retrofit = { group = "com.tickaroo.tikxml", name = "retrofit-converter", version.ref = "tikxml" }
+tikxml-processor = { group = "com.tickaroo.tikxml", name = "processor", version.ref = "tikxml" }
 navigation-fragment = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigation" }
 navigation-ui = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigation" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
