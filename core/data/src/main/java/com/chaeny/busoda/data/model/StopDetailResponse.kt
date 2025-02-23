@@ -13,7 +13,7 @@ data class StopDetailResponse(
 @Xml(name = "msgBody")
 data class StopDetailBody(
     @Element(name = "itemList")
-    val busList: List<StopDetailItem>?
+    val busInfos: List<StopDetailItem>?
 )
 
 @Xml(name = "itemList")
