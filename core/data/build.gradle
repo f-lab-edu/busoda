@@ -32,6 +32,12 @@ android {
 }
 
 dependencies {
+    implementation libs.tikxml.annotation
+    implementation libs.tikxml.core
+    implementation libs.tikxml.retrofit
+    kapt libs.tikxml.processor
+    implementation libs.okhttp
+    implementation libs.okhttp.logging
     implementation libs.retrofit
     implementation libs.hilt.android
     kapt libs.hilt.compiler
