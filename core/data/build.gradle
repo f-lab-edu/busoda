@@ -5,6 +5,9 @@ plugins {
     alias(libs.plugins.kapt)
 }
 
+Properties properties = new Properties()
+properties.load(project.rootProject.file("local.properties").newDataInputStream())
+
 android {
     namespace 'com.chaeny.busoda.data'
     compileSdk libs.versions.compileSdk.get().toInteger()
@@ -14,6 +17,12 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
+
+        buildConfigField "String", "SERVICE_KEY", properties['SERVICE_KEY']
+    }
+
+    buildFeatures {
+        buildConfig true
     }
 
     buildTypes {
