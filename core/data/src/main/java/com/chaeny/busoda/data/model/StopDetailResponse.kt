@@ -18,27 +18,24 @@ data class StopDetailBody(
 
 @Xml(name = "itemList")
 data class StopDetailItem(
-    @PropertyElement(name = "arsId")
-    val arsId: String?,
+    @PropertyElement(name = "rtNm")
+    val busNumber: String?,
 
     @PropertyElement(name = "stNm")
     val stopName: String?,
-
-    @PropertyElement(name = "rtNm")
-    val busNumber: String?,
 
     @PropertyElement(name = "nxtStn")
     val nextStopName: String?,
 
     @PropertyElement(name = "arrmsg1")
-    val arrivalMessage1: String?,
+    val firstArrivalInfo: String?,
 
     @PropertyElement(name = "arrmsg2")
-    val arrivalMessage2: String?,
+    val secondArrivalInfo: String?,
 
     @PropertyElement(name = "congestion1")
-    val congestion1: String?,
+    val firstBusCongestion: String?,
 
     @PropertyElement(name = "congestion2")
-    val congestion2: String?
+    val secondBusCongestion: String?
 )

@@ -1,9 +1,9 @@
 package com.chaeny.busoda.data.network
 
 import com.chaeny.busoda.data.model.StopDetailResponse
+import com.chaeny.busoda.data.BuildConfig
 import retrofit2.http.GET
 import retrofit2.http.Query
-import com.chaeny.busoda.data.BuildConfig
 
 interface BusApiService {
     @GET("getStationByUid")

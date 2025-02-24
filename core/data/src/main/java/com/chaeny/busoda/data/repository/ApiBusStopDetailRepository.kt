@@ -16,10 +16,10 @@ class ApiBusStopDetailRepository @Inject constructor(
         val busInfos = response.msgBody?.busInfos?.map { busInfo ->
             val busArrivalInfos = mutableListOf<BusArrivalInfo>()
 
-            if (!busInfo.arrivalMessage1.isNullOrEmpty()) {
-                val time = busInfo.arrivalMessage1.substringBefore("[")
-                val position = busInfo.arrivalMessage1.substringAfter("[").removeSuffix("]")
-                val congestion = when (busInfo.congestion1) {
+            if (!busInfo.firstArrivalInfo.isNullOrEmpty()) {
+                val time = busInfo.firstArrivalInfo.substringBefore("[")
+                val position = busInfo.firstArrivalInfo.substringAfter("[").removeSuffix("]")
+                val congestion = when (busInfo.firstBusCongestion) {
                     "3" -> "여유"
                     "4" -> "보통"
                     "5" -> "혼잡"
@@ -29,10 +29,10 @@ class ApiBusStopDetailRepository @Inject constructor(
                 busArrivalInfos.add(BusArrivalInfo(time, position, congestion))
             }
 
-            if (!busInfo.arrivalMessage2.isNullOrEmpty()) {
-                val time = busInfo.arrivalMessage2.substringBefore("[")
-                val position = busInfo.arrivalMessage2.substringAfter("[").removeSuffix("]")
-                val congestion = when (busInfo.congestion2) {
+            if (!busInfo.secondArrivalInfo.isNullOrEmpty()) {
+                val time = busInfo.secondArrivalInfo.substringBefore("[")
+                val position = busInfo.secondArrivalInfo.substringAfter("[").removeSuffix("]")
+                val congestion = when (busInfo.secondBusCongestion) {
                     "3" -> "여유"
                     "4" -> "보통"
                     "5" -> "혼잡"
