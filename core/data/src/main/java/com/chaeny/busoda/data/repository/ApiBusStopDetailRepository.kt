@@ -12,46 +12,48 @@ class ApiBusStopDetailRepository @Inject constructor(
 
     override suspend fun getBusStopDetail(stopId: String): BusStopDetail {
         val response = busApiService.getStationByUid(arsId = stopId)
-
         val busInfos = response.msgBody?.busInfos?.map { busInfo ->
-            val busArrivalInfos = mutableListOf<BusArrivalInfo>()
-
-            if (!busInfo.firstArrivalInfo.isNullOrEmpty()) {
-                val time = busInfo.firstArrivalInfo.substringBefore("[")
-                val position = busInfo.firstArrivalInfo.substringAfter("[").removeSuffix("]")
-                val congestion = when (busInfo.firstBusCongestion) {
-                    "3" -> "여유"
-                    "4" -> "보통"
-                    "5" -> "혼잡"
-                    "6" -> "매우혼잡"
-                    else -> ""
-                }
-                busArrivalInfos.add(BusArrivalInfo(time, position, congestion))
-            }
-
-            if (!busInfo.secondArrivalInfo.isNullOrEmpty()) {
-                val time = busInfo.secondArrivalInfo.substringBefore("[")
-                val position = busInfo.secondArrivalInfo.substringAfter("[").removeSuffix("]")
-                val congestion = when (busInfo.secondBusCongestion) {
-                    "3" -> "여유"
-                    "4" -> "보통"
-                    "5" -> "혼잡"
-                    "6" -> "매우혼잡"
-                    else -> ""
-                }
-                busArrivalInfos.add(BusArrivalInfo(time, position, congestion))
-            }
-
+            val busArrivalInfos = listOfNotNull(
+                parseArrivalInfo(busInfo.firstBusArrMsg, busInfo.firstBusCongestion),
+                parseArrivalInfo(busInfo.secondBusArrMsg, busInfo.secondBusCongestion)
+            )
             BusInfo(
-                busInfo.busNumber ?: "",
-                busInfo.nextStopName ?: "",
+                busInfo.busNumber.orEmpty(),
+                busInfo.nextStopName.orEmpty(),
                 busArrivalInfos
             )
-        } ?: emptyList()
+        }.orEmpty()
 
         return BusStopDetail(
-            response.msgBody?.busInfos?.firstOrNull()?.stopName ?: "",
+            response.msgBody?.busInfos?.firstOrNull()?.stopName.orEmpty(),
             busInfos
+        )
+    }
+
+    private fun parseArrivalInfo(arrMsg: String?, congestion: String?): BusArrivalInfo? {
+        val arrivalMsg = arrMsg ?: return null
+
+        val arrivalInfo = if (arrivalMsg.startsWith("[")) {
+            arrivalMsg.substringAfter("]")
+        } else {
+            arrivalMsg
+        }
+
+        if ('[' !in arrivalInfo) {
+            return BusArrivalInfo(
+                "",
+                arrivalInfo,
+                congestion.orEmpty()
+            )
+        }
+
+        val arrivalTime = arrivalInfo.substringBeforeLast("[")
+        val position = arrivalInfo.substringAfterLast("[").substringBefore("]")
+
+        return BusArrivalInfo(
+            arrivalTime,
+            position,
+            congestion.orEmpty()
         )
     }
 

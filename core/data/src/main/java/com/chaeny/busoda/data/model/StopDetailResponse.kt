@@ -28,10 +28,10 @@ data class StopDetailItem(
     val nextStopName: String?,
 
     @PropertyElement(name = "arrmsg1")
-    val firstArrivalInfo: String?,
+    val firstBusArrMsg: String?,
 
     @PropertyElement(name = "arrmsg2")
-    val secondArrivalInfo: String?,
+    val secondBusArrMsg: String?,
 
     @PropertyElement(name = "congestion1")
     val firstBusCongestion: String?,
