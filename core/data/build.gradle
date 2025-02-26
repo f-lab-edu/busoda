@@ -19,6 +19,7 @@ android {
         consumerProguardFiles "consumer-rules.pro"
 
         buildConfigField "String", "SERVICE_KEY", properties['SERVICE_KEY']
+        buildConfigField "String", "BASE_URL", properties['BASE_URL']
     }
 
     buildFeatures {
