@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="congestion_very_high">#8B0000</color>
+    <color name="congestion_high">#FF0000</color>
+    <color name="congestion_medium">#FFAB40</color>
+    <color name="congestion_low">#008000</color>
+    <color name="congestion_unknown">#808080</color>
+</resources>
