@@ -22,7 +22,10 @@ class ApiBusStopDetailRepository @Inject constructor(
     }
 
     private fun StopDetailResponse.toBusStopDetail(): BusStopDetail {
-        val busInfos = this.msgBody?.busInfos?.map { busInfo ->
+        val busInfos = msgBody?.busInfos
+        val stopName = busInfos?.firstOrNull()?.stopName
+
+        val mappedBusInfos = busInfos?.map { busInfo ->
             val busArrivalInfos = listOfNotNull(
                 parseArrivalInfo(busInfo.firstBusArrMsg, busInfo.firstBusCongestion),
                 parseArrivalInfo(busInfo.secondBusArrMsg, busInfo.secondBusCongestion)
@@ -35,13 +38,15 @@ class ApiBusStopDetailRepository @Inject constructor(
         }.orEmpty()
 
         return BusStopDetail(
-            this.msgBody?.busInfos?.firstOrNull()?.stopName.orEmpty(),
-            busInfos
+            stopName.orEmpty(),
+            mappedBusInfos
         )
     }
 
     private fun StopDetailResponse.toNextStopName(): String {
-        return this.msgBody?.busInfos?.firstOrNull()?.nextStopName.orEmpty()
+        val busInfos = msgBody?.busInfos
+        val nextStopName = busInfos?.firstOrNull()?.nextStopName
+        return nextStopName.orEmpty()
     }
 
     private fun StopDetailResponse.parseArrivalInfo(
