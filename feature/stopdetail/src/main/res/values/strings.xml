@@ -3,4 +3,8 @@
     <string name="way">방면</string>
     <string name="no_info">도착정보없음</string>
     <string name="no_data"> </string>
+    <string name="congestion_very_high">매우 혼잡</string>
+    <string name="congestion_high">혼잡</string>
+    <string name="congestion_medium">보통</string>
+    <string name="congestion_low">여유</string>
 </resources>
