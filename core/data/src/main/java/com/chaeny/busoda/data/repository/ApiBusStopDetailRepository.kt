@@ -44,7 +44,9 @@ class ApiBusStopDetailRepository @Inject constructor(
         return this.msgBody?.busInfos?.firstOrNull()?.nextStopName.orEmpty()
     }
 
-    private fun parseArrivalInfo(arrMsg: String?, congestion: String?): BusArrivalInfo? {
+    private fun StopDetailResponse.parseArrivalInfo(
+        arrMsg: String?, congestion: String?
+    ): BusArrivalInfo? {
         val arrivalMsg = arrMsg ?: return null
 
         val arrivalInfo = if (arrivalMsg.startsWith("[")) {
