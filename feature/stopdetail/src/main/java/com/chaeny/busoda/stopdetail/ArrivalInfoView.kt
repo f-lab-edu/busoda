@@ -23,9 +23,8 @@ class ArrivalInfoView @JvmOverloads constructor(
                 textArrivalTime.text = arrivalInfo.arrivalTime
                 textPosition.text = arrivalInfo.position
 
-                val congestionText = getCongestionText(arrivalInfo.congestion)
-                textCongestion.text = congestionText
-                textCongestion.setTextColor(getCongestionColor(congestionText))
+                textCongestion.text = arrivalInfo.getCongestionText()
+                textCongestion.setTextColor(arrivalInfo.getCongestionColor())
             }
         } else {
             bindEmptyInfo(position)
@@ -41,8 +40,8 @@ class ArrivalInfoView @JvmOverloads constructor(
         }
     }
 
-    private fun getCongestionText(congestion: String?): String {
-        return when (congestion) {
+    private fun BusArrivalInfo.getCongestionText(): String {
+        return when (this.congestion) {
             "6" -> context.getString(R.string.congestion_very_high)
             "5" -> context.getString(R.string.congestion_high)
             "4" -> context.getString(R.string.congestion_medium)
@@ -51,8 +50,8 @@ class ArrivalInfoView @JvmOverloads constructor(
         }
     }
 
-    private fun getCongestionColor(congestion: String?): Int {
-        return when (congestion) {
+    private fun BusArrivalInfo.getCongestionColor(): Int {
+        return when (this.getCongestionText()) {
             context.getString(R.string.congestion_very_high) -> context.getColor(R.color.congestion_very_high)
             context.getString(R.string.congestion_high) -> context.getColor(R.color.congestion_high)
             context.getString(R.string.congestion_medium) -> context.getColor(R.color.congestion_medium)
