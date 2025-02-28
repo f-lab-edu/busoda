@@ -1,6 +1,5 @@
 package com.chaeny.busoda.data.di
 
-import com.chaeny.busoda.data.BuildConfig
 import com.chaeny.busoda.data.network.BusApiService
 import com.tickaroo.tikxml.TikXml
 import com.tickaroo.tikxml.retrofit.TikXmlConverterFactory
@@ -38,7 +37,7 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient, tikXml: TikXml): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(BuildConfig.BASE_URL)
+            .baseUrl("http://ws.bus.go.kr/api/rest/")
             .client(okHttpClient)
             .addConverterFactory(TikXmlConverterFactory.create(tikXml))
             .build()

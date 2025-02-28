@@ -6,7 +6,7 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface BusApiService {
-    @GET("getStationByUid")
+    @GET("stationinfo/getStationByUid")
     suspend fun getStationByUid(
         @Query("serviceKey", encoded = true) serviceKey: String = BuildConfig.SERVICE_KEY,
         @Query("arsId") arsId: String
