@@ -5,6 +5,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import com.chaeny.busoda.model.BusArrivalInfo
+import com.chaeny.busoda.model.CongestionLevel
 import com.chaeny.busoda.stopdetail.databinding.ArrivalInfoViewBinding
 
 class ArrivalInfoView @JvmOverloads constructor(
@@ -42,10 +43,10 @@ class ArrivalInfoView @JvmOverloads constructor(
 
     private fun BusArrivalInfo.getCongestionText(): String {
         return when (this.congestion) {
-            "6" -> context.getString(R.string.congestion_very_high)
-            "5" -> context.getString(R.string.congestion_high)
-            "4" -> context.getString(R.string.congestion_medium)
-            "3" -> context.getString(R.string.congestion_low)
+            CongestionLevel.VERY_HIGH -> context.getString(R.string.congestion_very_high)
+            CongestionLevel.HIGH -> context.getString(R.string.congestion_high)
+            CongestionLevel.MEDIUM -> context.getString(R.string.congestion_medium)
+            CongestionLevel.LOW -> context.getString(R.string.congestion_low)
             else -> context.getString(R.string.no_data)
         }
     }

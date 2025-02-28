@@ -5,6 +5,7 @@ import com.chaeny.busoda.data.network.BusApiService
 import com.chaeny.busoda.model.BusArrivalInfo
 import com.chaeny.busoda.model.BusInfo
 import com.chaeny.busoda.model.BusStopDetail
+import com.chaeny.busoda.model.CongestionLevel
 import javax.inject.Inject
 
 class ApiBusStopDetailRepository @Inject constructor(
@@ -53,6 +54,7 @@ class ApiBusStopDetailRepository @Inject constructor(
         arrMsg: String?, congestion: String?
     ): BusArrivalInfo? {
         val arrivalMsg = arrMsg ?: return null
+        val congestionLevel = getCongestionLevel(congestion)
 
         val arrivalInfo = if (arrivalMsg.startsWith("[")) {
             arrivalMsg.substringAfter("]")
@@ -64,7 +66,7 @@ class ApiBusStopDetailRepository @Inject constructor(
             val noArrivalTimeInfo = BusArrivalInfo(
                 "",
                 arrivalInfo,
-                congestion.orEmpty()
+                congestionLevel
             )
             return noArrivalTimeInfo
         }
@@ -75,7 +77,17 @@ class ApiBusStopDetailRepository @Inject constructor(
         return BusArrivalInfo(
             arrivalTime,
             position,
-            congestion.orEmpty()
+            congestionLevel
         )
+    }
+
+    private fun StopDetailResponse.getCongestionLevel(congestion: String?): CongestionLevel {
+        return when (congestion) {
+            "6" -> CongestionLevel.VERY_HIGH
+            "5" -> CongestionLevel.HIGH
+            "4" -> CongestionLevel.MEDIUM
+            "3" -> CongestionLevel.LOW
+            else -> CongestionLevel.UNKNOWN
+        }
     }
 }
