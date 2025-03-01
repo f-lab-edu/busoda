@@ -19,12 +19,10 @@ internal class StopListViewModel @Inject constructor(
     private val busStopDetailRepository: BusStopDetailRepository
 ) : ViewModel() {
 
-    private val dummyData = MutableLiveData<List<BusStop>>()
-    private val _removeCompleted = MutableLiveData<Event<RemoveResult>>()
+    private val _busStops = MutableLiveData<List<BusStop>>()
     private val _busStopClicked = MutableLiveData<Event<String>>()
     private val _isLoading = MutableLiveData<Boolean>()
-    val busStops: LiveData<List<BusStop>> = dummyData
-    val removeCompleted: LiveData<Event<RemoveResult>> = _removeCompleted
+    val busStops: LiveData<List<BusStop>> = _busStops
     val busStopClicked: LiveData<Event<String>> = _busStopClicked
     val isLoading: LiveData<Boolean> = _isLoading
 
@@ -41,18 +39,9 @@ internal class StopListViewModel @Inject constructor(
                     stop.copy(nextStopName = busStopDetailRepository.getNextStopName(stop.stopId))
                 }
             }.awaitAll()
-            dummyData.value = updatedStops
+            _busStops.value = updatedStops
             _isLoading.value = false
         }
-    }
-
-    fun removeLastStop() {
-        val currentStops = dummyData.value
-        if (currentStops.isNullOrEmpty()) {
-            return
-        }
-        dummyData.value = currentStops.dropLast(1)
-        _removeCompleted.value = Event(RemoveResult.SUCCESS)
     }
 
     fun handleBusStopClick(stopId: String) {

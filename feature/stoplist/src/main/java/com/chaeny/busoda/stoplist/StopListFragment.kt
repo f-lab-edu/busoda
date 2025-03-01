@@ -31,8 +31,6 @@ class StopListFragment : Fragment() {
         val adapter = StopListAdapter(viewModel::handleBusStopClick)
         binding.stopList.adapter = adapter
         subscribeUi(adapter)
-        setupRemoveButton()
-        subscribeRemoveEvent()
         subscribeStopClickEvent()
         return binding.root
     }
@@ -45,20 +43,6 @@ class StopListFragment : Fragment() {
 
         viewModel.busStops.observe(viewLifecycleOwner) { stops ->
             adapter.submitList(stops)
-        }
-    }
-
-    private fun subscribeRemoveEvent() {
-        viewModel.removeCompleted.observe(viewLifecycleOwner) { event ->
-            event.getContentIfNotHandled()?.let { result ->
-                messageHelper.showMessage(requireContext(), result.getRemoveMessage())
-            }
-        }
-    }
-
-    private fun RemoveResult.getRemoveMessage(): String {
-        return when (this) {
-            RemoveResult.SUCCESS -> getString(R.string.remove_stop_completed)
         }
     }
 
@@ -76,11 +60,5 @@ class StopListFragment : Fragment() {
             .fromUri(uri.toUri())
             .build()
         findNavController().navigate(request)
-    }
-
-    private fun setupRemoveButton() {
-        binding.removeStopButton.setOnClickListener {
-            viewModel.removeLastStop()
-        }
     }
 }
