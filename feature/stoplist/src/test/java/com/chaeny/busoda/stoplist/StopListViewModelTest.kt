@@ -34,9 +34,9 @@ class StopListViewModelTest {
         busStopDetailRepository = mockk()
     }
 
-    private fun initViewModel(
-        initialBusStops: List<BusStop> = TEST_BUS_STOPS,
-        nextStopNames: Map<String, String> = TEST_NEXT_STOP_NAMES
+    private fun createViewModel(
+        initialBusStops: List<BusStop>,
+        nextStopNames: Map<String, String>
     ): StopListViewModel {
         stubBusStopRepository(initialBusStops)
         stubBusStopDetailRepository(nextStopNames)
@@ -69,7 +69,7 @@ class StopListViewModelTest {
             "16206" to "화곡본동시장",
             "16146" to "한국폴리텍1.서울강서대학교"
         )
-        viewModel = initViewModel(initialBusStops, nextStopNames)
+        viewModel = createViewModel(initialBusStops, nextStopNames)
         verifyGetNextStopNameCalls(initialBusStops.size)
 
         val updatedBusStops = viewModel.busStops.getOrAwaitValue()
@@ -82,7 +82,7 @@ class StopListViewModelTest {
 
     @Test
     fun `when data loading completes then isLoading should be false`() {
-        viewModel = initViewModel()
+        viewModel = createViewModel(TEST_BUS_STOPS, TEST_NEXT_STOP_NAMES)
         coVerify {
             busStopRepository.getBusStops()
             busStopDetailRepository.getNextStopName(any())
@@ -93,7 +93,7 @@ class StopListViewModelTest {
 
     @Test
     fun `when stop selected then should emit event with correct expected value`() {
-        viewModel = initViewModel()
+        viewModel = createViewModel(TEST_BUS_STOPS, TEST_NEXT_STOP_NAMES)
         viewModel.handleBusStopClick(EXPECTED_STOP_ID)
         val clickEvent = viewModel.busStopClicked.getOrAwaitValue()
         assertEquals(EXPECTED_STOP_ID, clickEvent.getContentIfNotHandled())
@@ -101,7 +101,7 @@ class StopListViewModelTest {
 
     @Test
     fun `when last stop removed then should decrease size and emit success`() {
-        viewModel = initViewModel()
+        viewModel = createViewModel(TEST_BUS_STOPS, TEST_NEXT_STOP_NAMES)
         val expectedSize = viewModel.busStops.getOrAwaitValue().size - 1
         viewModel.removeLastStop()
         val busStopsSize = viewModel.busStops.getOrAwaitValue().size
