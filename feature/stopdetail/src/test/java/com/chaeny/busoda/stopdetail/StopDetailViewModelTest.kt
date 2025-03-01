@@ -6,6 +6,7 @@ import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.model.BusArrivalInfo
 import com.chaeny.busoda.model.BusInfo
 import com.chaeny.busoda.model.BusStopDetail
+import com.chaeny.busoda.model.CongestionLevel
 import com.chaeny.busoda.testing.util.MainCoroutineScopeRule
 import com.chaeny.busoda.testing.util.getOrAwaitValue
 import io.mockk.coEvery
@@ -85,7 +86,7 @@ class StopDetailViewModelTest {
             "화곡역4번출구", listOf(
                 BusInfo(
                     "604", "화곡본동시장", listOf(
-                        BusArrivalInfo("2분 38초", "2번째 전", "보통")
+                        BusArrivalInfo("2분 38초", "2번째 전", CongestionLevel.MEDIUM)
                     )
                 )
             )
