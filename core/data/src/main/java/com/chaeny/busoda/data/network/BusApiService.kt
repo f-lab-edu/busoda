@@ -10,7 +10,7 @@ interface BusApiService {
     @GET("stationinfo/getStationByUid")
     suspend fun getStationByUid(
         @Query("serviceKey", encoded = true) serviceKey: String = BuildConfig.SERVICE_KEY,
-        @Query("arsId") arsId: String
+        @Query("arsId") stopId: String
     ): StopDetailResponse
 
     @GET("stationinfo/getStationByName")

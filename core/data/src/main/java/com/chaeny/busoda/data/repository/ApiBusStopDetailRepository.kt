@@ -13,12 +13,12 @@ class ApiBusStopDetailRepository @Inject constructor(
 ) : BusStopDetailRepository {
 
     override suspend fun getBusStopDetail(stopId: String): BusStopDetail {
-        val response = busApiService.getStationByUid(arsId = stopId)
+        val response = busApiService.getStationByUid(stopId = stopId)
         return response.toBusStopDetail()
     }
 
     override suspend fun getNextStopName(stopId: String): String {
-        val response = busApiService.getStationByUid(arsId = stopId)
+        val response = busApiService.getStationByUid(stopId = stopId)
         return response.toNextStopName()
     }
 
