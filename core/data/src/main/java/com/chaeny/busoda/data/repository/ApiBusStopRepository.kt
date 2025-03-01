@@ -9,8 +9,8 @@ class ApiBusStopRepository @Inject constructor(
     private val busApiService: BusApiService
 ) : BusStopRepository {
 
-    override suspend fun getBusStops(): List<BusStop> {
-        val response = busApiService.getStationByName(stationName = "화곡역")
+    override suspend fun getBusStops(stopName: String): List<BusStop> {
+        val response = busApiService.getStationByName(stopName = stopName)
         return response.toBusStopList()
     }
 

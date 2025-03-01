@@ -16,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class StopListViewModel @Inject constructor(
     private val busStopRepository: BusStopRepository,
-    private val busStopDetailRepository: BusStopDetailRepository
+    private val busStopDetailRepository: BusStopDetailRepository,
 ) : ViewModel() {
 
     private val _busStops = MutableLiveData<List<BusStop>>()
@@ -33,7 +33,7 @@ internal class StopListViewModel @Inject constructor(
     private fun loadBusStops() {
         _isLoading.value = true
         viewModelScope.launch {
-            val stops = busStopRepository.getBusStops()
+            val stops = busStopRepository.getBusStops("화곡역")
             val updatedStops = stops.map { stop ->
                 async {
                     stop.copy(nextStopName = busStopDetailRepository.getNextStopName(stop.stopId))
