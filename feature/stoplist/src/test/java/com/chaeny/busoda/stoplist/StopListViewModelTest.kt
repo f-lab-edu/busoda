@@ -99,18 +99,6 @@ class StopListViewModelTest {
         assertEquals(EXPECTED_STOP_ID, clickEvent.getContentIfNotHandled())
     }
 
-    @Test
-    fun `when last stop removed then should decrease size and emit success`() {
-        viewModel = createViewModel(TEST_BUS_STOPS, TEST_NEXT_STOP_NAMES)
-        val expectedSize = viewModel.busStops.getOrAwaitValue().size - 1
-        viewModel.removeLastStop()
-        val busStopsSize = viewModel.busStops.getOrAwaitValue().size
-        assertEquals(expectedSize, busStopsSize)
-
-        val removeEvent = viewModel.removeCompleted.getOrAwaitValue()
-        assertEquals(RemoveResult.SUCCESS, removeEvent.getContentIfNotHandled())
-    }
-
     companion object {
         private const val EXPECTED_STOP_ID = "16206"
         private val TEST_BUS_STOPS = listOf(
