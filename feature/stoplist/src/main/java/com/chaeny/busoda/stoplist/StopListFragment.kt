@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
+import androidx.appcompat.widget.SearchView
 import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.fragment.findNavController
 import com.chaeny.busoda.stoplist.databinding.FragmentStopListBinding
@@ -32,6 +33,7 @@ class StopListFragment : Fragment() {
         binding.stopList.adapter = adapter
         subscribeUi(adapter)
         subscribeStopClickEvent()
+        setupSearchView()
         return binding.root
     }
 
@@ -60,5 +62,20 @@ class StopListFragment : Fragment() {
             .fromUri(uri.toUri())
             .build()
         findNavController().navigate(request)
+    }
+
+    private fun setupSearchView() {
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                query?.let {
+                    viewModel.setKeyWord(query)
+                }
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                return false
+            }
+        })
     }
 }
