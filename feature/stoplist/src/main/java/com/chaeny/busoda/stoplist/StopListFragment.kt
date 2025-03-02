@@ -67,13 +67,13 @@ class StopListFragment : Fragment() {
     private fun setupSearchView() {
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                query?.let {
-                    viewModel.setKeyWord(query)
-                }
                 return false
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
+                newText?.run {
+                    viewModel.setKeyWord(this)
+                }
                 return false
             }
         })

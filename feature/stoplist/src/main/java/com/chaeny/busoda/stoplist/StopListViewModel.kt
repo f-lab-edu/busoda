@@ -8,12 +8,15 @@ import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.data.repository.BusStopRepository
 import com.chaeny.busoda.model.BusStop
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@OptIn(FlowPreview::class)
 @HiltViewModel
 internal class StopListViewModel @Inject constructor(
     private val busStopRepository: BusStopRepository,
@@ -30,11 +33,15 @@ internal class StopListViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            keyWord.collect { newKeyWord ->
-                if (newKeyWord != EMPTY_KEYWORD) {
-                    loadBusStops(newKeyWord)
+            keyWord
+                .debounce(1000)
+                .collect { newKeyWord ->
+                    if (newKeyWord.length >= 3) {
+                        loadBusStops(newKeyWord)
+                    } else {
+                        _busStops.value = emptyList()
+                    }
                 }
-            }
         }
     }
 
