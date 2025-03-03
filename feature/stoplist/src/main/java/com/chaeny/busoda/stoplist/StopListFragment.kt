@@ -71,8 +71,8 @@ class StopListFragment : Fragment() {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                newText?.run {
-                    viewModel.setKeyWord(this)
+                newText?.let {
+                    viewModel.setKeyWord(newText)
                 }
                 return false
             }

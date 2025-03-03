@@ -13,6 +13,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -35,13 +36,8 @@ internal class StopListViewModel @Inject constructor(
         viewModelScope.launch {
             keyWord
                 .debounce(1000)
-                .collect { newKeyWord ->
-                    if (newKeyWord.length >= 3) {
-                        loadBusStops(newKeyWord)
-                    } else {
-                        _busStops.value = emptyList()
-                    }
-                }
+                .filter { it.length >= 3 }
+                .collect { loadBusStops(it) }
         }
     }
 
@@ -59,12 +55,21 @@ internal class StopListViewModel @Inject constructor(
         }
     }
 
+    private fun clearBusStopsIfNeeded() {
+        if (!_busStops.value.isNullOrEmpty()) {
+            _busStops.value = emptyList()
+        }
+    }
+
     fun handleBusStopClick(stopId: String) {
         _busStopClicked.value = Event(stopId)
     }
 
     fun setKeyWord(word: String) {
         keyWord.value = word
+        if (word.length < 3) {
+            clearBusStopsIfNeeded()
+        }
     }
 
     companion object {
