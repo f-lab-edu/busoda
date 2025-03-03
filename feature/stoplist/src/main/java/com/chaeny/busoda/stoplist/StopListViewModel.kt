@@ -2,63 +2,71 @@ package com.chaeny.busoda.stoplist
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.data.repository.BusStopRepository
 import com.chaeny.busoda.model.BusStop
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@OptIn(FlowPreview::class)
 @HiltViewModel
 internal class StopListViewModel @Inject constructor(
     private val busStopRepository: BusStopRepository,
-    private val busStopDetailRepository: BusStopDetailRepository
+    private val busStopDetailRepository: BusStopDetailRepository,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _busStops = MutableLiveData<List<BusStop>>()
     private val _busStopClicked = MutableLiveData<Event<String>>()
     private val _isLoading = MutableLiveData<Boolean>()
-    private val keyWord: MutableStateFlow<String> = MutableStateFlow(EMPTY_KEYWORD)
-    val busStops: LiveData<List<BusStop>> = _busStops
+    private val keyWord: MutableStateFlow<String> =
+        MutableStateFlow(savedStateHandle.get(KEYWORD_SAVED_STATE_KEY) ?: EMPTY_KEYWORD)
     val busStopClicked: LiveData<Event<String>> = _busStopClicked
     val isLoading: LiveData<Boolean> = _isLoading
 
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    val busStops: LiveData<List<BusStop>> = keyWord
+        .debounce(1000)
+        .flatMapLatest { word ->
+            when {
+                word.length > 2 -> loadBusStops(word)
+                else -> emptyFlow()
+            }
+        }.asLiveData()
+
     init {
         viewModelScope.launch {
-            keyWord
-                .debounce(1000)
-                .filter { it.length >= 3 }
-                .collect { loadBusStops(it) }
+            keyWord.collect { newKeyWord ->
+                savedStateHandle.set(KEYWORD_SAVED_STATE_KEY, newKeyWord)
+            }
         }
     }
 
-    private fun loadBusStops(stopName: String) {
+    private fun loadBusStops(stopName: String) = flow {
         _isLoading.value = true
-        viewModelScope.launch {
-            val stops = busStopRepository.getBusStops(stopName)
-            val updatedStops = stops.map { stop ->
+        val stops = busStopRepository.getBusStops(stopName)
+        val updatedStops = coroutineScope {
+            stops.map { stop ->
                 async {
                     stop.copy(nextStopName = busStopDetailRepository.getNextStopName(stop.stopId))
                 }
             }.awaitAll()
-            _busStops.value = updatedStops
-            _isLoading.value = false
         }
-    }
-
-    private fun clearBusStopsIfNeeded() {
-        if (!_busStops.value.isNullOrEmpty()) {
-            _busStops.value = emptyList()
-        }
+        emit(updatedStops)
+        _isLoading.value = false
     }
 
     fun handleBusStopClick(stopId: String) {
@@ -67,12 +75,10 @@ internal class StopListViewModel @Inject constructor(
 
     fun setKeyWord(word: String) {
         keyWord.value = word
-        if (word.length < 3) {
-            clearBusStopsIfNeeded()
-        }
     }
 
     companion object {
         private const val EMPTY_KEYWORD = ""
+        private const val KEYWORD_SAVED_STATE_KEY = "KEYWORD_SAVED_STATE_KEY"
     }
 }
