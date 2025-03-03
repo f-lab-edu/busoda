@@ -41,6 +41,7 @@ dependencies {
 
     implementation libs.navigation.fragment
     implementation libs.navigation.ui
+    implementation libs.androidx.lifecycle.livedata.ktx
 
     implementation libs.androidx.core.ktx
     implementation libs.androidx.appcompat
