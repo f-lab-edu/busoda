@@ -72,7 +72,7 @@ class StopListFragment : Fragment() {
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 newText?.let {
-                    viewModel.setKeyWord(newText)
+                    viewModel.setKeyWord(it)
                 }
                 return false
             }
