@@ -1,11 +1,13 @@
 package com.chaeny.busoda.data.repository
 
+import android.util.Log
 import com.chaeny.busoda.data.model.StopDetailResponse
 import com.chaeny.busoda.data.network.BusApiService
 import com.chaeny.busoda.model.BusArrivalInfo
 import com.chaeny.busoda.model.BusInfo
 import com.chaeny.busoda.model.BusStopDetail
 import com.chaeny.busoda.model.CongestionLevel
+import java.io.IOException
 import javax.inject.Inject
 
 class ApiBusStopDetailRepository @Inject constructor(
@@ -13,13 +15,29 @@ class ApiBusStopDetailRepository @Inject constructor(
 ) : BusStopDetailRepository {
 
     override suspend fun getBusStopDetail(stopId: String): BusStopDetail {
-        val response = busApiService.getStationByUid(stopId = stopId)
-        return response.toBusStopDetail()
+        return try {
+            val response = busApiService.getStationByUid(stopId = stopId)
+            response.toBusStopDetail()
+        } catch (e: IOException) {
+            Log.e("Repository", "getBusStopDetail(stopId=$stopId) - IOException: ${e.message}")
+            BusStopDetail("", emptyList())
+        } catch (e: Exception) {
+            Log.e("Repository", "getBusStopDetail(stopId=$stopId) - Exception: ${e.message}")
+            BusStopDetail("", emptyList())
+        }
     }
 
     override suspend fun getNextStopName(stopId: String): String {
-        val response = busApiService.getStationByUid(stopId = stopId)
-        return response.toNextStopName()
+        return try {
+            val response = busApiService.getStationByUid(stopId = stopId)
+            response.toNextStopName()
+        } catch (e: IOException) {
+            Log.e("Repository", "getNextStopName(stopId=$stopId) - IOException: ${e.message}")
+            ""
+        } catch (e: Exception) {
+            Log.e("Repository", "getNextStopName(stopId=$stopId) - Exception: ${e.message}")
+            ""
+        }
     }
 
     private fun StopDetailResponse.toBusStopDetail(): BusStopDetail {

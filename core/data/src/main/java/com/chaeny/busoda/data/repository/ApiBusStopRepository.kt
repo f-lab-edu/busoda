@@ -1,8 +1,10 @@
 package com.chaeny.busoda.data.repository
 
+import android.util.Log
 import com.chaeny.busoda.data.model.StopListResponse
 import com.chaeny.busoda.data.network.BusApiService
 import com.chaeny.busoda.model.BusStop
+import java.io.IOException
 import javax.inject.Inject
 
 class ApiBusStopRepository @Inject constructor(
@@ -10,8 +12,16 @@ class ApiBusStopRepository @Inject constructor(
 ) : BusStopRepository {
 
     override suspend fun getBusStops(stopName: String): List<BusStop> {
-        val response = busApiService.getStationByName(stopName = stopName)
-        return response.toBusStopList()
+        return try {
+            val response = busApiService.getStationByName(stopName = stopName)
+            response.toBusStopList()
+        } catch (e: IOException) {
+            Log.e("Repository", "getBusStops(stopName=$stopName) - IOException: ${e.message}")
+            emptyList()
+        } catch (e: Exception) {
+            Log.e("Repository", "getBusStops(stopName=$stopName) - Exception: ${e.message}")
+            emptyList()
+        }
     }
 
     private fun StopListResponse.toBusStopList(): List<BusStop> {
