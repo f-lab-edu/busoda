@@ -12,6 +12,7 @@ import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import java.io.IOException
@@ -70,6 +71,53 @@ class ApiBusStopDetailRepositoryTest {
         assertEquals(CONGESTION_VALUE_UNKNOWN, secondCongestionLevel)
     }
 
+    @Test
+    fun `when StopDetailResponse has arrival messages then both should be parsed correctly`() = runTest {
+        val mockResponse = createStopDetailResponseWithArrMsg("1분 30초후[1번째 전]", "[막차]1분 30초후[1번째 전]")
+        coEvery { busApiService.getStationByUid(stopId = TEST_STOP_ID) } returns mockResponse
+        val stopDetail = repository.getBusStopDetail(TEST_STOP_ID)
+
+        val firstArrivalTime = stopDetail.busInfos.first().arrivalInfos[0].arrivalTime
+        val firstPosition = stopDetail.busInfos.first().arrivalInfos[0].position
+        assertEquals("1분 30초후", firstArrivalTime)
+        assertEquals("1번째 전", firstPosition)
+
+        val secondArrivalTime = stopDetail.busInfos.first().arrivalInfos[1].arrivalTime
+        val secondPosition = stopDetail.busInfos.first().arrivalInfos[1].position
+        assertEquals("1분 30초후", secondArrivalTime)
+        assertEquals("1번째 전", secondPosition)
+    }
+
+    @Test
+    fun `when StopDetailResponse has special arrival messages then they should be mapped correctly`() = runTest {
+        val mockResponse = createStopDetailResponseWithArrMsg("운행종료", "곧 도착")
+        coEvery { busApiService.getStationByUid(stopId = TEST_STOP_ID) } returns mockResponse
+        val stopDetail = repository.getBusStopDetail(TEST_STOP_ID)
+
+        val firstArrivalTime = stopDetail.busInfos.first().arrivalInfos[0].arrivalTime
+        val firstPosition = stopDetail.busInfos.first().arrivalInfos[0].position
+        assertEquals("", firstArrivalTime)
+        assertEquals("운행종료", firstPosition)
+
+        val secondArrivalTime = stopDetail.busInfos.first().arrivalInfos[1].arrivalTime
+        val secondPosition = stopDetail.busInfos.first().arrivalInfos[1].position
+        assertEquals("", secondArrivalTime)
+        assertEquals("곧 도착", secondPosition)
+    }
+
+    @Test
+    fun `when StopDetailResponse has no arrival messages then arrivalInfos should be null`() = runTest {
+        val mockResponse = createStopDetailResponseWithArrMsg(null, null)
+        coEvery { busApiService.getStationByUid(stopId = TEST_STOP_ID) } returns mockResponse
+        val stopDetail = repository.getBusStopDetail(TEST_STOP_ID)
+
+        val firstArrivalInfo = stopDetail.busInfos.first().arrivalInfos.getOrNull(0)
+        assertNull(firstArrivalInfo)
+
+        val secondArrivalInfo = stopDetail.busInfos.first().arrivalInfos.getOrNull(1)
+        assertNull(secondArrivalInfo)
+    }
+
     private fun createStopDetailResponse(): StopDetailResponse {
         val busInfo = StopDetailItem(
             "604",
@@ -92,6 +140,19 @@ class ApiBusStopDetailRepositoryTest {
             "3분 38초후[3번째 전]",
             firstBusCongestion,
             secondBusCongestion
+        )
+        return StopDetailResponse(StopDetailBody(listOf(busInfo)))
+    }
+
+    private fun createStopDetailResponseWithArrMsg(firstArrMsg: String?, secondArrMsg: String?): StopDetailResponse {
+        val busInfo = StopDetailItem(
+            "604",
+            "화곡역4번출구",
+            "화곡본동시장",
+            firstArrMsg,
+            secondArrMsg,
+            "3",
+            "4"
         )
         return StopDetailResponse(StopDetailBody(listOf(busInfo)))
     }
