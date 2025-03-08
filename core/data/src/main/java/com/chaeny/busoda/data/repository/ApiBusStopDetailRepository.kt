@@ -1,6 +1,5 @@
 package com.chaeny.busoda.data.repository
 
-import android.util.Log
 import com.chaeny.busoda.data.model.StopDetailResponse
 import com.chaeny.busoda.data.network.BusApiService
 import com.chaeny.busoda.model.BusArrivalInfo
@@ -19,10 +18,8 @@ class ApiBusStopDetailRepository @Inject constructor(
             val response = busApiService.getStationByUid(stopId = stopId)
             response.toBusStopDetail()
         } catch (e: IOException) {
-            Log.e("Repository", "getBusStopDetail(stopId=$stopId) - IOException: ${e.message}")
             BusStopDetail("", emptyList())
         } catch (e: Exception) {
-            Log.e("Repository", "getBusStopDetail(stopId=$stopId) - Exception: ${e.message}")
             BusStopDetail("", emptyList())
         }
     }
@@ -32,10 +29,8 @@ class ApiBusStopDetailRepository @Inject constructor(
             val response = busApiService.getStationByUid(stopId = stopId)
             response.toNextStopName()
         } catch (e: IOException) {
-            Log.e("Repository", "getNextStopName(stopId=$stopId) - IOException: ${e.message}")
             ""
         } catch (e: Exception) {
-            Log.e("Repository", "getNextStopName(stopId=$stopId) - Exception: ${e.message}")
             ""
         }
     }

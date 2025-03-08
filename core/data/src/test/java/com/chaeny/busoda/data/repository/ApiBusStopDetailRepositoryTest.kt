@@ -8,12 +8,13 @@ import com.chaeny.busoda.model.BusArrivalInfo
 import com.chaeny.busoda.model.BusInfo
 import com.chaeny.busoda.model.BusStopDetail
 import com.chaeny.busoda.model.CongestionLevel
-import kotlinx.coroutines.test.runTest
 import io.mockk.coEvery
 import io.mockk.mockk
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import org.junit.Assert.assertEquals
+import java.io.IOException
 
 class ApiBusStopDetailRepositoryTest {
 
@@ -27,35 +28,48 @@ class ApiBusStopDetailRepositoryTest {
     }
 
     @Test
-    fun `when getBusStopDetail called then returned BusStopDetail should equal expected value`() = runTest {
-        val stopId = "16206"
-        val expected = BusStopDetail(
+    fun `when getBusStopDetail and getNextStopName called then results should match expected values`() = runTest {
+        val mockResponse = createStopDetailResponse()
+        coEvery { busApiService.getStationByUid(stopId = TEST_STOP_ID) } returns mockResponse
+        val stopDetail = repository.getBusStopDetail(TEST_STOP_ID)
+        val nextStopName = repository.getNextStopName(TEST_STOP_ID)
+        assertEquals(EXPECTED_STOP_DETAIL, stopDetail)
+        assertEquals(EXPECTED_NEXT_STOP_NAME, nextStopName)
+    }
+
+    @Test
+    fun `when getBusStopDetail throws IOException then empty BusStopDetail should be returned`() = runTest {
+        coEvery { busApiService.getStationByUid(stopId = TEST_STOP_ID) } throws IOException("Failed to connect")
+        val stopDetail = repository.getBusStopDetail(TEST_STOP_ID)
+        assertEquals(EMPTY_STOP_DETAIL, stopDetail)
+    }
+
+    private fun createStopDetailResponse(): StopDetailResponse {
+        val busInfo = StopDetailItem(
+            "604",
+            "화곡역4번출구",
+            "화곡본동시장",
+            "2분 38초후[2번째 전]",
+            "3분 38초후[3번째 전]",
+            "3",
+            "4"
+        )
+        return StopDetailResponse(StopDetailBody(listOf(busInfo)))
+    }
+
+    companion object {
+        private const val TEST_STOP_ID = "16206"
+        private val EXPECTED_NEXT_STOP_NAME = "화곡본동시장"
+        val EXPECTED_STOP_DETAIL = BusStopDetail(
             "화곡역4번출구", listOf(
                 BusInfo(
                     "604", "화곡본동시장", listOf(
-                        BusArrivalInfo("2분 38초 ", "2번째 전", CongestionLevel.LOW),
-                        BusArrivalInfo("3분 38초 ", "3번째 전", CongestionLevel.MEDIUM)
+                        BusArrivalInfo("2분 38초후", "2번째 전", CongestionLevel.LOW),
+                        BusArrivalInfo("3분 38초후", "3번째 전", CongestionLevel.MEDIUM)
                     )
                 )
             )
         )
-        val mockResponse = StopDetailResponse(
-            StopDetailBody(
-                busInfos = listOf(
-                    StopDetailItem(
-                        "604",
-                        "화곡역4번출구",
-                        "화곡본동시장",
-                        "2분 38초 [2번째 전]",
-                        "3분 38초 [3번째 전]",
-                        "3",
-                        "4"
-                    )
-                )
-            )
-        )
-        coEvery { busApiService.getStationByUid(stopId = stopId) } returns mockResponse
-        val result = repository.getBusStopDetail(stopId)
-        assertEquals(expected, result)
+        private val EMPTY_STOP_DETAIL = BusStopDetail("", emptyList())
     }
 }
