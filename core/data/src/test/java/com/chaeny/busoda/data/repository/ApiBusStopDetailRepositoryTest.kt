@@ -44,6 +44,32 @@ class ApiBusStopDetailRepositoryTest {
         assertEquals(EMPTY_STOP_DETAIL, stopDetail)
     }
 
+    @Test
+    fun `when StopDetailResponse has valid congestion values then correct levels should be returned`() = runTest {
+        val mockResponse = createStopDetailResponseWithCongestion("3", "5")
+        coEvery { busApiService.getStationByUid(stopId = TEST_STOP_ID) } returns mockResponse
+        val stopDetail = repository.getBusStopDetail(TEST_STOP_ID)
+
+        val firstCongestionLevel = stopDetail.busInfos.first().arrivalInfos[0].congestion
+        assertEquals(CONGESTION_VALUE_THREE, firstCongestionLevel)
+
+        val secondCongestionLevel = stopDetail.busInfos.first().arrivalInfos[1].congestion
+        assertEquals(CONGESTION_VALUE_FIVE, secondCongestionLevel)
+    }
+
+    @Test
+    fun `when StopDetailResponse has unknown congestion values then UNKNOWN level should be returned`() = runTest {
+        val mockResponse = createStopDetailResponseWithCongestion("1", null)
+        coEvery { busApiService.getStationByUid(stopId = TEST_STOP_ID) } returns mockResponse
+        val stopDetail = repository.getBusStopDetail(TEST_STOP_ID)
+
+        val firstCongestionLevel = stopDetail.busInfos.first().arrivalInfos[0].congestion
+        assertEquals(CONGESTION_VALUE_UNKNOWN, firstCongestionLevel)
+
+        val secondCongestionLevel = stopDetail.busInfos.first().arrivalInfos[1].congestion
+        assertEquals(CONGESTION_VALUE_UNKNOWN, secondCongestionLevel)
+    }
+
     private fun createStopDetailResponse(): StopDetailResponse {
         val busInfo = StopDetailItem(
             "604",
@@ -53,6 +79,19 @@ class ApiBusStopDetailRepositoryTest {
             "3분 38초후[3번째 전]",
             "3",
             "4"
+        )
+        return StopDetailResponse(StopDetailBody(listOf(busInfo)))
+    }
+
+    private fun createStopDetailResponseWithCongestion(firstBusCongestion: String?, secondBusCongestion: String?): StopDetailResponse {
+        val busInfo = StopDetailItem(
+            "604",
+            "화곡역4번출구",
+            "화곡본동시장",
+            "2분 38초후[2번째 전]",
+            "3분 38초후[3번째 전]",
+            firstBusCongestion,
+            secondBusCongestion
         )
         return StopDetailResponse(StopDetailBody(listOf(busInfo)))
     }
@@ -71,5 +110,8 @@ class ApiBusStopDetailRepositoryTest {
             )
         )
         private val EMPTY_STOP_DETAIL = BusStopDetail("", emptyList())
+        private val CONGESTION_VALUE_THREE = CongestionLevel.LOW
+        private val CONGESTION_VALUE_FIVE = CongestionLevel.HIGH
+        private val CONGESTION_VALUE_UNKNOWN = CongestionLevel.UNKNOWN
     }
 }
