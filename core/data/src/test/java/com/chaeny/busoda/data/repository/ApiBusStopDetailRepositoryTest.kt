@@ -30,9 +30,7 @@ class ApiBusStopDetailRepositoryTest {
 
     @Test
     fun `when getBusStopDetail and getNextStopName called then results should match expected values`() = runTest {
-        val mockResponse = createStopDetailResponse()
-        coEvery { busApiService.getStationByUid(stopId = TEST_STOP_ID) } returns mockResponse
-        val stopDetail = repository.getBusStopDetail(TEST_STOP_ID)
+        val stopDetail = getMockStopDetail(createMockResponse())
         val nextStopName = repository.getNextStopName(TEST_STOP_ID)
         assertEquals(EXPECTED_STOP_DETAIL, stopDetail)
         assertEquals(EXPECTED_NEXT_STOP_NAME, nextStopName)
@@ -47,9 +45,7 @@ class ApiBusStopDetailRepositoryTest {
 
     @Test
     fun `when StopDetailResponse has valid congestion values then correct levels should be returned`() = runTest {
-        val mockResponse = createStopDetailResponseWithCongestion("3", "5")
-        coEvery { busApiService.getStationByUid(stopId = TEST_STOP_ID) } returns mockResponse
-        val stopDetail = repository.getBusStopDetail(TEST_STOP_ID)
+        val stopDetail = getMockStopDetail(createMockResponseWithCongestion("3", "5"))
 
         val firstCongestionLevel = stopDetail.busInfos.first().arrivalInfos[0].congestion
         assertEquals(CONGESTION_VALUE_THREE, firstCongestionLevel)
@@ -60,9 +56,7 @@ class ApiBusStopDetailRepositoryTest {
 
     @Test
     fun `when StopDetailResponse has unknown congestion values then UNKNOWN level should be returned`() = runTest {
-        val mockResponse = createStopDetailResponseWithCongestion("1", null)
-        coEvery { busApiService.getStationByUid(stopId = TEST_STOP_ID) } returns mockResponse
-        val stopDetail = repository.getBusStopDetail(TEST_STOP_ID)
+        val stopDetail = getMockStopDetail(createMockResponseWithCongestion("1", null))
 
         val firstCongestionLevel = stopDetail.busInfos.first().arrivalInfos[0].congestion
         assertEquals(CONGESTION_VALUE_UNKNOWN, firstCongestionLevel)
@@ -73,9 +67,7 @@ class ApiBusStopDetailRepositoryTest {
 
     @Test
     fun `when StopDetailResponse has arrival messages then both should be parsed correctly`() = runTest {
-        val mockResponse = createStopDetailResponseWithArrMsg("1분 30초후[1번째 전]", "[막차]1분 30초후[1번째 전]")
-        coEvery { busApiService.getStationByUid(stopId = TEST_STOP_ID) } returns mockResponse
-        val stopDetail = repository.getBusStopDetail(TEST_STOP_ID)
+        val stopDetail = getMockStopDetail(createMockResponseWithArrMsg("1분 30초후[1번째 전]", "[막차]1분 30초후[1번째 전]"))
 
         val firstArrivalTime = stopDetail.busInfos.first().arrivalInfos[0].arrivalTime
         val firstPosition = stopDetail.busInfos.first().arrivalInfos[0].position
@@ -90,9 +82,7 @@ class ApiBusStopDetailRepositoryTest {
 
     @Test
     fun `when StopDetailResponse has special arrival messages then they should be mapped correctly`() = runTest {
-        val mockResponse = createStopDetailResponseWithArrMsg("운행종료", "곧 도착")
-        coEvery { busApiService.getStationByUid(stopId = TEST_STOP_ID) } returns mockResponse
-        val stopDetail = repository.getBusStopDetail(TEST_STOP_ID)
+        val stopDetail = getMockStopDetail(createMockResponseWithArrMsg("운행종료", "곧 도착"))
 
         val firstArrivalTime = stopDetail.busInfos.first().arrivalInfos[0].arrivalTime
         val firstPosition = stopDetail.busInfos.first().arrivalInfos[0].position
@@ -107,9 +97,7 @@ class ApiBusStopDetailRepositoryTest {
 
     @Test
     fun `when StopDetailResponse has no arrival messages then arrivalInfos should be null`() = runTest {
-        val mockResponse = createStopDetailResponseWithArrMsg(null, null)
-        coEvery { busApiService.getStationByUid(stopId = TEST_STOP_ID) } returns mockResponse
-        val stopDetail = repository.getBusStopDetail(TEST_STOP_ID)
+        val stopDetail = getMockStopDetail(createMockResponseWithArrMsg(null, null))
 
         val firstArrivalInfo = stopDetail.busInfos.first().arrivalInfos.getOrNull(0)
         assertNull(firstArrivalInfo)
@@ -118,7 +106,7 @@ class ApiBusStopDetailRepositoryTest {
         assertNull(secondArrivalInfo)
     }
 
-    private fun createStopDetailResponse(): StopDetailResponse {
+    private fun createMockResponse(): StopDetailResponse {
         val busInfo = StopDetailItem(
             "604",
             "화곡역4번출구",
@@ -131,7 +119,7 @@ class ApiBusStopDetailRepositoryTest {
         return StopDetailResponse(StopDetailBody(listOf(busInfo)))
     }
 
-    private fun createStopDetailResponseWithCongestion(firstBusCongestion: String?, secondBusCongestion: String?): StopDetailResponse {
+    private fun createMockResponseWithCongestion(firstBusCongestion: String?, secondBusCongestion: String?): StopDetailResponse {
         val busInfo = StopDetailItem(
             "604",
             "화곡역4번출구",
@@ -144,7 +132,7 @@ class ApiBusStopDetailRepositoryTest {
         return StopDetailResponse(StopDetailBody(listOf(busInfo)))
     }
 
-    private fun createStopDetailResponseWithArrMsg(firstArrMsg: String?, secondArrMsg: String?): StopDetailResponse {
+    private fun createMockResponseWithArrMsg(firstArrMsg: String?, secondArrMsg: String?): StopDetailResponse {
         val busInfo = StopDetailItem(
             "604",
             "화곡역4번출구",
@@ -157,10 +145,15 @@ class ApiBusStopDetailRepositoryTest {
         return StopDetailResponse(StopDetailBody(listOf(busInfo)))
     }
 
+    private suspend fun getMockStopDetail(mockResponse: StopDetailResponse): BusStopDetail {
+        coEvery { busApiService.getStationByUid(stopId = TEST_STOP_ID) } returns mockResponse
+        return repository.getBusStopDetail(TEST_STOP_ID)
+    }
+
     companion object {
         private const val TEST_STOP_ID = "16206"
-        private val EXPECTED_NEXT_STOP_NAME = "화곡본동시장"
-        val EXPECTED_STOP_DETAIL = BusStopDetail(
+        private const val EXPECTED_NEXT_STOP_NAME = "화곡본동시장"
+        private val EXPECTED_STOP_DETAIL = BusStopDetail(
             "화곡역4번출구", listOf(
                 BusInfo(
                     "604", "화곡본동시장", listOf(
