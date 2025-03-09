@@ -17,22 +17,22 @@ internal class StopDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val dummyData = MutableLiveData<BusStopDetail>()
-    private val isLoadingData = MutableLiveData<Boolean>()
-    private val stopIdData = MutableLiveData<String>(savedStateHandle.get(BUS_STOP_ID))
-    val stopDetail: LiveData<BusStopDetail> = dummyData
-    val isLoading: LiveData<Boolean> = isLoadingData
-    val stopId: LiveData<String> = stopIdData
+    private val _stopDetail = MutableLiveData<BusStopDetail>()
+    private val _isLoading = MutableLiveData<Boolean>()
+    private val _stopId = MutableLiveData<String>(savedStateHandle.get(BUS_STOP_ID))
+    val stopDetail: LiveData<BusStopDetail> = _stopDetail
+    val isLoading: LiveData<Boolean> = _isLoading
+    val stopId: LiveData<String> = _stopId
 
     init {
         asyncDataLoad()
     }
 
     private fun asyncDataLoad() {
-        isLoadingData.value = true
+        _isLoading.value = true
         viewModelScope.launch {
-            dummyData.value = busStopDetailRepository.getBusStopDetail(stopIdData.value!!)
-            isLoadingData.value = false
+            _stopDetail.value = busStopDetailRepository.getBusStopDetail(_stopId.value!!)
+            _isLoading.value = false
         }
     }
 
