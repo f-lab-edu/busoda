@@ -90,6 +90,8 @@ class StopListViewModelTest {
     @Test
     fun `when data loading completes then isLoading should be false`() {
         viewModel = createViewModel(TEST_BUS_STOPS, TEST_NEXT_STOP_NAMES)
+        viewModel.setKeyWord(TEST_KEYWORD)
+        viewModel.busStops.getOrAwaitValue()
         coVerify {
             busStopRepository.getBusStops(any())
             busStopDetailRepository.getNextStopName(any())
