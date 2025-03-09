@@ -17,9 +17,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -40,10 +38,10 @@ internal class StopListViewModel @Inject constructor(
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     val busStops: LiveData<List<BusStop>> = keyWord
         .debounce(1000)
-        .flatMapLatest { word ->
+        .mapLatest { word ->
             when {
                 word.length > 2 -> loadBusStops(word)
-                else -> emptyFlow()
+                else -> emptyList()
             }
         }.asLiveData()
 
@@ -55,7 +53,7 @@ internal class StopListViewModel @Inject constructor(
         }
     }
 
-    private fun loadBusStops(stopName: String) = flow {
+    private suspend fun loadBusStops(stopName: String): List<BusStop> {
         _isLoading.value = true
         val stops = busStopRepository.getBusStops(stopName)
         val updatedStops = coroutineScope {
@@ -65,8 +63,8 @@ internal class StopListViewModel @Inject constructor(
                 }
             }.awaitAll()
         }
-        emit(updatedStops)
         _isLoading.value = false
+        return updatedStops
     }
 
     fun handleBusStopClick(stopId: String) {
