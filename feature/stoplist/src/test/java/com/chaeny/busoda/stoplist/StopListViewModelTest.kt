@@ -11,6 +11,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -90,6 +91,16 @@ class StopListViewModelTest {
             BusStop("16146", "화곡본동시장", "한국폴리텍1.서울강서대학교")
         )
         assertEquals(expectedBusStops, updatedBusStops)
+    }
+
+    @Test
+    fun `when keyWord is empty then busStops should be empty`() = runTest {
+        viewModel = createViewModel(TEST_BUS_STOPS, TEST_NEXT_STOP_NAMES)
+        viewModel.busStops.observeForever { }
+        viewModel.setKeyWord("")
+        advanceTimeBy(1100)
+        val updatedBusStops = viewModel.busStops.getOrAwaitValue()
+        assertEquals(emptyList<BusStop>(), updatedBusStops)
     }
 
     @Test
