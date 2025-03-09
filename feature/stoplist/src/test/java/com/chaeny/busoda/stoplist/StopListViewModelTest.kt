@@ -1,37 +1,43 @@
 package com.chaeny.busoda.stoplist
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.SavedStateHandle
 import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.data.repository.BusStopRepository
 import com.chaeny.busoda.model.BusStop
-import com.chaeny.busoda.testing.util.getOrAwaitValue
 import com.chaeny.busoda.testing.util.MainCoroutineScopeRule
+import com.chaeny.busoda.testing.util.getOrAwaitValue
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import org.junit.Assert.*
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class StopListViewModelTest {
 
     @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule()
 
-    @ExperimentalCoroutinesApi
     @get:Rule
     val coroutineScope = MainCoroutineScopeRule()
 
     private lateinit var viewModel: StopListViewModel
     private lateinit var busStopRepository: BusStopRepository
     private lateinit var busStopDetailRepository: BusStopDetailRepository
+    private lateinit var savedStateHandle: SavedStateHandle
 
     @Before
     fun setup() {
         busStopRepository = mockk()
         busStopDetailRepository = mockk()
+        savedStateHandle = SavedStateHandle()
     }
 
     private fun createViewModel(
@@ -40,11 +46,11 @@ class StopListViewModelTest {
     ): StopListViewModel {
         stubBusStopRepository(initialBusStops)
         stubBusStopDetailRepository(nextStopNames)
-        return StopListViewModel(busStopRepository, busStopDetailRepository)
+        return StopListViewModel(busStopRepository, busStopDetailRepository, savedStateHandle)
     }
 
     private fun stubBusStopRepository(busStops: List<BusStop>) {
-        coEvery { busStopRepository.getBusStops() } returns busStops
+        coEvery { busStopRepository.getBusStops(any()) } returns busStops
     }
 
     private fun stubBusStopDetailRepository(nextStopNames: Map<String, String>) {
@@ -60,7 +66,7 @@ class StopListViewModelTest {
     }
 
     @Test
-    fun `when initialized then updatedBusStops should include nextStopName`() {
+    fun `when initialized then updatedBusStops should include nextStopName`() = runTest {
         val initialBusStops = listOf(
             BusStop("16206", "화곡역4번출구"),
             BusStop("16146", "화곡본동시장")
@@ -70,9 +76,10 @@ class StopListViewModelTest {
             "16146" to "한국폴리텍1.서울강서대학교"
         )
         viewModel = createViewModel(initialBusStops, nextStopNames)
-        verifyGetNextStopNameCalls(initialBusStops.size)
-
+        viewModel.setKeyWord(TEST_KEYWORD)
+        advanceUntilIdle()
         val updatedBusStops = viewModel.busStops.getOrAwaitValue()
+        verifyGetNextStopNameCalls(initialBusStops.size)
         val expectedBusStops = listOf(
             BusStop("16206", "화곡역4번출구", "화곡본동시장"),
             BusStop("16146", "화곡본동시장", "한국폴리텍1.서울강서대학교")
@@ -84,7 +91,7 @@ class StopListViewModelTest {
     fun `when data loading completes then isLoading should be false`() {
         viewModel = createViewModel(TEST_BUS_STOPS, TEST_NEXT_STOP_NAMES)
         coVerify {
-            busStopRepository.getBusStops()
+            busStopRepository.getBusStops(any())
             busStopDetailRepository.getNextStopName(any())
         }
         val isLoading = viewModel.isLoading.getOrAwaitValue()
@@ -109,5 +116,6 @@ class StopListViewModelTest {
             "16206" to "화곡본동시장",
             "16146" to "한국폴리텍1.서울강서대학교"
         )
+        private const val TEST_KEYWORD = "화곡역"
     }
 }
