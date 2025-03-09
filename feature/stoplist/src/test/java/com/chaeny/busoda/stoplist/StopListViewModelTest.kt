@@ -107,7 +107,6 @@ class StopListViewModelTest {
     fun `when data loading completes then isLoading should be false`() {
         viewModel = createViewModel(TEST_BUS_STOPS, TEST_NEXT_STOP_NAMES)
         triggerLoadBusStops()
-        viewModel.busStops.getOrAwaitValue()
         coVerify {
             busStopRepository.getBusStops(any())
             busStopDetailRepository.getNextStopName(any())
@@ -122,6 +121,26 @@ class StopListViewModelTest {
         viewModel.handleBusStopClick(EXPECTED_STOP_ID)
         val clickEvent = viewModel.busStopClicked.getOrAwaitValue()
         assertEquals(EXPECTED_STOP_ID, clickEvent.getContentIfNotHandled())
+    }
+
+    @Test
+    fun `when keyword is updated then api is called only once after debounce time`() = runTest {
+        viewModel = createViewModel(TEST_BUS_STOPS, TEST_NEXT_STOP_NAMES)
+        viewModel.busStops.observeForever { }
+
+        viewModel.setKeyWord("화")
+        advanceTimeBy(500)
+        viewModel.setKeyWord("화곡")
+        advanceTimeBy(500)
+        viewModel.setKeyWord("화곡역")
+        coVerify(exactly = 0) {
+            busStopRepository.getBusStops(any())
+        }
+
+        advanceTimeBy(1100)
+        coVerify(exactly = 1) {
+            busStopRepository.getBusStops(any())
+        }
     }
 
     companion object {
