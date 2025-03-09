@@ -65,8 +65,14 @@ class StopListViewModelTest {
         }
     }
 
+    private fun triggerLoadBusStops() = runTest {
+        viewModel.busStops.observeForever { }
+        viewModel.setKeyWord(TEST_KEYWORD)
+        advanceUntilIdle()
+    }
+
     @Test
-    fun `when initialized then updatedBusStops should include nextStopName`() = runTest {
+    fun `when loadBusStops is called then updatedBusStops should include nextStopName`() {
         val initialBusStops = listOf(
             BusStop("16206", "화곡역4번출구"),
             BusStop("16146", "화곡본동시장")
@@ -76,8 +82,7 @@ class StopListViewModelTest {
             "16146" to "한국폴리텍1.서울강서대학교"
         )
         viewModel = createViewModel(initialBusStops, nextStopNames)
-        viewModel.setKeyWord(TEST_KEYWORD)
-        advanceUntilIdle()
+        triggerLoadBusStops()
         val updatedBusStops = viewModel.busStops.getOrAwaitValue()
         verifyGetNextStopNameCalls(initialBusStops.size)
         val expectedBusStops = listOf(
@@ -90,7 +95,7 @@ class StopListViewModelTest {
     @Test
     fun `when data loading completes then isLoading should be false`() {
         viewModel = createViewModel(TEST_BUS_STOPS, TEST_NEXT_STOP_NAMES)
-        viewModel.setKeyWord(TEST_KEYWORD)
+        triggerLoadBusStops()
         viewModel.busStops.getOrAwaitValue()
         coVerify {
             busStopRepository.getBusStops(any())
@@ -110,6 +115,7 @@ class StopListViewModelTest {
 
     companion object {
         private const val EXPECTED_STOP_ID = "16206"
+        private const val TEST_KEYWORD = "화곡역"
         private val TEST_BUS_STOPS = listOf(
             BusStop("16206", "화곡역4번출구"),
             BusStop("16146", "화곡본동시장")
@@ -118,6 +124,5 @@ class StopListViewModelTest {
             "16206" to "화곡본동시장",
             "16146" to "한국폴리텍1.서울강서대학교"
         )
-        private const val TEST_KEYWORD = "화곡역"
     }
 }
