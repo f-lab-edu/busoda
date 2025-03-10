@@ -135,12 +135,18 @@ class StopListViewModelTest {
         advanceTimeBy(500)
         viewModel.setKeyWord("화곡역")
         coVerify(exactly = 0) {
-            busStopRepository.getBusStops(any())
+            busStopRepository.getBusStops("화")
+            busStopRepository.getBusStops("화곡")
+            busStopRepository.getBusStops("화곡역")
         }
 
         advanceTimeBy(1100)
+        coVerify(exactly = 0) {
+            busStopRepository.getBusStops("화")
+            busStopRepository.getBusStops("화곡")
+        }
         coVerify(exactly = 1) {
-            busStopRepository.getBusStops(any())
+            busStopRepository.getBusStops("화곡역")
         }
     }
 
