@@ -30,10 +30,14 @@ internal class StopListViewModel @Inject constructor(
 
     private val _busStopClicked = MutableLiveData<Event<String>>()
     private val _isLoading = MutableLiveData<Boolean>()
+    private val _isNoResult = MutableLiveData<Boolean>()
+    private val _isNetworkError = MutableLiveData<Boolean>()
     private val keyWord: MutableStateFlow<String> =
         MutableStateFlow(savedStateHandle.get(KEYWORD_SAVED_STATE_KEY) ?: EMPTY_KEYWORD)
     val busStopClicked: LiveData<Event<String>> = _busStopClicked
     val isLoading: LiveData<Boolean> = _isLoading
+    val isNoResult: LiveData<Boolean> = _isNoResult
+    val isNetworkError: LiveData<Boolean> = _isNetworkError
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     val busStops: LiveData<List<BusStop>> = keyWord
@@ -55,16 +59,33 @@ internal class StopListViewModel @Inject constructor(
 
     private suspend fun loadBusStops(stopName: String): List<BusStop> {
         _isLoading.value = true
-        val stops = busStopRepository.getBusStops(stopName)
-        val updatedStops = coroutineScope {
-            stops.map { stop ->
-                async {
-                    stop.copy(nextStopName = busStopDetailRepository.getNextStopName(stop.stopId))
+        val result = busStopRepository.getBusStops(stopName)
+
+        when {
+            result.isNetworkError -> {
+                _isNetworkError.value = true
+                _isLoading.value = false
+                return emptyList()
+            }
+
+            result.isNoResult -> {
+                _isNoResult.value = true
+                _isLoading.value = false
+                return emptyList()
+            }
+
+            else -> {
+                val updatedStops = coroutineScope {
+                    result.data.map { stop ->
+                        async {
+                            stop.copy(nextStopName = busStopDetailRepository.getNextStopName(stop.stopId))
+                        }
+                    }.awaitAll()
                 }
-            }.awaitAll()
+                _isLoading.value = false
+                return updatedStops
+            }
         }
-        _isLoading.value = false
-        return updatedStops
     }
 
     fun handleBusStopClick(stopId: String) {

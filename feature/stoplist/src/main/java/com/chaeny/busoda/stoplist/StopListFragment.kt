@@ -32,6 +32,7 @@ class StopListFragment : Fragment() {
         val adapter = StopListAdapter(viewModel::handleBusStopClick)
         binding.stopList.adapter = adapter
         subscribeUi(adapter)
+        subscribeStopResultError()
         subscribeStopClickEvent()
         setupSearchView()
         return binding.root
@@ -52,6 +53,26 @@ class StopListFragment : Fragment() {
         viewModel.busStopClicked.observe(viewLifecycleOwner) { event ->
             event.getContentIfNotHandled()?.let { stopId ->
                 navigateToStopDetail(stopId)
+            }
+        }
+    }
+
+    private fun subscribeStopResultError() {
+        viewModel.isNoResult.observe(viewLifecycleOwner) { isNoResult ->
+            if (isNoResult) {
+                messageHelper.showMessage(
+                    requireContext(),
+                    requireContext().getString(R.string.no_result)
+                )
+            }
+        }
+
+        viewModel.isNetworkError.observe(viewLifecycleOwner) { isNetworkError ->
+            if (isNetworkError) {
+                messageHelper.showMessage(
+                    requireContext(),
+                    requireContext().getString(R.string.network_error)
+                )
             }
         }
     }
