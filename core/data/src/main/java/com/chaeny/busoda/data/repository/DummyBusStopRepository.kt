@@ -15,8 +15,8 @@ class DummyBusStopRepository @Inject constructor() : BusStopRepository {
         BusStop("16008", "강서구청사거리.서울디지털대학교")
     )
 
-    override suspend fun getBusStops(stopName: String): List<BusStop> {
+    override suspend fun getBusStops(stopName: String): BusStopResult {
         delay(3000)
-        return dummyData
+        return BusStopResult(data = dummyData)
     }
 }
