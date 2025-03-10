@@ -61,30 +61,30 @@ internal class StopListViewModel @Inject constructor(
         _isLoading.value = true
         val result = busStopRepository.getBusStops(stopName)
 
-        when {
-            result.isNetworkError -> {
-                _isNetworkError.value = true
-                _isLoading.value = false
-                return emptyList()
-            }
+        if (result.isNetworkError) {
+            _isNetworkError.value = true
+            _isLoading.value = false
+            return emptyList()
+        }
 
-            result.isNoResult -> {
-                _isNoResult.value = true
-                _isLoading.value = false
-                return emptyList()
-            }
+        if (result.isNoResult) {
+            _isNoResult.value = true
+            _isLoading.value = false
+            return emptyList()
+        }
 
-            else -> {
-                val updatedStops = coroutineScope {
-                    result.data.map { stop ->
-                        async {
-                            stop.copy(nextStopName = busStopDetailRepository.getNextStopName(stop.stopId))
-                        }
-                    }.awaitAll()
+        val updatedStops = getUpdatedStops(result.data)
+        _isLoading.value = false
+        return updatedStops
+    }
+
+    private suspend fun getUpdatedStops(stops: List<BusStop>): List<BusStop> {
+        return coroutineScope {
+            stops.map { stop ->
+                async {
+                    stop.copy(nextStopName = busStopDetailRepository.getNextStopName(stop.stopId))
                 }
-                _isLoading.value = false
-                return updatedStops
-            }
+            }.awaitAll()
         }
     }
 
