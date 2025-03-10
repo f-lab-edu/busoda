@@ -21,7 +21,7 @@ class ApiBusStopRepository @Inject constructor(
         } catch (e: IOException) {
             BusStopResult(isNetworkError = true)
         } catch (e: Exception) {
-            BusStopResult(isNetworkError = true)
+            BusStopResult(isNoResult = true)
         }
     }
 

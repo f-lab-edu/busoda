@@ -8,4 +8,5 @@
     <string name="direction">%1$s 방면</string>
     <string name="network_error">인터넷이 연결되어 있지 않습니다.</string>
     <string name="no_result">검색결과가 없습니다.</string>
+    <string name="short_keyword">검색어가 너무 짧습니다.</string>
 </resources>

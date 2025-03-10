@@ -75,6 +75,15 @@ class StopListFragment : Fragment() {
                 )
             }
         }
+
+        viewModel.isShortKeyword.observe(viewLifecycleOwner) { isShortKeyword ->
+            if (isShortKeyword) {
+                messageHelper.showMessage(
+                    requireContext(),
+                    requireContext().getString(R.string.short_keyword)
+                )
+            }
+        }
     }
 
     private fun navigateToStopDetail(stopId: String) {

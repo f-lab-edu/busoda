@@ -32,12 +32,14 @@ internal class StopListViewModel @Inject constructor(
     private val _isLoading = MutableLiveData<Boolean>()
     private val _isNoResult = MutableLiveData<Boolean>()
     private val _isNetworkError = MutableLiveData<Boolean>()
+    private val _isShortKeyword = MutableLiveData<Boolean>()
     private val keyWord: MutableStateFlow<String> =
         MutableStateFlow(savedStateHandle.get(KEYWORD_SAVED_STATE_KEY) ?: EMPTY_KEYWORD)
     val busStopClicked: LiveData<Event<String>> = _busStopClicked
     val isLoading: LiveData<Boolean> = _isLoading
     val isNoResult: LiveData<Boolean> = _isNoResult
     val isNetworkError: LiveData<Boolean> = _isNetworkError
+    val isShortKeyword: LiveData<Boolean> = _isShortKeyword
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     val busStops: LiveData<List<BusStop>> = keyWord
@@ -45,7 +47,8 @@ internal class StopListViewModel @Inject constructor(
         .mapLatest { word ->
             when {
                 word.length > 2 -> loadBusStops(word)
-                else -> emptyList()
+                word.isEmpty() -> emptyList()
+                else -> handleShortKeyword()
             }
         }.asLiveData()
 
@@ -86,6 +89,11 @@ internal class StopListViewModel @Inject constructor(
                 }
             }.awaitAll()
         }
+    }
+
+    private fun handleShortKeyword(): List<BusStop> {
+        _isShortKeyword.value = true
+        return emptyList()
     }
 
     fun handleBusStopClick(stopId: String) {
