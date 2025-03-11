@@ -32,7 +32,7 @@ class StopListFragment : Fragment() {
         val adapter = StopListAdapter(viewModel::handleBusStopClick)
         binding.stopList.adapter = adapter
         subscribeUi(adapter)
-        subscribeStopResultError()
+        subscribeStopSpecificEvent()
         subscribeStopClickEvent()
         setupSearchView()
         return binding.root
@@ -57,33 +57,34 @@ class StopListFragment : Fragment() {
         }
     }
 
-    private fun subscribeStopResultError() {
-        viewModel.isNoResult.observe(viewLifecycleOwner) { isNoResult ->
-            if (isNoResult) {
-                messageHelper.showMessage(
-                    requireContext(),
-                    requireContext().getString(R.string.no_result)
-                )
+    private fun subscribeStopSpecificEvent() {
+        viewModel.isNoResult.observe(viewLifecycleOwner) { event ->
+            event.getContentIfNotHandled()?.let { isNoResult ->
+                if (isNoResult) {
+                    showMessage(R.string.no_result)
+                }
             }
         }
 
-        viewModel.isNetworkError.observe(viewLifecycleOwner) { isNetworkError ->
-            if (isNetworkError) {
-                messageHelper.showMessage(
-                    requireContext(),
-                    requireContext().getString(R.string.network_error)
-                )
+        viewModel.isNetworkError.observe(viewLifecycleOwner) { event ->
+            event.getContentIfNotHandled()?.let { isNetworkError ->
+                if (isNetworkError) {
+                    showMessage(R.string.network_error)
+                }
             }
         }
 
-        viewModel.isShortKeyword.observe(viewLifecycleOwner) { isShortKeyword ->
-            if (isShortKeyword) {
-                messageHelper.showMessage(
-                    requireContext(),
-                    requireContext().getString(R.string.short_keyword)
-                )
+        viewModel.isKeywordTooShort.observe(viewLifecycleOwner) { event ->
+            event.getContentIfNotHandled()?.let { isKeywordTooShort ->
+                if (isKeywordTooShort) {
+                    showMessage(R.string.short_keyword)
+                }
             }
         }
+    }
+
+    private fun showMessage(stringResId: Int) {
+        messageHelper.showMessage(requireContext(), requireContext().getString(stringResId))
     }
 
     private fun navigateToStopDetail(stopId: String) {

@@ -28,18 +28,18 @@ internal class StopListViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _busStopClicked = MutableLiveData<Event<String>>()
     private val _isLoading = MutableLiveData<Boolean>()
-    private val _isNoResult = MutableLiveData<Boolean>()
-    private val _isNetworkError = MutableLiveData<Boolean>()
-    private val _isShortKeyword = MutableLiveData<Boolean>()
+    private val _isNoResult = MutableLiveData<Event<Boolean>>()
+    private val _isNetworkError = MutableLiveData<Event<Boolean>>()
+    private val _isKeywordTooShort = MutableLiveData<Event<Boolean>>()
+    private val _busStopClicked = MutableLiveData<Event<String>>()
     private val keyWord: MutableStateFlow<String> =
         MutableStateFlow(savedStateHandle.get(KEYWORD_SAVED_STATE_KEY) ?: EMPTY_KEYWORD)
-    val busStopClicked: LiveData<Event<String>> = _busStopClicked
     val isLoading: LiveData<Boolean> = _isLoading
-    val isNoResult: LiveData<Boolean> = _isNoResult
-    val isNetworkError: LiveData<Boolean> = _isNetworkError
-    val isShortKeyword: LiveData<Boolean> = _isShortKeyword
+    val isNoResult: LiveData<Event<Boolean>> = _isNoResult
+    val isNetworkError: LiveData<Event<Boolean>> = _isNetworkError
+    val isKeywordTooShort: LiveData<Event<Boolean>> = _isKeywordTooShort
+    val busStopClicked: LiveData<Event<String>> = _busStopClicked
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     val busStops: LiveData<List<BusStop>> = keyWord
@@ -65,13 +65,13 @@ internal class StopListViewModel @Inject constructor(
         val result = busStopRepository.getBusStops(stopName)
 
         if (result.isNetworkError) {
-            _isNetworkError.value = true
+            _isNetworkError.value = Event(true)
             _isLoading.value = false
             return emptyList()
         }
 
         if (result.isNoResult) {
-            _isNoResult.value = true
+            _isNoResult.value = Event(true)
             _isLoading.value = false
             return emptyList()
         }
@@ -92,7 +92,7 @@ internal class StopListViewModel @Inject constructor(
     }
 
     private fun handleShortKeyword(): List<BusStop> {
-        _isShortKeyword.value = true
+        _isKeywordTooShort.value = Event(true)
         return emptyList()
     }
 
