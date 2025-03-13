@@ -10,18 +10,18 @@ class ApiBusStopRepository @Inject constructor(
     private val busApiService: BusApiService
 ) : BusStopRepository {
 
-    override suspend fun getBusStops(stopName: String): BusStopResult {
+    override suspend fun getBusStops(stopName: String): GetBusStopResult {
         return try {
             val response = busApiService.getStationByName(stopName = stopName)
             val busStops = response.toBusStopList()
             when {
-                busStops.isNotEmpty() -> BusStopResult(data = busStops)
-                else -> BusStopResult(isNoResult = true)
+                busStops.isNotEmpty() -> GetBusStopResult.Success(busStops)
+                else -> GetBusStopResult.NoResult
             }
         } catch (e: IOException) {
-            BusStopResult(isNetworkError = true)
+            GetBusStopResult.NetworkError
         } catch (e: Exception) {
-            BusStopResult(isNoResult = true)
+            GetBusStopResult.NoResult
         }
     }
 

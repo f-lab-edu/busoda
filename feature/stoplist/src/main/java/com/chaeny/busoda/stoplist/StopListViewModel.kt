@@ -8,6 +8,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.data.repository.BusStopRepository
+import com.chaeny.busoda.data.repository.GetBusStopResult
 import com.chaeny.busoda.model.BusStop
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -63,20 +64,17 @@ internal class StopListViewModel @Inject constructor(
     private suspend fun loadBusStops(stopName: String): List<BusStop> {
         _isLoading.value = true
         val result = busStopRepository.getBusStops(stopName)
-
-        if (result.isNetworkError) {
-            _isNetworkError.value = Event(true)
-            _isLoading.value = false
-            return emptyList()
+        val updatedStops = when (result) {
+            is GetBusStopResult.Success -> getUpdatedStops(result.data)
+            is GetBusStopResult.NoResult -> {
+                _isNoResult.value = Event(true)
+                emptyList()
+            }
+            is GetBusStopResult.NetworkError -> {
+                _isNetworkError.value = Event(true)
+                emptyList()
+            }
         }
-
-        if (result.isNoResult) {
-            _isNoResult.value = Event(true)
-            _isLoading.value = false
-            return emptyList()
-        }
-
-        val updatedStops = getUpdatedStops(result.data)
         _isLoading.value = false
         return updatedStops
     }
