@@ -4,7 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.SavedStateHandle
 import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.data.repository.BusStopRepository
-import com.chaeny.busoda.data.repository.BusStopResult
+import com.chaeny.busoda.data.repository.GetBusStopResult
 import com.chaeny.busoda.model.BusStop
 import com.chaeny.busoda.testing.util.MainCoroutineScopeRule
 import com.chaeny.busoda.testing.util.getOrAwaitValue
@@ -46,12 +46,12 @@ class StopListViewModelTest {
         initialBusStops: List<BusStop>,
         nextStopNames: Map<String, String>
     ): StopListViewModel {
-        stubBusStopRepository(BusStopResult(data = initialBusStops))
+        stubBusStopRepository(GetBusStopResult.Success(initialBusStops))
         stubBusStopDetailRepository(nextStopNames)
         return StopListViewModel(busStopRepository, busStopDetailRepository, savedStateHandle)
     }
 
-    private fun stubBusStopRepository(busStops: BusStopResult) {
+    private fun stubBusStopRepository(busStops: GetBusStopResult) {
         coEvery { busStopRepository.getBusStops(any()) } returns busStops
     }
 

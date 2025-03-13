@@ -55,7 +55,8 @@ class ApiBusStopDetailRepositoryTest {
                 )
             )
         )
-        val stopDetail = getParsedStopDetailWithMock(mockResponse)
+        coEvery { busApiService.getStationByUid(stopId = TEST_STOP_ID) } returns mockResponse
+        val stopDetail = repository.getBusStopDetail(TEST_STOP_ID)
         assertEquals(expectedStopDetail, stopDetail)
 
         val nextStopName = repository.getNextStopName(TEST_STOP_ID)
