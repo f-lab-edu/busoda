@@ -11,6 +11,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.fragment.findNavController
 import com.chaeny.busoda.stoplist.databinding.FragmentStopListBinding
+import com.chaeny.busoda.stoplist.event.EventObserver
 import com.chaeny.busoda.ui.MessageHelper
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -31,14 +32,14 @@ class StopListFragment : Fragment() {
         binding = FragmentStopListBinding.inflate(inflater, container, false)
         val adapter = StopListAdapter(viewModel::handleBusStopClick)
         binding.stopList.adapter = adapter
-        subscribeUi(adapter)
+        subscribeStopListUpdate(adapter)
         subscribeStopSpecificEvent()
         subscribeStopClickEvent()
         setupSearchView()
         return binding.root
     }
 
-    private fun subscribeUi(adapter: StopListAdapter) {
+    private fun subscribeStopListUpdate(adapter: StopListAdapter) {
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             binding.stopListLoadingBar.visibility =
                 if (isLoading) View.VISIBLE else View.GONE
@@ -50,37 +51,29 @@ class StopListFragment : Fragment() {
     }
 
     private fun subscribeStopClickEvent() {
-        viewModel.busStopClicked.observe(viewLifecycleOwner) { event ->
-            event.getContentIfNotHandled()?.let { stopId ->
-                navigateToStopDetail(stopId)
-            }
-        }
+        viewModel.busStopClicked.observe(viewLifecycleOwner, EventObserver { stopId ->
+            navigateToStopDetail(stopId)
+        })
     }
 
     private fun subscribeStopSpecificEvent() {
-        viewModel.isNoResult.observe(viewLifecycleOwner) { event ->
-            event.getContentIfNotHandled()?.let { isNoResult ->
-                if (isNoResult) {
-                    showMessage(R.string.no_result)
-                }
+        viewModel.isNoResult.observe(viewLifecycleOwner, EventObserver { isNoResult ->
+            if (isNoResult) {
+                showMessage(R.string.no_result)
             }
-        }
+        })
 
-        viewModel.isNetworkError.observe(viewLifecycleOwner) { event ->
-            event.getContentIfNotHandled()?.let { isNetworkError ->
-                if (isNetworkError) {
-                    showMessage(R.string.network_error)
-                }
+        viewModel.isNetworkError.observe(viewLifecycleOwner, EventObserver { isNetworkError ->
+            if (isNetworkError) {
+                showMessage(R.string.network_error)
             }
-        }
+        })
 
-        viewModel.isKeywordTooShort.observe(viewLifecycleOwner) { event ->
-            event.getContentIfNotHandled()?.let { isKeywordTooShort ->
-                if (isKeywordTooShort) {
-                    showMessage(R.string.short_keyword)
-                }
+        viewModel.isKeywordTooShort.observe(viewLifecycleOwner, EventObserver { isKeywordTooShort ->
+            if (isKeywordTooShort) {
+                showMessage(R.string.short_keyword)
             }
-        }
+        })
     }
 
     private fun showMessage(stringResId: Int) {
