@@ -63,6 +63,12 @@ class StopListFragment : Fragment() {
             }
         })
 
+        viewModel.isNoInternet.observe(viewLifecycleOwner, EventObserver { isNoInternet ->
+            if (isNoInternet) {
+                showMessage(R.string.no_internet)
+            }
+        })
+
         viewModel.isNetworkError.observe(viewLifecycleOwner, EventObserver { isNetworkError ->
             if (isNetworkError) {
                 showMessage(R.string.network_error)

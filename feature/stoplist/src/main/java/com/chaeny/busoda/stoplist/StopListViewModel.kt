@@ -32,6 +32,7 @@ internal class StopListViewModel @Inject constructor(
 
     private val _isLoading = MutableLiveData<Boolean>()
     private val _isNoResult = MutableLiveData<Event<Boolean>>()
+    private val _isNoInternet = MutableLiveData<Event<Boolean>>()
     private val _isNetworkError = MutableLiveData<Event<Boolean>>()
     private val _isKeywordTooShort = MutableLiveData<Event<Boolean>>()
     private val _busStopClicked = MutableLiveData<Event<String>>()
@@ -39,6 +40,7 @@ internal class StopListViewModel @Inject constructor(
         MutableStateFlow(savedStateHandle.get(KEYWORD_SAVED_STATE_KEY) ?: EMPTY_KEYWORD)
     val isLoading: LiveData<Boolean> = _isLoading
     val isNoResult: LiveData<Event<Boolean>> = _isNoResult
+    val isNoInternet: LiveData<Event<Boolean>> = _isNoInternet
     val isNetworkError: LiveData<Event<Boolean>> = _isNetworkError
     val isKeywordTooShort: LiveData<Event<Boolean>> = _isKeywordTooShort
     val busStopClicked: LiveData<Event<String>> = _busStopClicked
@@ -69,6 +71,10 @@ internal class StopListViewModel @Inject constructor(
             is GetBusStopResult.Success -> getUpdatedStops(result.data)
             is GetBusStopResult.NoResult -> {
                 _isNoResult.value = Event(true)
+                emptyList()
+            }
+            is GetBusStopResult.NoInternet -> {
+                _isNoInternet.value = Event(true)
                 emptyList()
             }
             is GetBusStopResult.NetworkError -> {

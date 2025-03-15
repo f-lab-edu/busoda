@@ -4,6 +4,7 @@ import com.chaeny.busoda.data.model.StopListResponse
 import com.chaeny.busoda.data.network.BusApiService
 import com.chaeny.busoda.model.BusStop
 import java.io.IOException
+import java.net.UnknownHostException
 import javax.inject.Inject
 
 class ApiBusStopRepository @Inject constructor(
@@ -18,10 +19,12 @@ class ApiBusStopRepository @Inject constructor(
                 busStops.isNotEmpty() -> GetBusStopResult.Success(busStops)
                 else -> GetBusStopResult.NoResult
             }
-        } catch (e: IOException) {
-            GetBusStopResult.NetworkError
         } catch (e: Exception) {
-            GetBusStopResult.NoResult
+            when (e) {
+                is UnknownHostException -> GetBusStopResult.NoInternet
+                is IOException -> GetBusStopResult.NetworkError
+                else -> GetBusStopResult.NetworkError
+            }
         }
     }
 
