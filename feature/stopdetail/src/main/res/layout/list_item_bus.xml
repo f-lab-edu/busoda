@@ -26,7 +26,7 @@
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_percent="0.25"
+            app:layout_constraintWidth_percent="0.3"
             tools:text="심야A21" />
 
         <TextView
@@ -41,7 +41,7 @@
             android:textSize="15sp"
             app:layout_constraintBottom_toBottomOf="@id/text_bus_number"
             app:layout_constraintEnd_toStartOf="@id/text_direction"
-            app:layout_constraintWidth_percent="0.6"
+            app:layout_constraintWidth_percent="0.55"
             tools:text="강서구청사거리.서울디지털대학교" />
 
         <TextView
