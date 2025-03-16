@@ -7,9 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
+import androidx.appcompat.widget.SearchView
 import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.fragment.findNavController
 import com.chaeny.busoda.stoplist.databinding.FragmentStopListBinding
+import com.chaeny.busoda.stoplist.event.EventObserver
 import com.chaeny.busoda.ui.MessageHelper
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -30,14 +32,14 @@ class StopListFragment : Fragment() {
         binding = FragmentStopListBinding.inflate(inflater, container, false)
         val adapter = StopListAdapter(viewModel::handleBusStopClick)
         binding.stopList.adapter = adapter
-        subscribeUi(adapter)
-        setupRemoveButton()
-        subscribeRemoveEvent()
+        subscribeStopListUpdate(adapter)
+        subscribeStopSpecificEvent()
         subscribeStopClickEvent()
+        setupSearchView()
         return binding.root
     }
 
-    private fun subscribeUi(adapter: StopListAdapter) {
+    private fun subscribeStopListUpdate(adapter: StopListAdapter) {
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             binding.stopListLoadingBar.visibility =
                 if (isLoading) View.VISIBLE else View.GONE
@@ -48,26 +50,40 @@ class StopListFragment : Fragment() {
         }
     }
 
-    private fun subscribeRemoveEvent() {
-        viewModel.removeCompleted.observe(viewLifecycleOwner) { event ->
-            event.getContentIfNotHandled()?.let { result ->
-                messageHelper.showMessage(requireContext(), result.getRemoveMessage())
-            }
-        }
-    }
-
-    private fun RemoveResult.getRemoveMessage(): String {
-        return when (this) {
-            RemoveResult.SUCCESS -> getString(R.string.remove_stop_completed)
-        }
-    }
-
     private fun subscribeStopClickEvent() {
-        viewModel.busStopClicked.observe(viewLifecycleOwner) { event ->
-            event.getContentIfNotHandled()?.let { stopId ->
-                navigateToStopDetail(stopId)
+        viewModel.busStopClicked.observe(viewLifecycleOwner, EventObserver { stopId ->
+            navigateToStopDetail(stopId)
+        })
+    }
+
+    private fun subscribeStopSpecificEvent() {
+        viewModel.isNoResult.observe(viewLifecycleOwner, EventObserver { isNoResult ->
+            if (isNoResult) {
+                showMessage(R.string.no_result)
             }
-        }
+        })
+
+        viewModel.isNoInternet.observe(viewLifecycleOwner, EventObserver { isNoInternet ->
+            if (isNoInternet) {
+                showMessage(R.string.no_internet)
+            }
+        })
+
+        viewModel.isNetworkError.observe(viewLifecycleOwner, EventObserver { isNetworkError ->
+            if (isNetworkError) {
+                showMessage(R.string.network_error)
+            }
+        })
+
+        viewModel.isKeywordTooShort.observe(viewLifecycleOwner, EventObserver { isKeywordTooShort ->
+            if (isKeywordTooShort) {
+                showMessage(R.string.short_keyword)
+            }
+        })
+    }
+
+    private fun showMessage(stringResId: Int) {
+        messageHelper.showMessage(requireContext(), requireContext().getString(stringResId))
     }
 
     private fun navigateToStopDetail(stopId: String) {
@@ -78,9 +94,18 @@ class StopListFragment : Fragment() {
         findNavController().navigate(request)
     }
 
-    private fun setupRemoveButton() {
-        binding.removeStopButton.setOnClickListener {
-            viewModel.removeLastStop()
-        }
+    private fun setupSearchView() {
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                newText?.let {
+                    viewModel.setKeyWord(it)
+                }
+                return false
+            }
+        })
     }
 }

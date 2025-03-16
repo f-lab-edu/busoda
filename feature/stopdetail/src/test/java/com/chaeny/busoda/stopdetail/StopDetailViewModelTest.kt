@@ -6,6 +6,7 @@ import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.model.BusArrivalInfo
 import com.chaeny.busoda.model.BusInfo
 import com.chaeny.busoda.model.BusStopDetail
+import com.chaeny.busoda.model.CongestionLevel
 import com.chaeny.busoda.testing.util.MainCoroutineScopeRule
 import com.chaeny.busoda.testing.util.getOrAwaitValue
 import io.mockk.coEvery
@@ -36,9 +37,9 @@ class StopDetailViewModelTest {
         savedStateHandle = SavedStateHandle()
     }
 
-    private fun initViewModel(
-        stopId: String = TEST_STOP_ID,
-        stopDetail: BusStopDetail = TEST_STOP_DETAIL
+    private fun createViewModel(
+        stopId: String,
+        stopDetail: BusStopDetail
     ): StopDetailViewModel {
         stubBusStopDetail(stopId, stopDetail)
         savedStateHandle.set(STOP_ID_KEY, stopId)
@@ -51,7 +52,7 @@ class StopDetailViewModelTest {
 
     @Test
     fun `when asyncDataLoad called then stopId and stopDetail should equal expected value`() {
-        viewModel = initViewModel(TEST_STOP_ID, TEST_STOP_DETAIL)
+        viewModel = createViewModel(TEST_STOP_ID, TEST_STOP_DETAIL)
         val observedStopId = viewModel.stopId.getOrAwaitValue()
         assertEquals(TEST_STOP_ID, observedStopId)
 
@@ -61,14 +62,14 @@ class StopDetailViewModelTest {
 
     @Test
     fun `when stopId invalid then stopDetail should equal expected value`() {
-        viewModel = initViewModel(INVALID_STOP_ID, EMPTY_STOP_DETAIL)
+        viewModel = createViewModel(INVALID_STOP_ID, EMPTY_STOP_DETAIL)
         val observedStopDetail = viewModel.stopDetail.getOrAwaitValue()
         assertEquals(EMPTY_STOP_DETAIL, observedStopDetail)
     }
 
     @Test
     fun `when data loading completes then isLoading should be false`() {
-        viewModel = initViewModel()
+        viewModel = createViewModel(TEST_STOP_ID, TEST_STOP_DETAIL)
         coVerify {
             repository.getBusStopDetail(any())
         }
@@ -85,7 +86,7 @@ class StopDetailViewModelTest {
             "화곡역4번출구", listOf(
                 BusInfo(
                     "604", "화곡본동시장", listOf(
-                        BusArrivalInfo("2분 38초", "2번째 전", "보통")
+                        BusArrivalInfo("2분 38초", "2번째 전", CongestionLevel.MEDIUM)
                     )
                 )
             )

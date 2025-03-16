@@ -6,29 +6,29 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/remove_stop_button"
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/search_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="30dp"
-        android:layout_marginTop="30dp"
-        android:text="@string/remove_stop"
-        android:textColor="?attr/colorOnSecondary"
-        app:backgroundTint="@android:color/white"
+        android:layout_marginTop="20dp"
+        app:defaultQueryHint="@string/stop_search"
+        app:iconifiedByDefault="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:searchIcon="@null" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/stop_list"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="20dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/remove_stop_button"
+        app:layout_constraintTop_toBottomOf="@+id/search_view"
         tools:listitem="@layout/list_item_stop" />
 
     <ProgressBar

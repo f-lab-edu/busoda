@@ -1,9 +1,9 @@
 package com.chaeny.busoda.data.di
 
+import com.chaeny.busoda.data.repository.ApiBusStopDetailRepository
+import com.chaeny.busoda.data.repository.ApiBusStopRepository
 import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.data.repository.BusStopRepository
-import com.chaeny.busoda.data.repository.DummyBusStopDetailRepository
-import com.chaeny.busoda.data.repository.DummyBusStopRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -16,9 +16,9 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindBusStopRepository(implementation: DummyBusStopRepository): BusStopRepository
+    abstract fun bindBusStopRepository(implementation: ApiBusStopRepository): BusStopRepository
 
     @Binds
     @Singleton
-    abstract fun bindBusStopDetailRepository(implementation: DummyBusStopDetailRepository): BusStopDetailRepository
+    abstract fun bindBusStopDetailRepository(implementation: ApiBusStopDetailRepository): BusStopDetailRepository
 }
