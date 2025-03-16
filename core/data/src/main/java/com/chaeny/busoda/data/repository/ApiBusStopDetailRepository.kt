@@ -2,6 +2,7 @@ package com.chaeny.busoda.data.repository
 
 import com.chaeny.busoda.data.model.StopDetailResponse
 import com.chaeny.busoda.data.network.BusApiService
+import com.chaeny.busoda.data.util.replaceStopNameEntities
 import com.chaeny.busoda.model.BusArrivalInfo
 import com.chaeny.busoda.model.BusInfo
 import com.chaeny.busoda.model.BusStopDetail
@@ -46,13 +47,13 @@ class ApiBusStopDetailRepository @Inject constructor(
             )
             BusInfo(
                 busInfo.busNumber.orEmpty(),
-                busInfo.nextStopName.orEmpty(),
+                busInfo.nextStopName.orEmpty().replaceStopNameEntities(),
                 busArrivalInfos
             )
         }.orEmpty()
 
         return BusStopDetail(
-            stopName.orEmpty(),
+            stopName.orEmpty().replaceStopNameEntities(),
             mappedBusInfos
         )
     }
@@ -60,7 +61,7 @@ class ApiBusStopDetailRepository @Inject constructor(
     private fun StopDetailResponse.toNextStopName(): String {
         val busInfos = msgBody?.busInfos
         val nextStopName = busInfos?.firstOrNull()?.nextStopName
-        return nextStopName.orEmpty()
+        return nextStopName.orEmpty().replaceStopNameEntities()
     }
 
     private fun StopDetailResponse.parseArrivalInfo(

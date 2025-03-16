@@ -2,6 +2,7 @@ package com.chaeny.busoda.data.repository
 
 import com.chaeny.busoda.data.model.StopListResponse
 import com.chaeny.busoda.data.network.BusApiService
+import com.chaeny.busoda.data.util.replaceStopNameEntities
 import com.chaeny.busoda.model.BusStop
 import java.io.IOException
 import java.net.UnknownHostException
@@ -34,7 +35,7 @@ class ApiBusStopRepository @Inject constructor(
         val mappedBusStops = busStops?.map { busStop ->
             BusStop(
                 stopId = busStop.stopId.orEmpty(),
-                stopName = busStop.stopName.orEmpty()
+                stopName = busStop.stopName.orEmpty().replaceStopNameEntities()
             )
         }.orEmpty()
 
