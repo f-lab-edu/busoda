@@ -1,5 +1,6 @@
 package com.chaeny.busoda.stopdetail
 
+import android.animation.ObjectAnimator
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -54,7 +55,15 @@ class StopDetailFragment : Fragment() {
 
     private fun setupRefreshButton() {
         binding.refreshButton.setOnClickListener {
+            startRotateAnimation(it)
             viewModel.refreshData()
+        }
+    }
+
+    private fun startRotateAnimation(view: View) {
+        ObjectAnimator.ofFloat(view, View.ROTATION, 0f, 180f).apply {
+            duration = 500
+            start()
         }
     }
 }
