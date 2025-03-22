@@ -53,7 +53,7 @@ class StopDetailFragment : Fragment() {
     }
 
     private fun setupRefreshButton() {
-        binding.refreshButton.setOnClickListener{
+        binding.refreshButton.setOnClickListener {
             viewModel.refreshData()
         }
     }
