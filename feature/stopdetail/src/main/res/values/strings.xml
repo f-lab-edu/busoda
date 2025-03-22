@@ -7,4 +7,5 @@
     <string name="congestion_high">혼잡</string>
     <string name="congestion_medium">보통</string>
     <string name="congestion_low">여유</string>
+    <string name="refresh">새로고침</string>
 </resources>
