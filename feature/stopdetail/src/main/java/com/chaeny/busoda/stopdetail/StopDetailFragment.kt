@@ -25,6 +25,7 @@ class StopDetailFragment : Fragment() {
         binding.busList.adapter = adapter
         subscribeUi(adapter)
         bindReceivedData()
+        setupRefreshButton()
         return binding.root
     }
 
@@ -48,6 +49,12 @@ class StopDetailFragment : Fragment() {
     private fun bindReceivedData() {
         viewModel.stopId.observe(viewLifecycleOwner) { stopId ->
             binding.textBusStopId.text = stopId
+        }
+    }
+
+    private fun setupRefreshButton() {
+        binding.refreshButton.setOnClickListener{
+            viewModel.refreshData()
         }
     }
 }

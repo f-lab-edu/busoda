@@ -36,6 +36,10 @@ internal class StopDetailViewModel @Inject constructor(
         }
     }
 
+    fun refreshData() {
+        asyncDataLoad()
+    }
+
     companion object {
         private const val BUS_STOP_ID = "stopId"
     }
