@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.chaeny.busoda.stopdetail.databinding.FragmentStopDetailBinding
+import com.chaeny.busoda.stopdetail.event.EventObserver
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -28,6 +29,7 @@ class StopDetailFragment : Fragment() {
         bindReceivedData()
         setupRefreshButton()
         subscribeCountdownTimer()
+        subscribeRefreshEvent()
         return binding.root
     }
 
@@ -70,9 +72,16 @@ class StopDetailFragment : Fragment() {
         }
     }
 
+    private fun subscribeRefreshEvent() {
+        viewModel.refreshEvent.observe(viewLifecycleOwner, EventObserver { isRefresh ->
+            if (isRefresh) {
+                startRotateAnimation(binding.refreshButton)
+            }
+        })
+    }
+
     private fun setupRefreshButton() {
         binding.refreshButton.setOnClickListener {
-            startRotateAnimation(it)
             viewModel.refreshData()
         }
     }

@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.model.BusStopDetail
+import com.chaeny.busoda.stopdetail.event.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -22,10 +23,12 @@ internal class StopDetailViewModel @Inject constructor(
     private val _isLoading = MutableLiveData<Boolean>()
     private val _stopId = MutableLiveData<String>(savedStateHandle.get(BUS_STOP_ID))
     private val _timer = MutableLiveData<Int>()
+    private val _refreshEvent = MutableLiveData<Event<Boolean>>()
     val stopDetail: LiveData<BusStopDetail> = _stopDetail
     val isLoading: LiveData<Boolean> = _isLoading
     val stopId: LiveData<String> = _stopId
     val timer: LiveData<Int> = _timer
+    val refreshEvent: LiveData<Event<Boolean>> = _refreshEvent
 
     private var isRefreshing = false
 
@@ -42,6 +45,7 @@ internal class StopDetailViewModel @Inject constructor(
     }
 
     fun refreshData() {
+        _refreshEvent.value = Event(true)
         asyncDataLoad()
     }
 
@@ -54,7 +58,7 @@ internal class StopDetailViewModel @Inject constructor(
         viewModelScope.launch {
             while (isRefreshing) {
                 var count = 15
-                while (count > 0) {
+                while (count > 0 && isRefreshing) {
                     _timer.value = count
                     delay(1000)
                     count--
