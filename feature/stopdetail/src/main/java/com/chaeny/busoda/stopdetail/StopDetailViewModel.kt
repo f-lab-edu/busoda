@@ -9,6 +9,7 @@ import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.model.BusStopDetail
 import kotlinx.coroutines.launch
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import javax.inject.Inject
 
 @HiltViewModel
@@ -26,6 +27,7 @@ internal class StopDetailViewModel @Inject constructor(
 
     init {
         asyncDataLoad()
+        startAutoRefresh()
     }
 
     private fun asyncDataLoad() {
@@ -33,6 +35,15 @@ internal class StopDetailViewModel @Inject constructor(
         viewModelScope.launch {
             _stopDetail.value = busStopDetailRepository.getBusStopDetail(_stopId.value!!)
             _isLoading.value = false
+        }
+    }
+
+    private fun startAutoRefresh() {
+        viewModelScope.launch {
+            while (true) {
+                delay(15 * 1000)
+                refreshData()
+            }
         }
     }
 
