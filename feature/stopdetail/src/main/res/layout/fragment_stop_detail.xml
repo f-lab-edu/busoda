@@ -68,4 +68,17 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/ic_refresh" />
+
+    <TextView
+        android:id="@+id/text_timer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="?attr/colorPrimaryVariant"
+        android:textSize="14dp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@id/refresh_button"
+        app:layout_constraintStart_toStartOf="@+id/refresh_button"
+        app:layout_constraintTop_toBottomOf="@id/refresh_button"
+        tools:ignore="SpUsage"
+        tools:text="15" />
 </androidx.constraintlayout.widget.ConstraintLayout>

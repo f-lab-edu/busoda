@@ -27,6 +27,7 @@ class StopDetailFragment : Fragment() {
         subscribeUi(adapter)
         bindReceivedData()
         setupRefreshButton()
+        subscribeCountdownTimer()
         return binding.root
     }
 
@@ -60,6 +61,12 @@ class StopDetailFragment : Fragment() {
     private fun bindReceivedData() {
         viewModel.stopId.observe(viewLifecycleOwner) { stopId ->
             binding.textBusStopId.text = stopId
+        }
+    }
+
+    private fun subscribeCountdownTimer() {
+        viewModel.timer.observe(viewLifecycleOwner) { countdownValue ->
+            binding.textTimer.text = "$countdownValue"
         }
     }
 

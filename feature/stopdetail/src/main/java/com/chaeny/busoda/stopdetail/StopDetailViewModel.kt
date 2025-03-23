@@ -21,9 +21,11 @@ internal class StopDetailViewModel @Inject constructor(
     private val _stopDetail = MutableLiveData<BusStopDetail>()
     private val _isLoading = MutableLiveData<Boolean>()
     private val _stopId = MutableLiveData<String>(savedStateHandle.get(BUS_STOP_ID))
+    private val _timer = MutableLiveData<Int>()
     val stopDetail: LiveData<BusStopDetail> = _stopDetail
     val isLoading: LiveData<Boolean> = _isLoading
     val stopId: LiveData<String> = _stopId
+    val timer: LiveData<Int> = _timer
 
     private var isRefreshing = false
 
@@ -51,7 +53,12 @@ internal class StopDetailViewModel @Inject constructor(
 
         viewModelScope.launch {
             while (isRefreshing) {
-                delay(15 * 1000)
+                var count = 15
+                while (count > 0) {
+                    _timer.value = count
+                    delay(1000)
+                    count--
+                }
                 if (isRefreshing) {
                     refreshData()
                 }
