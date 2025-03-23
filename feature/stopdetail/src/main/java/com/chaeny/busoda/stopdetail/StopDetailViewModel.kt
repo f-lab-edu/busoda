@@ -31,6 +31,7 @@ internal class StopDetailViewModel @Inject constructor(
     val refreshEvent: LiveData<Event<Boolean>> = _refreshEvent
 
     private var isRefreshing = false
+    private var currentCount = 15
 
     init {
         asyncDataLoad()
@@ -44,7 +45,16 @@ internal class StopDetailViewModel @Inject constructor(
         }
     }
 
+    private suspend fun runCountdown() {
+        while (currentCount > 0 && isRefreshing) {
+            _timer.value = currentCount
+            delay(1000)
+            currentCount--
+        }
+    }
+
     fun refreshData() {
+        currentCount = 15
         _refreshEvent.value = Event(true)
         asyncDataLoad()
     }
@@ -57,12 +67,7 @@ internal class StopDetailViewModel @Inject constructor(
 
         viewModelScope.launch {
             while (isRefreshing) {
-                var count = 15
-                while (count > 0 && isRefreshing) {
-                    _timer.value = count
-                    delay(1000)
-                    count--
-                }
+                runCountdown()
                 if (isRefreshing) {
                     refreshData()
                 }
