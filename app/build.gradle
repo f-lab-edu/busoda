@@ -24,10 +24,12 @@ android {
 
     signingConfigs {
         release {
-            storeFile file(properties['STORE_FILE'])
-            storePassword properties['STORE_PASSWORD']
-            keyAlias properties['KEY_ALIAS']
-            keyPassword properties['KEY_PASSWORD']
+            if (properties['STORE_FILE'] != null) {
+                storeFile file(properties['STORE_FILE'])
+                storePassword properties['STORE_PASSWORD']
+                keyAlias properties['KEY_ALIAS']
+                keyPassword properties['KEY_PASSWORD']
+            }
         }
     }
 
