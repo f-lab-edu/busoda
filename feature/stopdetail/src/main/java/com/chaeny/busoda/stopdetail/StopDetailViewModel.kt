@@ -7,9 +7,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.model.BusStopDetail
-import kotlinx.coroutines.launch
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,9 +25,10 @@ internal class StopDetailViewModel @Inject constructor(
     val isLoading: LiveData<Boolean> = _isLoading
     val stopId: LiveData<String> = _stopId
 
+    private var isRefreshing = false
+
     init {
         asyncDataLoad()
-        startAutoRefresh()
     }
 
     private fun asyncDataLoad() {
@@ -38,17 +39,28 @@ internal class StopDetailViewModel @Inject constructor(
         }
     }
 
-    private fun startAutoRefresh() {
+    fun refreshData() {
+        asyncDataLoad()
+    }
+
+    fun startAutoRefresh() {
+        if (isRefreshing) {
+            return
+        }
+        isRefreshing = true
+
         viewModelScope.launch {
-            while (true) {
+            while (isRefreshing) {
                 delay(15 * 1000)
-                refreshData()
+                if (isRefreshing) {
+                    refreshData()
+                }
             }
         }
     }
 
-    fun refreshData() {
-        asyncDataLoad()
+    fun stopAutoRefresh() {
+        isRefreshing = false
     }
 
     companion object {
