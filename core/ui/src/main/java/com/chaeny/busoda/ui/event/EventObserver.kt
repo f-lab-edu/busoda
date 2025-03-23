@@ -1,4 +1,4 @@
-package com.chaeny.busoda.stopdetail.event
+package com.chaeny.busoda.ui.event
 
 import androidx.lifecycle.Observer
 
