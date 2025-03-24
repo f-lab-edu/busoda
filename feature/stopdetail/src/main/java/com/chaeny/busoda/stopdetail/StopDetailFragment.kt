@@ -7,8 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import com.chaeny.busoda.stopdetail.databinding.FragmentStopDetailBinding
 import com.chaeny.busoda.ui.event.EventObserver
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,7 +32,7 @@ class StopDetailFragment : Fragment() {
         setupRefreshButton()
         subscribeCountdownTimer()
         subscribeRefreshEvent()
-        observeLifecycle()
+        setupAutoRefreshObserver()
         return binding.root
     }
 
@@ -86,12 +86,14 @@ class StopDetailFragment : Fragment() {
         }
     }
 
-    private fun observeLifecycle() {
-        viewLifecycleOwner.lifecycle.addObserver(LifecycleEventObserver { _, event ->
-            when (event) {
-                Lifecycle.Event.ON_RESUME -> viewModel.startAutoRefresh()
-                Lifecycle.Event.ON_PAUSE -> viewModel.stopAutoRefresh()
-                else -> {}
+    private fun setupAutoRefreshObserver() {
+        viewLifecycleOwner.lifecycle.addObserver(object : DefaultLifecycleObserver {
+            override fun onResume(owner: LifecycleOwner) {
+                viewModel.startAutoRefresh()
+            }
+
+            override fun onPause(owner: LifecycleOwner) {
+                viewModel.stopAutoRefresh()
             }
         })
     }
