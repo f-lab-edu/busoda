@@ -10,7 +10,7 @@ import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.data.repository.BusStopRepository
 import com.chaeny.busoda.data.repository.GetBusStopResult
 import com.chaeny.busoda.model.BusStop
-import com.chaeny.busoda.stoplist.event.Event
+import com.chaeny.busoda.ui.event.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview

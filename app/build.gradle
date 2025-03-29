@@ -5,6 +5,9 @@ plugins {
     alias(libs.plugins.kapt)
 }
 
+Properties properties = new Properties()
+properties.load(project.rootProject.file("local.properties").newDataInputStream())
+
 android {
     namespace 'com.chaeny.busoda'
     compileSdk libs.versions.compileSdk.get().toInteger()
@@ -19,10 +22,22 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        release {
+            if (properties['STORE_FILE'] != null) {
+                storeFile file(properties['STORE_FILE'])
+                storePassword properties['STORE_PASSWORD']
+                keyAlias properties['KEY_ALIAS']
+                keyPassword properties['KEY_PASSWORD']
+            }
+        }
+    }
+
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     compileOptions {

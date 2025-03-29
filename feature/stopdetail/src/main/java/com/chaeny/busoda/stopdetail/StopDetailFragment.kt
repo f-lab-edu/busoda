@@ -1,12 +1,14 @@
 package com.chaeny.busoda.stopdetail
 
+import android.animation.ObjectAnimator
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.chaeny.busoda.stopdetail.databinding.FragmentStopDetailBinding
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.chaeny.busoda.stopdetail.databinding.FragmentStopDetailBinding
+import com.chaeny.busoda.ui.event.EventObserver
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -25,6 +27,9 @@ class StopDetailFragment : Fragment() {
         binding.busList.adapter = adapter
         subscribeUi(adapter)
         bindReceivedData()
+        setupRefreshButton()
+        subscribeCountdownTimer()
+        subscribeRefreshEvent()
         return binding.root
     }
 
@@ -48,6 +53,33 @@ class StopDetailFragment : Fragment() {
     private fun bindReceivedData() {
         viewModel.stopId.observe(viewLifecycleOwner) { stopId ->
             binding.textBusStopId.text = stopId
+        }
+    }
+
+    private fun subscribeCountdownTimer() {
+        viewModel.timer.observe(viewLifecycleOwner) { countdownValue ->
+            binding.textTimer.text = "$countdownValue"
+        }
+    }
+
+    private fun subscribeRefreshEvent() {
+        viewModel.refreshEvent.observe(viewLifecycleOwner, EventObserver { isRefresh ->
+            if (isRefresh) {
+                startRotateAnimation(binding.refreshButton)
+            }
+        })
+    }
+
+    private fun setupRefreshButton() {
+        binding.refreshButton.setOnClickListener {
+            viewModel.refreshData()
+        }
+    }
+
+    private fun startRotateAnimation(view: View) {
+        ObjectAnimator.ofFloat(view, View.ROTATION, 0f, 180f).apply {
+            duration = 500
+            start()
         }
     }
 }

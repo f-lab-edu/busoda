@@ -11,8 +11,8 @@ import androidx.appcompat.widget.SearchView
 import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.fragment.findNavController
 import com.chaeny.busoda.stoplist.databinding.FragmentStopListBinding
-import com.chaeny.busoda.stoplist.event.EventObserver
 import com.chaeny.busoda.ui.MessageHelper
+import com.chaeny.busoda.ui.event.EventObserver
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
