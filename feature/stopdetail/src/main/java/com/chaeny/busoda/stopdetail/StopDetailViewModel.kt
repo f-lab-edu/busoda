@@ -34,12 +34,13 @@ internal class StopDetailViewModel @Inject constructor(
 
     val timer: LiveData<Int> = flow {
         while (true) {
-            while (currentCount > 0) {
-                emit(currentCount)
-                delay(1000)
-                currentCount--
+            emit(currentCount)
+            delay(1000)
+            currentCount--
+
+            if (currentCount == 0) {
+                refreshData()
             }
-            refreshData()
         }
     }.asLiveData()
 
