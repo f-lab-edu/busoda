@@ -58,9 +58,11 @@ class StopDetailFragment : Fragment() {
 
     private fun subscribeCountdownTimer() {
         viewModel.timer.observe(viewLifecycleOwner) { countdownValue ->
-            val stepTranslationX = 55f
             val maxCount = 15
-            val translationValue = stepTranslationX * (maxCount - countdownValue)
+            val moveStep = maxCount - countdownValue
+            val totalDistance = binding.textStopEmoji.left - binding.textBusEmoji.left
+            val stepDistance = (totalDistance / maxCount).toFloat()
+            val translationValue = stepDistance * moveStep
 
             ObjectAnimator.ofFloat(binding.textBusEmoji, "translationX", translationValue).apply {
                 duration = 1000
