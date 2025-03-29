@@ -58,6 +58,15 @@ class StopDetailFragment : Fragment() {
 
     private fun subscribeCountdownTimer() {
         viewModel.timer.observe(viewLifecycleOwner) { countdownValue ->
+            val stepTranslationX = 55f
+            val maxCount = 15
+            val translationValue = stepTranslationX * (maxCount - countdownValue)
+
+            ObjectAnimator.ofFloat(binding.textBusEmoji, "translationX", translationValue).apply {
+                duration = 1000
+                start()
+            }
+
             binding.textTimer.text = "$countdownValue"
         }
     }

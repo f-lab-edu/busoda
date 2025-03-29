@@ -8,4 +8,6 @@
     <string name="congestion_medium">보통</string>
     <string name="congestion_low">여유</string>
     <string name="refresh">새로고침</string>
+    <string name="bus_emoji">🚌</string>
+    <string name="stop_emoji">🚏</string>
 </resources>

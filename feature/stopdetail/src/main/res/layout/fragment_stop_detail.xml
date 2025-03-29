@@ -36,16 +36,38 @@
         tools:text="화곡역4번출구"
         tools:textColor="@android:color/white" />
 
+    <TextView
+        android:id="@+id/text_bus_emoji"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="35dp"
+        android:rotationY="180"
+        android:text="@string/bus_emoji"
+        android:textSize="30dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_bus_stop_name"
+        tools:ignore="SpUsage" />
+
+    <TextView
+        android:id="@+id/text_stop_emoji"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="30dp"
+        android:text="@string/stop_emoji"
+        android:textSize="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_bus_stop_name"
+        tools:ignore="SpUsage" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/bus_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="20dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_bus_stop_name"
+        app:layout_constraintTop_toBottomOf="@id/text_bus_emoji"
         tools:listitem="@layout/list_item_bus" />
 
     <ProgressBar
