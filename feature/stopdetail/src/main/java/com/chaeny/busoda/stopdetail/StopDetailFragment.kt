@@ -68,8 +68,6 @@ class StopDetailFragment : Fragment() {
                 duration = 1000
                 start()
             }
-
-            binding.textTimer.text = "$countdownValue"
         }
     }
 
