@@ -1,5 +1,6 @@
 package com.chaeny.busoda.stopdetail
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -32,7 +33,7 @@ internal class StopDetailViewModel @Inject constructor(
 
     private var currentCount = 15
 
-    val timer: LiveData<Int> = flow {
+    private val _timer = flow {
         while (true) {
             emit(currentCount)
             delay(1000)
@@ -42,7 +43,8 @@ internal class StopDetailViewModel @Inject constructor(
                 refreshData()
             }
         }
-    }.asLiveData()
+    }
+    val timer: LiveData<Int> = _timer.asLiveData()
 
     init {
         asyncDataLoad()
@@ -53,6 +55,15 @@ internal class StopDetailViewModel @Inject constructor(
         viewModelScope.launch {
             _stopDetail.value = busStopDetailRepository.getBusStopDetail(_stopId.value!!)
             _isLoading.value = false
+            readArrivalTime()
+        }
+    }
+
+    private fun readArrivalTime() {
+        _stopDetail.value?.busInfos?.forEach { busInfo ->
+            busInfo.arrivalInfos.forEach { arrivalInfo ->
+                Log.d("ArrivalTime", "ArrivalTime : ${arrivalInfo.arrivalTime}")
+            }
         }
     }
 
