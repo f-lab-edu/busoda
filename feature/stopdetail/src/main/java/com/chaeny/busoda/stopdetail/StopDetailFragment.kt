@@ -68,6 +68,8 @@ class StopDetailFragment : Fragment() {
                 duration = 1000
                 start()
             }
+
+            viewModel.readArrivalTime()
         }
     }
 
