@@ -37,5 +37,11 @@ data class StopDetailItem(
     val firstBusCongestion: String?,
 
     @PropertyElement(name = "congestion2")
-    val secondBusCongestion: String?
+    val secondBusCongestion: String?,
+
+    @PropertyElement(name = "traTime1")
+    val firstBusArrTime: String?,
+
+    @PropertyElement(name = "traTime2")
+    val secondBusArrTime: String?
 )
