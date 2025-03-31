@@ -21,7 +21,7 @@ class ArrivalInfoView @JvmOverloads constructor(
         if (arrivalInfo != null) {
             with(binding) {
                 textInfoTitle.text = context.getString(R.string.nth_bus, position + 1)
-                textArrivalTime.text = arrivalInfo.arrivalTime
+                textArrivalTime.text = arrivalInfo.getFormattedArrivalTime()
                 textPosition.text = arrivalInfo.position
 
                 textCongestion.text = arrivalInfo.getCongestionText()
@@ -58,6 +58,20 @@ class ArrivalInfoView @JvmOverloads constructor(
             context.getString(R.string.congestion_medium) -> context.getColor(R.color.congestion_medium)
             context.getString(R.string.congestion_low) -> context.getColor(R.color.congestion_low)
             else -> context.getColor(R.color.congestion_unknown)
+        }
+    }
+
+    private fun BusArrivalInfo.getFormattedArrivalTime(): String {
+        val totalSeconds = this.arrivalTime.toIntOrNull() ?: return context.getString(R.string.no_data)
+        if (totalSeconds <= 0) return context.getString(R.string.no_data)
+
+        val minutes = totalSeconds / 60
+        val seconds = totalSeconds % 60
+
+        return when {
+            minutes > 0 && seconds > 0 -> context.getString(R.string.minutes_seconds, minutes, seconds)
+            minutes > 0 -> context.getString(R.string.minutes, minutes)
+            else -> context.getString(R.string.seconds, seconds)
         }
     }
 }

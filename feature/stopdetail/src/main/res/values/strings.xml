@@ -10,4 +10,7 @@
     <string name="refresh">새로고침</string>
     <string name="bus_emoji">🚌</string>
     <string name="stop_emoji">🚏</string>
+    <string name="minutes_seconds">%1$d분 %2$d초</string>
+    <string name="minutes">%1$d분</string>
+    <string name="seconds">%1$d초</string>
 </resources>
