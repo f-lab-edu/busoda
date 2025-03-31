@@ -34,8 +34,8 @@ class ApiBusStopDetailRepositoryTest {
             "화곡역4번출구", listOf(
                 BusInfo(
                     "604", "화곡본동시장", listOf(
-                        BusArrivalInfo("2분 38초후", "2번째 전", CongestionLevel.LOW),
-                        BusArrivalInfo("3분 38초후", "3번째 전", CongestionLevel.MEDIUM)
+                        BusArrivalInfo("158", "2번째 전", CongestionLevel.LOW),
+                        BusArrivalInfo("218", "3번째 전", CongestionLevel.MEDIUM)
                     )
                 )
             )
@@ -50,7 +50,9 @@ class ApiBusStopDetailRepositoryTest {
                         "2분 38초후[2번째 전]",
                         "3분 38초후[3번째 전]",
                         "3",
-                        "4"
+                        "4",
+                        "158",
+                        "218"
                     )
                 )
             )
@@ -96,14 +98,10 @@ class ApiBusStopDetailRepositoryTest {
     fun `when StopDetailResponse has arrival messages then both should be parsed correctly`() = runTest {
         val stopDetail = getParsedStopDetailWithMock(createMockResponseWithArrMsg("1분 30초후[1번째 전]", "[막차]1분 30초후[1번째 전]"))
 
-        val firstArrivalTime = stopDetail.busInfos.first().arrivalInfos[0].arrivalTime
         val firstPosition = stopDetail.busInfos.first().arrivalInfos[0].position
-        assertEquals("1분 30초후", firstArrivalTime)
         assertEquals("1번째 전", firstPosition)
 
-        val secondArrivalTime = stopDetail.busInfos.first().arrivalInfos[1].arrivalTime
         val secondPosition = stopDetail.busInfos.first().arrivalInfos[1].position
-        assertEquals("1분 30초후", secondArrivalTime)
         assertEquals("1번째 전", secondPosition)
     }
 
@@ -111,14 +109,10 @@ class ApiBusStopDetailRepositoryTest {
     fun `when StopDetailResponse has special arrival messages then they should be mapped correctly`() = runTest {
         val stopDetail = getParsedStopDetailWithMock(createMockResponseWithArrMsg("운행종료", "곧 도착"))
 
-        val firstArrivalTime = stopDetail.busInfos.first().arrivalInfos[0].arrivalTime
         val firstPosition = stopDetail.busInfos.first().arrivalInfos[0].position
-        assertEquals("", firstArrivalTime)
         assertEquals("운행종료", firstPosition)
 
-        val secondArrivalTime = stopDetail.busInfos.first().arrivalInfos[1].arrivalTime
         val secondPosition = stopDetail.busInfos.first().arrivalInfos[1].position
-        assertEquals("", secondArrivalTime)
         assertEquals("곧 도착", secondPosition)
     }
 
@@ -141,7 +135,9 @@ class ApiBusStopDetailRepositoryTest {
             "2분 38초후[2번째 전]",
             "3분 38초후[3번째 전]",
             firstBusCongestion,
-            secondBusCongestion
+            secondBusCongestion,
+            "158",
+            "218"
         )
         return StopDetailResponse(StopDetailBody(listOf(busInfo)))
     }
@@ -154,7 +150,9 @@ class ApiBusStopDetailRepositoryTest {
             firstArrMsg,
             secondArrMsg,
             "3",
-            "4"
+            "4",
+            "0",
+            "0"
         )
         return StopDetailResponse(StopDetailBody(listOf(busInfo)))
     }
