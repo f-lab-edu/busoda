@@ -69,7 +69,7 @@ class StopDetailFragment : Fragment() {
                 start()
             }
 
-            viewModel.readArrivalTime()
+            viewModel.updateArrivalTime()
         }
     }
 

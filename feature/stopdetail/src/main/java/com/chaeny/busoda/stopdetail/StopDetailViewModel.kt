@@ -1,6 +1,5 @@
 package com.chaeny.busoda.stopdetail
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -8,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.chaeny.busoda.data.repository.BusStopDetailRepository
-import com.chaeny.busoda.model.BusArrivalInfo
 import com.chaeny.busoda.model.BusStopDetail
 import com.chaeny.busoda.ui.event.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -59,12 +57,16 @@ internal class StopDetailViewModel @Inject constructor(
         }
     }
 
-    fun readArrivalTime() {
-        _stopDetail.value?.busInfos?.forEach { busInfo ->
-            busInfo.arrivalInfos.forEach { arrivalInfo ->
-                val seconds = arrivalInfo.toSeconds()
-                Log.d("ArrivalTime", "ArrivalTime : (${arrivalInfo.arrivalTime}) → ($seconds)초")
+    fun updateArrivalTime() {
+        _stopDetail.value?.let { stopDetail ->
+            val updateBusInfos = stopDetail.busInfos.map { busInfo ->
+                val updateArrivalInfos = busInfo.arrivalInfos.map { arrivalInfo ->
+                    val currentTime = arrivalInfo.arrivalTime.toIntOrNull() ?: 0
+                    arrivalInfo.copy(arrivalTime = (currentTime - 1).toString())
+                }
+                busInfo.copy(arrivalInfos = updateArrivalInfos)
             }
+            _stopDetail.value = stopDetail.copy(busInfos = updateBusInfos)
         }
     }
 
@@ -72,28 +74,6 @@ internal class StopDetailViewModel @Inject constructor(
         currentCount = 15
         _refreshEvent.value = Event(true)
         asyncDataLoad()
-    }
-
-    private fun BusArrivalInfo.toSeconds(): Int {
-        val numbers = mutableListOf<Int>()
-        val regex = Regex("\\d+")
-        val matchResults = regex.findAll(this.arrivalTime)
-        for (match in matchResults) {
-            val number = match.value.toInt()
-            numbers.add(number)
-        }
-        return when (numbers.size) {
-            2 -> {
-                val minutes = numbers[0]
-                val seconds = numbers[1]
-                minutes * 60 + seconds
-            }
-            1 -> {
-                val minutes = numbers[0]
-                minutes * 60
-            }
-            else -> 0
-        }
     }
 
     companion object {
