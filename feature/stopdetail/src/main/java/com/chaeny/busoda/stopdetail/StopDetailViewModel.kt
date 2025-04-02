@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.model.BusStopDetail
@@ -32,7 +31,7 @@ internal class StopDetailViewModel @Inject constructor(
 
     private var currentCount = 15
 
-    private val _timer = flow {
+    val timer = flow {
         while (true) {
             emit(currentCount)
             delay(1000)
@@ -43,7 +42,6 @@ internal class StopDetailViewModel @Inject constructor(
             }
         }
     }
-    val timer: LiveData<Int> = _timer.asLiveData()
 
     init {
         asyncDataLoad()

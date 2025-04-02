@@ -7,9 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.chaeny.busoda.stopdetail.databinding.FragmentStopDetailBinding
 import com.chaeny.busoda.ui.event.EventObserver
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class StopDetailFragment : Fragment() {
@@ -57,19 +61,26 @@ class StopDetailFragment : Fragment() {
     }
 
     private fun subscribeCountdownTimer() {
-        viewModel.timer.observe(viewLifecycleOwner) { countdownValue ->
-            val maxCount = 15
-            val moveStep = maxCount - countdownValue
-            val totalDistance = binding.textStopEmoji.left - binding.textBusEmoji.left
-            val stepDistance = (totalDistance / maxCount).toFloat()
-            val translationValue = stepDistance * moveStep
-
-            ObjectAnimator.ofFloat(binding.textBusEmoji, "translationX", translationValue).apply {
-                duration = 1000
-                start()
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.timer.collect { countdownValue ->
+                    updateBusAnimation(countdownValue)
+                    viewModel.updateArrivalTime()
+                }
             }
+        }
+    }
 
-            viewModel.updateArrivalTime()
+    private fun updateBusAnimation(countdownValue: Int) {
+        val maxCount = 15
+        val moveStep = maxCount - countdownValue
+        val totalDistance = binding.textStopEmoji.left - binding.textBusEmoji.left
+        val stepDistance = (totalDistance / maxCount).toFloat()
+        val translationValue = stepDistance * moveStep
+
+        ObjectAnimator.ofFloat(binding.textBusEmoji, "translationX", translationValue).apply {
+            duration = 1000
+            start()
         }
     }
 
