@@ -18,7 +18,7 @@
         android:textSize="14sp"
         tools:text="첫번째 버스:" />
 
-    <TextView
+    <com.chaeny.busoda.stopdetail.ArrivalTimeView
         android:id="@+id/text_arrival_time"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
