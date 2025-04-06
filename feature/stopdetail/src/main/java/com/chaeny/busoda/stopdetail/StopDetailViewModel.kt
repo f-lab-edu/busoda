@@ -55,19 +55,6 @@ internal class StopDetailViewModel @Inject constructor(
         }
     }
 
-    fun updateArrivalTime() {
-        _stopDetail.value?.let { stopDetail ->
-            val updateBusInfos = stopDetail.busInfos.map { busInfo ->
-                val updateArrivalInfos = busInfo.arrivalInfos.map { arrivalInfo ->
-                    val currentTime = arrivalInfo.arrivalTime.toIntOrNull() ?: 0
-                    arrivalInfo.copy(arrivalTime = (currentTime - 1).toString())
-                }
-                busInfo.copy(arrivalInfos = updateArrivalInfos)
-            }
-            _stopDetail.value = stopDetail.copy(busInfos = updateBusInfos)
-        }
-    }
-
     fun refreshData() {
         currentCount = 15
         _refreshEvent.value = Event(true)
