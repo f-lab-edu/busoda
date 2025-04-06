@@ -27,7 +27,7 @@ class StopDetailFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentStopDetailBinding.inflate(inflater, container, false)
-        val adapter = StopDetailAdapter()
+        val adapter = StopDetailAdapter(viewModel.timer)
         binding.busList.adapter = adapter
         subscribeUi(adapter)
         bindReceivedData()

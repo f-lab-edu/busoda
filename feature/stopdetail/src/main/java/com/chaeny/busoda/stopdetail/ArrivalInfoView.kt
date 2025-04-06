@@ -7,6 +7,7 @@ import android.widget.LinearLayout
 import com.chaeny.busoda.model.BusArrivalInfo
 import com.chaeny.busoda.model.CongestionLevel
 import com.chaeny.busoda.stopdetail.databinding.ArrivalInfoViewBinding
+import kotlinx.coroutines.flow.Flow
 
 class ArrivalInfoView @JvmOverloads constructor(
     context: Context,
@@ -17,7 +18,7 @@ class ArrivalInfoView @JvmOverloads constructor(
     private val layoutInflater = LayoutInflater.from(context)
     private var binding = ArrivalInfoViewBinding.inflate(layoutInflater, this)
 
-    internal fun bindArrivalInfo(arrivalInfo: BusArrivalInfo?, position: Int) {
+    internal fun bindArrivalInfo(arrivalInfo: BusArrivalInfo?, position: Int, timerFlow: Flow<Int>) {
         if (arrivalInfo != null) {
             with(binding) {
                 textInfoTitle.text = context.getString(R.string.nth_bus, position + 1)
@@ -27,7 +28,10 @@ class ArrivalInfoView @JvmOverloads constructor(
                 textCongestion.setTextColor(arrivalInfo.getCongestionColor())
 
                 val arrivalTime = arrivalInfo.arrivalTime.toIntOrNull() ?: 0
-                textArrivalTime.startCountdown(arrivalTime)
+                textArrivalTime.setTextTime(arrivalTime)
+                textArrivalTime.post {
+                    textArrivalTime.observeCountdownFlow(timerFlow, arrivalTime)
+                }
             }
         } else {
             bindEmptyInfo(position)
