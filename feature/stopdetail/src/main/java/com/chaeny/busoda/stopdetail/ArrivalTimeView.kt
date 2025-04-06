@@ -1,6 +1,8 @@
 package com.chaeny.busoda.stopdetail
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatTextView
 
@@ -10,17 +12,26 @@ class ArrivalTimeView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : AppCompatTextView(context, attrs, defStyleAttr) {
     private var currentTime = 0
-
-    fun setInitialTime(seconds: Int) {
-        currentTime = seconds
-        text = formattedArrivalTime()
+    private val handler = Handler(Looper.getMainLooper())
+    private val decreaseTimeRunnable = object : Runnable {
+        override fun run() {
+            if (currentTime > 0) {
+                currentTime--
+                text = formattedArrivalTime()
+                handler.postDelayed(this, 1000)
+            }
+        }
     }
 
-    fun decreaseOneSec() {
-        if (currentTime > 0) {
-            currentTime--
-            text = formattedArrivalTime()
-        }
+    fun startCountdown(seconds: Int) {
+        stopCountdown()
+        currentTime = seconds
+        text = formattedArrivalTime()
+        handler.post(decreaseTimeRunnable)
+    }
+
+    private fun stopCountdown() {
+        handler.removeCallbacks(decreaseTimeRunnable)
     }
 
     private fun formattedArrivalTime(): String {

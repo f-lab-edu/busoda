@@ -10,7 +10,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.chaeny.busoda.stopdetail.databinding.FragmentStopDetailBinding
 import com.chaeny.busoda.ui.event.EventObserver
 import dagger.hilt.android.AndroidEntryPoint
@@ -66,26 +65,8 @@ class StopDetailFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.timer.collect { countdownValue ->
                     updateBusAnimation(countdownValue)
-                    updateVisibleArrivalTime()
                 }
             }
-        }
-    }
-
-    private fun updateVisibleArrivalTime() {
-        val recyclerView = binding.busList
-        val layoutManager = recyclerView.layoutManager
-        if (layoutManager !is LinearLayoutManager) return
-
-        var position = layoutManager.findFirstVisibleItemPosition()
-        val lastPosition = layoutManager.findLastVisibleItemPosition()
-
-        while (position <= lastPosition) {
-            val holder = recyclerView.findViewHolderForAdapterPosition(position)
-            if (holder is StopDetailAdapter.BusDetailViewHolder) {
-                holder.decreaseArrivalTime()
-            }
-            position++
         }
     }
 

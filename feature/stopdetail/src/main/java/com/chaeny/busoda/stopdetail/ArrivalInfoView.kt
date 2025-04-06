@@ -27,15 +27,11 @@ class ArrivalInfoView @JvmOverloads constructor(
                 textCongestion.setTextColor(arrivalInfo.getCongestionColor())
 
                 val arrivalTime = arrivalInfo.arrivalTime.toIntOrNull() ?: 0
-                textArrivalTime.setInitialTime(arrivalTime)
+                textArrivalTime.startCountdown(arrivalTime)
             }
         } else {
             bindEmptyInfo(position)
         }
-    }
-
-    internal fun decreaseArrivalTime() {
-        binding.textArrivalTime.decreaseOneSec()
     }
 
     private fun bindEmptyInfo(position: Int) {

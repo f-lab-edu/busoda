@@ -33,11 +33,6 @@ internal class StopDetailAdapter : ListAdapter<BusInfo, StopDetailAdapter.BusDet
             bindArrivalInfos(busData, binding)
         }
 
-        fun decreaseArrivalTime() {
-            binding.firstArrivalInfoView.decreaseArrivalTime()
-            binding.secondArrivalInfoView.decreaseArrivalTime()
-        }
-
         private fun bindArrivalInfos(busData: BusInfo, binding: ListItemBusBinding) {
             with(binding) {
                 firstArrivalInfoView.bindArrivalInfo(busData.arrivalInfos.getOrNull(0), 0)
