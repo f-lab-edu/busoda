@@ -16,24 +16,24 @@ class ArrivalTimeView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : AppCompatTextView(context, attrs, defStyleAttr) {
 
-    fun setTextTime(arrivalTime: Int) {
-        text = formattedArrivalTime(arrivalTime)
+    fun setTextRemainingTime(arrivalTime: Long) {
+        val now = System.currentTimeMillis() / 1000
+        text = formattedArrivalTime(arrivalTime - now)
     }
 
-    fun observeCountdownFlow(timerFlow: Flow<Int>, arrivalTime: Int) {
+    fun observeCountdownFlow(timerFlow: Flow<Int>, arrivalTime: Long) {
         val lifecycleOwner = findViewTreeLifecycleOwner() ?: return
 
         lifecycleOwner.lifecycleScope.launch {
             lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                timerFlow.collect { elapsedTime ->
-                    val currentTime = arrivalTime - (15 - elapsedTime)
-                    setTextTime(currentTime)
+                timerFlow.collect {
+                    setTextRemainingTime(arrivalTime)
                 }
             }
         }
     }
 
-    private fun formattedArrivalTime(arrivalTime: Int): String {
+    private fun formattedArrivalTime(arrivalTime: Long): String {
         if (arrivalTime <= 0) return context.getString(R.string.no_data)
 
         val minutes = arrivalTime / 60

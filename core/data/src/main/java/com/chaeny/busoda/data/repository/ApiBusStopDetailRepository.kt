@@ -77,7 +77,9 @@ class ApiBusStopDetailRepository @Inject constructor(
     ): BusArrivalInfo? {
         val arrivalMsg = arrMsg ?: return null
         val congestionLevel = getCongestionLevel(congestion)
-        val arrivalTime = arrTime ?: ""
+        val remainingTime = arrTime?.toLongOrNull() ?: 0L
+        val now = System.currentTimeMillis() / 1000
+        val arrivalTime = now + remainingTime
 
         val arrivalInfo = if (arrivalMsg.startsWith("[")) {
             arrivalMsg.substringAfter("]")
