@@ -20,16 +20,19 @@ class ArrivalTimeView @JvmOverloads constructor(
     private var timerFlow: Flow<Int>? = null
     private var arrivalTime: Long = 0L
 
-    fun setTextRemainingTime(arrivalTime: Long) {
+    fun bindArrivalTime(timerFlow: Flow<Int>, arrivalTime: Long) {
+        this.timerFlow = timerFlow
+        this.arrivalTime = arrivalTime
+        setTextRemainingTime(arrivalTime)
+    }
+
+    private fun setTextRemainingTime(arrivalTime: Long) {
         val now = System.currentTimeMillis() / 1000
         val remainingTime = arrivalTime - now
         text = formattedArrivalTime(remainingTime)
     }
 
-    fun observeCountdownFlow(timerFlow: Flow<Int>, arrivalTime: Long) {
-        this.timerFlow = timerFlow
-        this.arrivalTime = arrivalTime
-
+    private fun observeCountdownFlow(timerFlow: Flow<Int>, arrivalTime: Long) {
         timerJob?.cancel()
 
         val lifecycleOwner = findViewTreeLifecycleOwner() ?: return

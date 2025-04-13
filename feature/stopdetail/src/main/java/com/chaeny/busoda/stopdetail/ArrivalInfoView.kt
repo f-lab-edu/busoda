@@ -27,10 +27,7 @@ class ArrivalInfoView @JvmOverloads constructor(
                 textCongestion.text = arrivalInfo.getCongestionText()
                 textCongestion.setTextColor(arrivalInfo.getCongestionColor())
 
-                textArrivalTime.setTextRemainingTime(arrivalInfo.arrivalTime)
-                textArrivalTime.post {
-                    textArrivalTime.observeCountdownFlow(timerFlow, arrivalInfo.arrivalTime)
-                }
+                textArrivalTime.bindArrivalTime(timerFlow, arrivalInfo.arrivalTime)
             }
         } else {
             bindEmptyInfo(position)
