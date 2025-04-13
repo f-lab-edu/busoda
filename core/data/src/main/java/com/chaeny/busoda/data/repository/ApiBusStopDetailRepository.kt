@@ -42,8 +42,16 @@ class ApiBusStopDetailRepository @Inject constructor(
 
         val mappedBusInfos = busInfos?.map { busInfo ->
             val busArrivalInfos = listOfNotNull(
-                parseArrivalInfo(busInfo.firstBusArrMsg, busInfo.firstBusCongestion),
-                parseArrivalInfo(busInfo.secondBusArrMsg, busInfo.secondBusCongestion)
+                parseArrivalInfo(
+                    busInfo.firstBusArrMsg,
+                    busInfo.firstBusCongestion,
+                    busInfo.firstBusArrTime
+                ),
+                parseArrivalInfo(
+                    busInfo.secondBusArrMsg,
+                    busInfo.secondBusCongestion,
+                    busInfo.secondBusArrTime
+                )
             )
             BusInfo(
                 busInfo.busNumber.orEmpty(),
@@ -65,10 +73,14 @@ class ApiBusStopDetailRepository @Inject constructor(
     }
 
     private fun StopDetailResponse.parseArrivalInfo(
-        arrMsg: String?, congestion: String?
+        arrMsg: String?, congestion: String?, arrTime: String?
     ): BusArrivalInfo? {
         val arrivalMsg = arrMsg ?: return null
         val congestionLevel = getCongestionLevel(congestion)
+        val remainingTime = arrTime?.toLongOrNull() ?: 0L
+        val now = System.currentTimeMillis() / 1000
+        val arrivalTime: Long
+        val position: String
 
         val arrivalInfo = if (arrivalMsg.startsWith("[")) {
             arrivalMsg.substringAfter("]")
@@ -76,17 +88,13 @@ class ApiBusStopDetailRepository @Inject constructor(
             arrivalMsg
         }
 
-        if ('[' !in arrivalInfo) {
-            val noArrivalTimeInfo = BusArrivalInfo(
-                "",
-                arrivalInfo,
-                congestionLevel
-            )
-            return noArrivalTimeInfo
+        if ("[" !in arrivalInfo) {
+            arrivalTime = 0L
+            position = arrivalInfo
+        } else {
+            arrivalTime = now + remainingTime
+            position = arrivalInfo.substringAfterLast("[").substringBefore("]")
         }
-
-        val arrivalTime = arrivalInfo.substringBeforeLast("[")
-        val position = arrivalInfo.substringAfterLast("[").substringBefore("]")
 
         return BusArrivalInfo(
             arrivalTime,

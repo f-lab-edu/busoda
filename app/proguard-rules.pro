@@ -19,3 +19,6 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Data model classes used for XML deserialization via TikXml
+-keep class com.chaeny.busoda.data.model.** { *; }

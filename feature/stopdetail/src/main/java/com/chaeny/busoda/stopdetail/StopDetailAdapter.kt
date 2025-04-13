@@ -7,8 +7,10 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.chaeny.busoda.model.BusInfo
 import com.chaeny.busoda.stopdetail.databinding.ListItemBusBinding
+import kotlinx.coroutines.flow.Flow
 
-internal class StopDetailAdapter : ListAdapter<BusInfo, StopDetailAdapter.BusDetailViewHolder>(BusDetailDiffCallback()) {
+internal class StopDetailAdapter(private val timerFlow: Flow<Int>) :
+    ListAdapter<BusInfo, StopDetailAdapter.BusDetailViewHolder>(BusDetailDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BusDetailViewHolder {
         return BusDetailViewHolder(
@@ -16,7 +18,7 @@ internal class StopDetailAdapter : ListAdapter<BusInfo, StopDetailAdapter.BusDet
                 LayoutInflater.from(parent.context),
                 parent,
                 false
-            )
+            ), timerFlow
         )
     }
 
@@ -24,19 +26,22 @@ internal class StopDetailAdapter : ListAdapter<BusInfo, StopDetailAdapter.BusDet
         holder.bind(getItem(position))
     }
 
-    class BusDetailViewHolder(private val binding: ListItemBusBinding) : RecyclerView.ViewHolder(binding.root) {
+    class BusDetailViewHolder(
+        private val binding: ListItemBusBinding,
+        private val timerFlow: Flow<Int>
+    ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(busData: BusInfo) {
             with(binding) {
                 textBusNumber.text = busData.busNumber
                 textNextStop.text = busData.nextStopName
             }
-            bindArrivalInfos(busData, binding)
+            bindArrivalInfos(busData, binding, timerFlow)
         }
 
-        private fun bindArrivalInfos(busData: BusInfo, binding: ListItemBusBinding) {
+        private fun bindArrivalInfos(busData: BusInfo, binding: ListItemBusBinding, timerFlow: Flow<Int>) {
             with(binding) {
-                firstArrivalInfoView.bindArrivalInfo(busData.arrivalInfos.getOrNull(0), 0)
-                secondArrivalInfoView.bindArrivalInfo(busData.arrivalInfos.getOrNull(1), 1)
+                firstArrivalInfoView.bindArrivalInfo(busData.arrivalInfos.getOrNull(0), 0, timerFlow)
+                secondArrivalInfoView.bindArrivalInfo(busData.arrivalInfos.getOrNull(1), 1, timerFlow)
             }
         }
     }
