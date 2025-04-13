@@ -106,7 +106,7 @@ internal class StopListViewModel @Inject constructor(
     }
 
     fun setKeyWord(word: String) {
-        keyWord.value = word
+        keyWord.value = word.replace(" ", "")
     }
 
     companion object {
