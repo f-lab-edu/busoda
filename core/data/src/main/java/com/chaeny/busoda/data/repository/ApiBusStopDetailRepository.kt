@@ -79,7 +79,8 @@ class ApiBusStopDetailRepository @Inject constructor(
         val congestionLevel = getCongestionLevel(congestion)
         val remainingTime = arrTime?.toLongOrNull() ?: 0L
         val now = System.currentTimeMillis() / 1000
-        val arrivalTime = now + remainingTime
+        val arrivalTime: Long
+        val position: String
 
         val arrivalInfo = if (arrivalMsg.startsWith("[")) {
             arrivalMsg.substringAfter("]")
@@ -87,10 +88,12 @@ class ApiBusStopDetailRepository @Inject constructor(
             arrivalMsg
         }
 
-        val position = if ('[' !in arrivalInfo) {
-            arrivalInfo
+        if ("[" !in arrivalInfo) {
+            arrivalTime = 0L
+            position = arrivalInfo
         } else {
-            arrivalInfo.substringAfterLast("[").substringBefore("]")
+            arrivalTime = now + remainingTime
+            position = arrivalInfo.substringAfterLast("[").substringBefore("]")
         }
 
         return BusArrivalInfo(
