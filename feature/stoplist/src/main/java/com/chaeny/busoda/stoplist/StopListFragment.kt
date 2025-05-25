@@ -1,6 +1,7 @@
 package com.chaeny.busoda.stoplist
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +16,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -109,9 +114,11 @@ class StopListFragment : Fragment() {
     private fun setupSearchView() {
         binding.composeSearchView.setContent {
             MaterialTheme {
-                SearchBar()
+                SearchBar(viewModel = viewModel)
             }
         }
+
+        showSoftKeyboard(binding.composeSearchView)
     }
 
     private fun showSoftKeyboard(view: View) {
@@ -122,12 +129,19 @@ class StopListFragment : Fragment() {
     }
 
     @Composable
-    fun SearchBar(
-        modifier: Modifier = Modifier
+    private fun SearchBar(
+        modifier: Modifier = Modifier,
+        viewModel: StopListViewModel,
     ) {
+        var keyword by rememberSaveable { mutableStateOf("") }
+
         TextField(
-            value = "",
-            onValueChange = {},
+            value = keyword,
+            onValueChange = {
+                Log.d("SearchBar", "keyword=$keyword, it=$it")
+                keyword = it
+                viewModel.setKeyWord(it)
+            },
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Color.Transparent,
                 unfocusedContainerColor = Color.Transparent,
@@ -147,7 +161,7 @@ class StopListFragment : Fragment() {
     @Preview(showBackground = true)
     @Composable
     fun SearchBarPreview() {
-        MaterialTheme { SearchBar() }
+        MaterialTheme { SearchBar(viewModel = viewModel) }
     }
 
 }
