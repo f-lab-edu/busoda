@@ -24,6 +24,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -141,7 +142,8 @@ class StopListFragment : Fragment() {
     private fun setupStopList() {
         binding.composeStopList.setContent {
             MaterialTheme {
-                StopList(stops = dummyData)
+                val stops by viewModel.busStops.observeAsState(initial = emptyList())
+                StopList(stops = stops)
             }
         }
     }
