@@ -8,7 +8,18 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.appcompat.widget.SearchView
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.fragment.findNavController
 import com.chaeny.busoda.stoplist.databinding.FragmentStopListBinding
@@ -96,20 +107,11 @@ class StopListFragment : Fragment() {
     }
 
     private fun setupSearchView() {
-        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                return false
+        binding.composeSearchView.setContent {
+            MaterialTheme {
+                SearchBar()
             }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                newText?.let {
-                    viewModel.setKeyWord(it)
-                }
-                return false
-            }
-        })
-
-        showSoftKeyboard(binding.searchView)
+        }
     }
 
     private fun showSoftKeyboard(view: View) {
@@ -118,4 +120,34 @@ class StopListFragment : Fragment() {
             imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
         }
     }
+
+    @Composable
+    fun SearchBar(
+        modifier: Modifier = Modifier
+    ) {
+        TextField(
+            value = "",
+            onValueChange = {},
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                focusedIndicatorColor = Color.Gray,
+            ),
+            placeholder = {
+                Text(
+                    stringResource(R.string.stop_search), color = Color.Gray
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 30.dp, vertical = 20.dp)
+        )
+    }
+
+    @Preview(showBackground = true)
+    @Composable
+    fun SearchBarPreview() {
+        MaterialTheme { SearchBar() }
+    }
+
 }
