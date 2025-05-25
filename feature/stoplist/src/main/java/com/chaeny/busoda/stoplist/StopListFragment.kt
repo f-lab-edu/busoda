@@ -1,7 +1,6 @@
 package com.chaeny.busoda.stoplist
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +14,8 @@ import androidx.fragment.app.viewModels
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -143,7 +144,6 @@ class StopListFragment : Fragment() {
         TextField(
             value = keyword,
             onValueChange = {
-                Log.d("SearchBar", "keyword=$keyword, it=$it")
                 keyword = it
                 viewModel.setKeyWord(it)
             },
@@ -159,7 +159,7 @@ class StopListFragment : Fragment() {
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 30.dp, vertical = 20.dp)
+                .padding(horizontal = 30.dp).padding(top = 20.dp)
         )
     }
 
@@ -170,7 +170,7 @@ class StopListFragment : Fragment() {
     ) {
         Column(modifier.fillMaxWidth().padding(15.dp)) {
             Text(text = stop.stopName)
-            Spacer(modifier = Modifier.height(5.dp))
+            Spacer(modifier = Modifier.height(10.dp))
             Row(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = stop.stopId,
@@ -179,6 +179,18 @@ class StopListFragment : Fragment() {
                 Text(
                     text = stop.nextStopName
                 )
+            }
+        }
+    }
+
+    @Composable
+    fun StopList(
+        stops: List<BusStop>,
+        modifier: Modifier = Modifier
+    ) {
+        LazyColumn(modifier) {
+            items(stops) { stop ->
+                StopItem(stop = stop)
             }
         }
     }
@@ -195,6 +207,17 @@ class StopListFragment : Fragment() {
         StopItem(
             stop = BusStop("정류장ID", "정류장", "다음정류장")
         )
+    }
+
+    @Preview(showBackground = true)
+    @Composable
+    fun StopListPreview() {
+        val dummyData = listOf(
+            BusStop("16206", "화곡역4번출구", "화곡본동시장"),
+            BusStop("16146", "화곡본동시장", "한국폴리텍1.서울강서대학교")
+        )
+
+        StopList(stops = dummyData)
     }
 
 }
