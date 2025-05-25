@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -26,6 +28,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -59,6 +62,7 @@ class StopListFragment : Fragment() {
         subscribeStopSpecificEvent()
         subscribeStopClickEvent()
         setupSearchView()
+        setupStopList()
         return binding.root
     }
 
@@ -134,6 +138,14 @@ class StopListFragment : Fragment() {
         }
     }
 
+    private fun setupStopList() {
+        binding.composeStopList.setContent {
+            MaterialTheme {
+                StopList(stops = dummyData)
+            }
+        }
+    }
+
     @Composable
     private fun SearchBar(
         modifier: Modifier = Modifier,
@@ -168,7 +180,13 @@ class StopListFragment : Fragment() {
         modifier: Modifier = Modifier,
         stop: BusStop
     ) {
-        Column(modifier.fillMaxWidth().padding(15.dp)) {
+        Column(modifier
+            .fillMaxWidth()
+            .padding(10.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(Color.White)
+            .padding(10.dp)
+        ) {
             Text(text = stop.stopName)
             Spacer(modifier = Modifier.height(10.dp))
             Row(modifier = Modifier.fillMaxWidth()) {
@@ -188,7 +206,7 @@ class StopListFragment : Fragment() {
         stops: List<BusStop>,
         modifier: Modifier = Modifier
     ) {
-        LazyColumn(modifier) {
+        LazyColumn(modifier.padding(20.dp)) {
             items(stops) { stop ->
                 StopItem(stop = stop)
             }
@@ -212,12 +230,20 @@ class StopListFragment : Fragment() {
     @Preview(showBackground = true)
     @Composable
     fun StopListPreview() {
-        val dummyData = listOf(
-            BusStop("16206", "화곡역4번출구", "화곡본동시장"),
-            BusStop("16146", "화곡본동시장", "한국폴리텍1.서울강서대학교")
-        )
-
         StopList(stops = dummyData)
     }
+
+    private val dummyData = listOf(
+        BusStop("16206", "화곡역4번출구", "화곡본동시장"),
+        BusStop("16206", "화곡역4번출구", "화곡본동시장"),
+        BusStop("16206", "화곡역4번출구", "화곡본동시장"),
+        BusStop("16206", "화곡역4번출구", "화곡본동시장"),
+        BusStop("16206", "화곡역4번출구", "화곡본동시장"),
+        BusStop("16146", "화곡본동시장", "한국폴리텍1.서울강서대학교"),
+        BusStop("16146", "화곡본동시장", "한국폴리텍1.서울강서대학교"),
+        BusStop("16146", "화곡본동시장", "한국폴리텍1.서울강서대학교"),
+        BusStop("16146", "화곡본동시장", "한국폴리텍1.서울강서대학교"),
+        BusStop("16146", "화곡본동시장", "한국폴리텍1.서울강서대학교")
+    )
 
 }
