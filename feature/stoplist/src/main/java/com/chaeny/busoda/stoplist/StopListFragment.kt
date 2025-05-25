@@ -6,10 +6,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -27,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.fragment.findNavController
+import com.chaeny.busoda.model.BusStop
 import com.chaeny.busoda.stoplist.databinding.FragmentStopListBinding
 import com.chaeny.busoda.ui.MessageHelper
 import com.chaeny.busoda.ui.event.EventObserver
@@ -158,10 +163,38 @@ class StopListFragment : Fragment() {
         )
     }
 
+    @Composable
+    fun StopItem(
+        modifier: Modifier = Modifier,
+        stop: BusStop
+    ) {
+        Column(modifier.fillMaxWidth().padding(15.dp)) {
+            Text(text = stop.stopName)
+            Spacer(modifier = Modifier.height(5.dp))
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = stop.stopId,
+                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    text = stop.nextStopName
+                )
+            }
+        }
+    }
+
     @Preview(showBackground = true)
     @Composable
     fun SearchBarPreview() {
-        MaterialTheme { SearchBar(viewModel = viewModel) }
+        SearchBar(viewModel = viewModel)
+    }
+
+    @Preview(showBackground = true)
+    @Composable
+    fun StopItemPreview() {
+        StopItem(
+            stop = BusStop("정류장ID", "정류장", "다음정류장")
+        )
     }
 
 }
