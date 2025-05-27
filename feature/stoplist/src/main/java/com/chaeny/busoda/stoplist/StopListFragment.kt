@@ -133,7 +133,8 @@ class StopListFragment : Fragment() {
         binding.composeStopList.setContent {
             MaterialTheme {
                 val stops by viewModel.busStops.observeAsState(initial = emptyList())
-                StopList(stops = stops, isLoading = true)
+                val isLoading by viewModel.isLoading.observeAsState(initial = false)
+                StopList(stops = stops, isLoading = isLoading)
             }
         }
     }
@@ -197,7 +198,7 @@ class StopListFragment : Fragment() {
     fun StopList(
         modifier: Modifier = Modifier,
         stops: List<BusStop>,
-        isLoading: Boolean = false
+        isLoading: Boolean
     ) {
         Box(modifier = modifier
             .fillMaxSize()
