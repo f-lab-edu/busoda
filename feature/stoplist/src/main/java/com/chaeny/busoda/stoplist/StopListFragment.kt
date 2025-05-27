@@ -57,9 +57,9 @@ class StopListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentStopListBinding.inflate(inflater, container, false)
-        val adapter = StopListAdapter(viewModel::handleBusStopClick)
-        binding.stopList.adapter = adapter
-        subscribeStopListUpdate(adapter)
+        //val adapter = StopListAdapter(viewModel::handleBusStopClick)
+        //binding.stopList.adapter = adapter
+        //subscribeStopListUpdate(adapter)
         subscribeStopSpecificEvent()
         subscribeStopClickEvent()
         setupSearchView()
