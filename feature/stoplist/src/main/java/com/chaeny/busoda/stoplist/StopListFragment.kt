@@ -6,9 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -18,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -28,6 +31,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -57,25 +61,11 @@ class StopListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentStopListBinding.inflate(inflater, container, false)
-        //val adapter = StopListAdapter(viewModel::handleBusStopClick)
-        //binding.stopList.adapter = adapter
-        //subscribeStopListUpdate(adapter)
         subscribeStopSpecificEvent()
         subscribeStopClickEvent()
         setupSearchView()
         setupStopList()
         return binding.root
-    }
-
-    private fun subscribeStopListUpdate(adapter: StopListAdapter) {
-        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            binding.stopListLoadingBar.visibility =
-                if (isLoading) View.VISIBLE else View.GONE
-        }
-
-        viewModel.busStops.observe(viewLifecycleOwner) { stops ->
-            adapter.submitList(stops)
-        }
     }
 
     private fun subscribeStopClickEvent() {
@@ -143,7 +133,7 @@ class StopListFragment : Fragment() {
         binding.composeStopList.setContent {
             MaterialTheme {
                 val stops by viewModel.busStops.observeAsState(initial = emptyList())
-                StopList(stops = stops)
+                StopList(stops = stops, isLoading = true)
             }
         }
     }
@@ -205,12 +195,24 @@ class StopListFragment : Fragment() {
 
     @Composable
     fun StopList(
+        modifier: Modifier = Modifier,
         stops: List<BusStop>,
-        modifier: Modifier = Modifier
+        isLoading: Boolean = false
     ) {
-        LazyColumn(modifier.padding(20.dp)) {
-            items(stops) { stop ->
-                StopItem(stop = stop)
+        Box(modifier = modifier
+            .fillMaxSize()
+            .padding(20.dp)
+        ) {
+            LazyColumn {
+                items(stops) { stop ->
+                    StopItem(stop = stop)
+                }
+            }
+
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center)
+                )
             }
         }
     }
@@ -232,7 +234,7 @@ class StopListFragment : Fragment() {
     @Preview(showBackground = true)
     @Composable
     fun StopListPreview() {
-        StopList(stops = dummyData)
+        StopList(stops = dummyData, isLoading = true)
     }
 
     private val dummyData = listOf(
