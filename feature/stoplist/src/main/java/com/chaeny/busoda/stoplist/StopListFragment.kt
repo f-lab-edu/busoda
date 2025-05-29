@@ -65,8 +65,8 @@ class StopListFragment : Fragment() {
             setContent {
                 MaterialTheme {
                     Column {
-                        SetupSearchView()
-                        SetupStopList()
+                        SearchBar(viewModel)
+                        StopListContent()
                     }
                 }
             }
@@ -125,21 +125,16 @@ class StopListFragment : Fragment() {
     }
 
     @Composable
-    private fun SetupSearchView() {
-        SearchBar(viewModel = viewModel)
-    }
-
-    @Composable
-    private fun SetupStopList() {
+    private fun StopListContent() {
         val stops by viewModel.busStops.observeAsState(initial = emptyList())
         val isLoading by viewModel.isLoading.observeAsState(initial = false)
-        StopList(stops = stops, isLoading = isLoading)
+        StopList(stops, isLoading)
     }
 
     @Composable
     private fun SearchBar(
-        modifier: Modifier = Modifier,
         viewModel: StopListViewModel,
+        modifier: Modifier = Modifier
     ) {
         var keyword by rememberSaveable { mutableStateOf("") }
 
@@ -167,8 +162,8 @@ class StopListFragment : Fragment() {
 
     @Composable
     fun StopItem(
-        modifier: Modifier = Modifier,
-        stop: BusStop
+        stop: BusStop,
+        modifier: Modifier = Modifier
     ) {
         Column(modifier
             .fillMaxWidth()
@@ -193,9 +188,9 @@ class StopListFragment : Fragment() {
 
     @Composable
     fun StopList(
-        modifier: Modifier = Modifier,
         stops: List<BusStop>,
-        isLoading: Boolean
+        isLoading: Boolean,
+        modifier: Modifier = Modifier
     ) {
         Box(modifier = modifier
             .fillMaxSize()
@@ -203,7 +198,7 @@ class StopListFragment : Fragment() {
         ) {
             LazyColumn {
                 items(stops) { stop ->
-                    StopItem(stop = stop)
+                    StopItem(stop)
                 }
             }
 
@@ -218,14 +213,14 @@ class StopListFragment : Fragment() {
     @Preview(showBackground = true)
     @Composable
     fun SearchBarPreview() {
-        SearchBar(viewModel = viewModel)
+        SearchBar(viewModel)
     }
 
     @Preview(showBackground = true)
     @Composable
     fun StopItemPreview() {
         StopItem(
-            stop = BusStop("정류장ID", "정류장", "다음정류장")
+            BusStop("정류장ID", "정류장", "다음정류장")
         )
     }
 
