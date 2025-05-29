@@ -35,13 +35,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.fragment.findNavController
 import com.chaeny.busoda.model.BusStop
-import com.chaeny.busoda.stoplist.databinding.FragmentStopListBinding
 import com.chaeny.busoda.ui.MessageHelper
 import com.chaeny.busoda.ui.event.EventObserver
 import dagger.hilt.android.AndroidEntryPoint
@@ -49,8 +49,6 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class StopListFragment : Fragment() {
-
-    private lateinit var binding: FragmentStopListBinding
     private val viewModel: StopListViewModel by viewModels()
     @Inject
     lateinit var messageHelper: MessageHelper
@@ -60,12 +58,19 @@ class StopListFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentStopListBinding.inflate(inflater, container, false)
         subscribeStopSpecificEvent()
         subscribeStopClickEvent()
-        setupSearchView()
-        setupStopList()
-        return binding.root
+
+        return ComposeView(requireContext()).apply {
+            setContent {
+                MaterialTheme {
+                    Column {
+                        SetupSearchView()
+                        SetupStopList()
+                    }
+                }
+            }
+        }
     }
 
     private fun subscribeStopClickEvent() {
@@ -112,16 +117,6 @@ class StopListFragment : Fragment() {
         findNavController().navigate(request)
     }
 
-    private fun setupSearchView() {
-        binding.composeSearchView.setContent {
-            MaterialTheme {
-                SearchBar(viewModel = viewModel)
-            }
-        }
-
-        showSoftKeyboard(binding.composeSearchView)
-    }
-
     private fun showSoftKeyboard(view: View) {
         if (view.requestFocus()) {
             val imm = requireContext().getSystemService(InputMethodManager::class.java)
@@ -129,14 +124,16 @@ class StopListFragment : Fragment() {
         }
     }
 
-    private fun setupStopList() {
-        binding.composeStopList.setContent {
-            MaterialTheme {
-                val stops by viewModel.busStops.observeAsState(initial = emptyList())
-                val isLoading by viewModel.isLoading.observeAsState(initial = false)
-                StopList(stops = stops, isLoading = isLoading)
-            }
-        }
+    @Composable
+    private fun SetupSearchView() {
+        SearchBar(viewModel = viewModel)
+    }
+
+    @Composable
+    private fun SetupStopList() {
+        val stops by viewModel.busStops.observeAsState(initial = emptyList())
+        val isLoading by viewModel.isLoading.observeAsState(initial = false)
+        StopList(stops = stops, isLoading = isLoading)
     }
 
     @Composable
