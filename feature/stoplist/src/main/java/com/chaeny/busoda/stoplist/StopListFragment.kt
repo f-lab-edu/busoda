@@ -69,7 +69,7 @@ class StopListFragment : Fragment() {
             setContent {
                 MaterialTheme {
                     Column {
-                        SearchBar(viewModel)
+                        SearchBarContent()
                         StopListContent()
                     }
                 }
@@ -122,6 +122,15 @@ class StopListFragment : Fragment() {
     }
 
     @Composable
+    private fun SearchBarContent() {
+        var keyword by rememberSaveable { mutableStateOf("") }
+        SearchBar(keyword, onKeywordChange = {
+            keyword = it
+            viewModel.setKeyWord(it)
+        })
+    }
+
+    @Composable
     private fun StopListContent() {
         val stops by viewModel.busStops.observeAsState(initial = emptyList())
         val isLoading by viewModel.isLoading.observeAsState(initial = false)
@@ -130,18 +139,15 @@ class StopListFragment : Fragment() {
 
     @Composable
     private fun SearchBar(
-        viewModel: StopListViewModel,
+        keyword: String,
+        onKeywordChange: (String) -> Unit,
         modifier: Modifier = Modifier
     ) {
-        var keyword by rememberSaveable { mutableStateOf("") }
         val focusRequester = remember { FocusRequester() }
 
         TextField(
             value = keyword,
-            onValueChange = {
-                keyword = it
-                viewModel.setKeyWord(it)
-            },
+            onValueChange = onKeywordChange,
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Color.Transparent,
                 unfocusedContainerColor = Color.Transparent,
@@ -219,7 +225,7 @@ class StopListFragment : Fragment() {
     @Preview(showBackground = true)
     @Composable
     fun SearchBarPreview() {
-        SearchBar(viewModel)
+        SearchBarContent()
     }
 
     @Preview(showBackground = true)
