@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -124,7 +125,7 @@ class StopListFragment : Fragment() {
     private fun StopListContent() {
         val stops by viewModel.busStops.observeAsState(initial = emptyList())
         val isLoading by viewModel.isLoading.observeAsState(initial = false)
-        StopList(stops, isLoading)
+        StopList(stops, isLoading, onClickItem = { stopId -> viewModel.handleBusStopClick(stopId) })
     }
 
     @Composable
@@ -165,6 +166,7 @@ class StopListFragment : Fragment() {
     @Composable
     fun StopItem(
         stop: BusStop,
+        onClick: (String) -> Unit,
         modifier: Modifier = Modifier
     ) {
         Column(modifier
@@ -173,6 +175,7 @@ class StopListFragment : Fragment() {
             .clip(RoundedCornerShape(12.dp))
             .background(Color.White)
             .padding(10.dp)
+            .clickable { onClick(stop.stopId) }
         ) {
             Text(text = stop.stopName)
             Spacer(modifier = Modifier.height(10.dp))
@@ -192,6 +195,7 @@ class StopListFragment : Fragment() {
     fun StopList(
         stops: List<BusStop>,
         isLoading: Boolean,
+        onClickItem: (String) -> Unit,
         modifier: Modifier = Modifier
     ) {
         Box(modifier = modifier
@@ -200,7 +204,7 @@ class StopListFragment : Fragment() {
         ) {
             LazyColumn {
                 items(stops) { stop ->
-                    StopItem(stop)
+                    StopItem(stop, onClickItem)
                 }
             }
 
@@ -222,14 +226,15 @@ class StopListFragment : Fragment() {
     @Composable
     fun StopItemPreview() {
         StopItem(
-            BusStop("정류장ID", "정류장", "다음정류장")
+            BusStop("정류장ID", "정류장", "다음정류장"),
+            onClick = {}
         )
     }
 
     @Preview(showBackground = true)
     @Composable
     fun StopListPreview() {
-        StopList(stops = dummyData, isLoading = true)
+        StopList(stops = dummyData, isLoading = true, onClickItem = {})
     }
 
     private val dummyData = listOf(
