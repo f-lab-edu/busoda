@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +19,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -35,7 +36,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -161,7 +161,8 @@ class StopListFragment : Fragment() {
             modifier = Modifier
                 .focusRequester(focusRequester)
                 .fillMaxWidth()
-                .padding(horizontal = 30.dp).padding(top = 20.dp)
+                .padding(horizontal = 30.dp)
+                .padding(top = 20.dp)
         )
 
         LaunchedEffect(Unit) {
@@ -175,24 +176,28 @@ class StopListFragment : Fragment() {
         onClick: (String) -> Unit,
         modifier: Modifier = Modifier
     ) {
-        Column(modifier
-            .fillMaxWidth()
-            .padding(10.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(Color.White)
-            .padding(10.dp)
-            .clickable { onClick(stop.stopId) }
+        Card(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 30.dp)
+                .padding(bottom = 15.dp)
+                .clickable { onClick(stop.stopId) },
+            shape = RoundedCornerShape(15.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
         ) {
-            Text(text = stop.stopName)
-            Spacer(modifier = Modifier.height(10.dp))
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    text = stop.stopId,
-                    modifier = Modifier.weight(1f)
-                )
-                Text(
-                    text = stop.nextStopName
-                )
+            Column(modifier = Modifier.padding(10.dp)) {
+                Text(text = stop.stopName)
+                Spacer(modifier = Modifier.height(10.dp))
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = stop.stopId,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        text = stop.nextStopName
+                    )
+                }
             }
         }
     }
@@ -206,7 +211,7 @@ class StopListFragment : Fragment() {
     ) {
         Box(modifier = modifier
             .fillMaxSize()
-            .padding(20.dp)
+            .padding(top = 20.dp)
         ) {
             LazyColumn {
                 items(stops) { stop ->
