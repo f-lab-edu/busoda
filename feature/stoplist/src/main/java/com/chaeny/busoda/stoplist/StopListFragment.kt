@@ -36,12 +36,10 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -50,6 +48,9 @@ import androidx.navigation.fragment.findNavController
 import com.chaeny.busoda.model.BusStop
 import com.chaeny.busoda.ui.MessageHelper
 import com.chaeny.busoda.ui.event.EventObserver
+import com.chaeny.busoda.ui.theme.DarkGreen
+import com.chaeny.busoda.ui.theme.Gray40
+import com.chaeny.busoda.ui.theme.Gray60
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -153,7 +154,7 @@ class StopListFragment : Fragment() {
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Color.Transparent,
                 unfocusedContainerColor = Color.Transparent,
-                focusedIndicatorColor = Color(0xFFADAEB0)
+                focusedIndicatorColor = Gray40
             ),
             placeholder = {
                 Text(
@@ -192,8 +193,7 @@ class StopListFragment : Fragment() {
                 Text(
                     text = stop.stopName,
                     color = Color.Black,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier
@@ -203,14 +203,14 @@ class StopListFragment : Fragment() {
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         text = stop.stopId,
-                        color = Color(0xFF5D5E64),
-                        fontSize = 14.sp,
+                        color = Gray60,
+                        style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.weight(0.3f)
                     )
                     Text(
                         text = stop.nextStopName,
-                        color = Color(0xFF5D5E64),
-                        fontSize = 14.sp,
+                        color = Gray60,
+                        style = MaterialTheme.typography.bodyMedium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         textAlign = TextAlign.Right,
@@ -241,7 +241,7 @@ class StopListFragment : Fragment() {
             if (isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.Center),
-                    color = Color(0xFF80AF81)
+                    color = DarkGreen
                 )
             }
         }
