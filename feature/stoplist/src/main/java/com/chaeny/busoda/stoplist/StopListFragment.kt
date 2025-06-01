@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -183,8 +182,8 @@ class StopListFragment : Fragment() {
             modifier = modifier
                 .fillMaxWidth()
                 .padding(horizontal = 30.dp)
-                .padding(bottom = 15.dp)
-                .clickable { onClick(stop.stopId) },
+                .padding(bottom = 15.dp),
+            onClick = { onClick(stop.stopId) },
             shape = RoundedCornerShape(15.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White),
             elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
