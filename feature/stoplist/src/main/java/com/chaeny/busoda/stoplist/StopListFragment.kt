@@ -35,6 +35,8 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -125,11 +127,15 @@ class StopListFragment : Fragment() {
 
     @Composable
     private fun SearchBarContent() {
-        var keyword by rememberSaveable { mutableStateOf("") }
-        SearchBar(keyword, onKeywordChange = {
-            keyword = it
-            viewModel.setKeyWord(it)
-        })
+        var keyword by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+            mutableStateOf(TextFieldValue(""))
+        }
+        SearchBar(keyword,
+            onKeywordChange = {
+                keyword = it.copy(selection = TextRange(it.text.length))
+                viewModel.setKeyWord(it.text)
+            }
+        )
     }
 
     @Composable
@@ -141,8 +147,8 @@ class StopListFragment : Fragment() {
 
     @Composable
     private fun SearchBar(
-        keyword: String,
-        onKeywordChange: (String) -> Unit,
+        keyword: TextFieldValue,
+        onKeywordChange: (TextFieldValue) -> Unit,
         modifier: Modifier = Modifier
     ) {
         val focusRequester = remember { FocusRequester() }
