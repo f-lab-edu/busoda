@@ -75,21 +75,15 @@ internal class StopListViewModel @Inject constructor(
         val updatedStops = when (result) {
             is GetBusStopResult.Success -> getUpdatedStops(result.data)
             is GetBusStopResult.NoResult -> {
-                viewModelScope.launch {
-                    _isNoResult.emit(true)
-                }
+                _isNoResult.emit(true)
                 emptyList()
             }
             is GetBusStopResult.NoInternet -> {
-                viewModelScope.launch {
-                    _isNoInternet.emit(true)
-                }
+                _isNoInternet.emit(true)
                 emptyList()
             }
             is GetBusStopResult.NetworkError -> {
-                viewModelScope.launch {
-                    _isNetworkError.emit(true)
-                }
+                _isNetworkError.emit(true)
                 emptyList()
             }
         }
