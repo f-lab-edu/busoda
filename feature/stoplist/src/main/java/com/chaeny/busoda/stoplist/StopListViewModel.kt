@@ -16,7 +16,9 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.debounce
@@ -37,7 +39,7 @@ internal class StopListViewModel @Inject constructor(
     private val _isNoInternet = MutableLiveData<Event<Boolean>>()
     private val _isNetworkError = MutableLiveData<Event<Boolean>>()
     private val _isKeywordTooShort = MutableLiveData<Event<Boolean>>()
-    private val _busStopClicked = MutableLiveData<Event<String>>()
+    private val _busStopClicked = MutableSharedFlow<String>()
     private val keyWord: MutableStateFlow<String> =
         MutableStateFlow(savedStateHandle.get(KEYWORD_SAVED_STATE_KEY) ?: EMPTY_KEYWORD)
     val isLoading: StateFlow<Boolean> = _isLoading
@@ -45,7 +47,7 @@ internal class StopListViewModel @Inject constructor(
     val isNoInternet: LiveData<Event<Boolean>> = _isNoInternet
     val isNetworkError: LiveData<Event<Boolean>> = _isNetworkError
     val isKeywordTooShort: LiveData<Event<Boolean>> = _isKeywordTooShort
-    val busStopClicked: LiveData<Event<String>> = _busStopClicked
+    val busStopClicked: SharedFlow<String> = _busStopClicked
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     val busStops: StateFlow<List<BusStop>> = keyWord
@@ -108,7 +110,9 @@ internal class StopListViewModel @Inject constructor(
     }
 
     fun handleBusStopClick(stopId: String) {
-        _busStopClicked.value = Event(stopId)
+        viewModelScope.launch {
+            _busStopClicked.emit(stopId)
+        }
     }
 
     fun setKeyWord(word: String) {

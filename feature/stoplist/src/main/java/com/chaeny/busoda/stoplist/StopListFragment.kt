@@ -44,6 +44,9 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.fragment.findNavController
 import com.chaeny.busoda.model.BusStop
@@ -53,6 +56,7 @@ import com.chaeny.busoda.ui.theme.DarkGreen
 import com.chaeny.busoda.ui.theme.Gray40
 import com.chaeny.busoda.ui.theme.Gray60
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -82,9 +86,13 @@ class StopListFragment : Fragment() {
     }
 
     private fun subscribeStopClickEvent() {
-        viewModel.busStopClicked.observe(viewLifecycleOwner, EventObserver { stopId ->
-            navigateToStopDetail(stopId)
-        })
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.busStopClicked.collect { stopId ->
+                    navigateToStopDetail(stopId)
+                }
+            }
+        }
     }
 
     private fun subscribeStopSpecificEvent() {
