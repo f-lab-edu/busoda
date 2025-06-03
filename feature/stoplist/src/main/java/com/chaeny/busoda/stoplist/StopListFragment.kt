@@ -202,34 +202,38 @@ class StopListFragment : Fragment() {
             colors = CardDefaults.cardColors(containerColor = Color.White),
             elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
         ) {
-            Column(modifier = Modifier.padding(15.dp)) {
+            Text(
+                text = stop.stopName,
+                color = Color.Black,
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 15.dp)
+                    .padding(top = 15.dp, bottom = 5.dp)
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 15.dp)
+                    .padding(bottom = 15.dp)
+            ) {
                 Text(
-                    text = stop.stopName,
-                    color = Color.Black,
-                    style = MaterialTheme.typography.titleMedium,
+                    text = stop.stopId,
+                    color = Gray60,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.weight(0.3f)
+                )
+                Text(
+                    text = stop.nextStopName,
+                    color = Gray60,
+                    style = MaterialTheme.typography.bodyMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 5.dp)
+                    textAlign = TextAlign.Right,
+                    modifier = Modifier.weight(0.7f)
                 )
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        text = stop.stopId,
-                        color = Gray60,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.weight(0.3f)
-                    )
-                    Text(
-                        text = stop.nextStopName,
-                        color = Gray60,
-                        style = MaterialTheme.typography.bodyMedium,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        textAlign = TextAlign.Right,
-                        modifier = Modifier.weight(0.7f)
-                    )
-                }
             }
         }
     }
