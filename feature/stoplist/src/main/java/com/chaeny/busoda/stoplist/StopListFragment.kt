@@ -51,7 +51,6 @@ import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.fragment.findNavController
 import com.chaeny.busoda.model.BusStop
 import com.chaeny.busoda.ui.MessageHelper
-import com.chaeny.busoda.ui.event.EventObserver
 import com.chaeny.busoda.ui.theme.DarkGreen
 import com.chaeny.busoda.ui.theme.Gray40
 import com.chaeny.busoda.ui.theme.Gray60
@@ -96,29 +95,30 @@ class StopListFragment : Fragment() {
     }
 
     private fun subscribeStopSpecificEvent() {
-        viewModel.isNoResult.observe(viewLifecycleOwner, EventObserver { isNoResult ->
-            if (isNoResult) {
-                showMessage(R.string.no_result)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.isNoResult.collect { isNoResult ->
+                        if (isNoResult) showMessage(R.string.no_result)
+                    }
+                }
+                launch {
+                    viewModel.isNoInternet.collect { isNoInternet ->
+                        if (isNoInternet) showMessage(R.string.no_internet)
+                    }
+                }
+                launch {
+                    viewModel.isNetworkError.collect { isNetworkError ->
+                        if (isNetworkError) showMessage(R.string.network_error)
+                    }
+                }
+                launch {
+                    viewModel.isKeywordTooShort.collect { isKeywordTooShort ->
+                        if (isKeywordTooShort) showMessage(R.string.short_keyword)
+                    }
+                }
             }
-        })
-
-        viewModel.isNoInternet.observe(viewLifecycleOwner, EventObserver { isNoInternet ->
-            if (isNoInternet) {
-                showMessage(R.string.no_internet)
-            }
-        })
-
-        viewModel.isNetworkError.observe(viewLifecycleOwner, EventObserver { isNetworkError ->
-            if (isNetworkError) {
-                showMessage(R.string.network_error)
-            }
-        })
-
-        viewModel.isKeywordTooShort.observe(viewLifecycleOwner, EventObserver { isKeywordTooShort ->
-            if (isKeywordTooShort) {
-                showMessage(R.string.short_keyword)
-            }
-        })
+        }
     }
 
     private fun showMessage(stringResId: Int) {
