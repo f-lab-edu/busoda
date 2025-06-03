@@ -24,7 +24,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -141,8 +140,8 @@ class StopListFragment : Fragment() {
 
     @Composable
     private fun StopListContent() {
-        val stops by viewModel.busStops.observeAsState(initial = emptyList())
-        val isLoading by viewModel.isLoading.collectAsState(initial = false)
+        val stops by viewModel.busStops.collectAsState()
+        val isLoading by viewModel.isLoading.collectAsState()
         StopList(stops, isLoading, onClickItem = { stopId -> viewModel.handleBusStopClick(stopId) })
     }
 

@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.data.repository.BusStopRepository
@@ -18,9 +17,11 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -47,7 +48,7 @@ internal class StopListViewModel @Inject constructor(
     val busStopClicked: LiveData<Event<String>> = _busStopClicked
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    val busStops: LiveData<List<BusStop>> = keyWord
+    val busStops: StateFlow<List<BusStop>> = keyWord
         .debounce(1000)
         .mapLatest { word ->
             when {
@@ -55,7 +56,11 @@ internal class StopListViewModel @Inject constructor(
                 word.isEmpty() -> emptyList()
                 else -> handleShortKeyword()
             }
-        }.asLiveData()
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
     init {
         viewModelScope.launch {
