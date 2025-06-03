@@ -18,6 +18,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
@@ -30,7 +31,7 @@ internal class StopListViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _isLoading = MutableLiveData<Boolean>()
+    private val _isLoading = MutableStateFlow(false)
     private val _isNoResult = MutableLiveData<Event<Boolean>>()
     private val _isNoInternet = MutableLiveData<Event<Boolean>>()
     private val _isNetworkError = MutableLiveData<Event<Boolean>>()
@@ -38,7 +39,7 @@ internal class StopListViewModel @Inject constructor(
     private val _busStopClicked = MutableLiveData<Event<String>>()
     private val keyWord: MutableStateFlow<String> =
         MutableStateFlow(savedStateHandle.get(KEYWORD_SAVED_STATE_KEY) ?: EMPTY_KEYWORD)
-    val isLoading: LiveData<Boolean> = _isLoading
+    val isLoading: StateFlow<Boolean> = _isLoading
     val isNoResult: LiveData<Event<Boolean>> = _isNoResult
     val isNoInternet: LiveData<Event<Boolean>> = _isNoInternet
     val isNetworkError: LiveData<Event<Boolean>> = _isNetworkError

@@ -22,6 +22,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -141,7 +142,7 @@ class StopListFragment : Fragment() {
     @Composable
     private fun StopListContent() {
         val stops by viewModel.busStops.observeAsState(initial = emptyList())
-        val isLoading by viewModel.isLoading.observeAsState(initial = false)
+        val isLoading by viewModel.isLoading.collectAsState(initial = false)
         StopList(stops, isLoading, onClickItem = { stopId -> viewModel.handleBusStopClick(stopId) })
     }
 
