@@ -22,8 +22,8 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -48,11 +48,11 @@ import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.fragment.findNavController
 import com.chaeny.busoda.model.BusStop
 import com.chaeny.busoda.ui.MessageHelper
-import com.chaeny.busoda.ui.event.EventObserver
 import com.chaeny.busoda.ui.theme.DarkGreen
 import com.chaeny.busoda.ui.theme.Gray40
 import com.chaeny.busoda.ui.theme.Gray60
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -66,8 +66,6 @@ class StopListFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        subscribeStopSpecificEvent()
-        subscribeStopClickEvent()
 
         return ComposeView(requireContext()).apply {
             setContent {
@@ -75,42 +73,12 @@ class StopListFragment : Fragment() {
                     Column {
                         SearchBarContent()
                         StopListContent()
+                        CollectStopSpecificEvent()
+                        CollectStopClickEvent()
                     }
                 }
             }
         }
-    }
-
-    private fun subscribeStopClickEvent() {
-        viewModel.busStopClicked.observe(viewLifecycleOwner, EventObserver { stopId ->
-            navigateToStopDetail(stopId)
-        })
-    }
-
-    private fun subscribeStopSpecificEvent() {
-        viewModel.isNoResult.observe(viewLifecycleOwner, EventObserver { isNoResult ->
-            if (isNoResult) {
-                showMessage(R.string.no_result)
-            }
-        })
-
-        viewModel.isNoInternet.observe(viewLifecycleOwner, EventObserver { isNoInternet ->
-            if (isNoInternet) {
-                showMessage(R.string.no_internet)
-            }
-        })
-
-        viewModel.isNetworkError.observe(viewLifecycleOwner, EventObserver { isNetworkError ->
-            if (isNetworkError) {
-                showMessage(R.string.network_error)
-            }
-        })
-
-        viewModel.isKeywordTooShort.observe(viewLifecycleOwner, EventObserver { isKeywordTooShort ->
-            if (isKeywordTooShort) {
-                showMessage(R.string.short_keyword)
-            }
-        })
     }
 
     private fun showMessage(stringResId: Int) {
@@ -123,6 +91,41 @@ class StopListFragment : Fragment() {
             .fromUri(uri.toUri())
             .build()
         findNavController().navigate(request)
+    }
+
+    @Composable
+    fun CollectStopSpecificEvent() {
+        LaunchedEffect(Unit) {
+            launch {
+                viewModel.isNoResult.collect {
+                    showMessage(R.string.no_result)
+                }
+            }
+            launch {
+                viewModel.isNoInternet.collect {
+                    showMessage(R.string.no_internet)
+                }
+            }
+            launch {
+                viewModel.isNetworkError.collect {
+                    showMessage(R.string.network_error)
+                }
+            }
+            launch {
+                viewModel.isKeywordTooShort.collect {
+                    showMessage(R.string.short_keyword)
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun CollectStopClickEvent() {
+        LaunchedEffect(Unit) {
+            viewModel.busStopClicked.collect { stopId ->
+                navigateToStopDetail(stopId)
+            }
+        }
     }
 
     @Composable
@@ -140,8 +143,8 @@ class StopListFragment : Fragment() {
 
     @Composable
     private fun StopListContent() {
-        val stops by viewModel.busStops.observeAsState(initial = emptyList())
-        val isLoading by viewModel.isLoading.observeAsState(initial = false)
+        val stops by viewModel.busStops.collectAsState()
+        val isLoading by viewModel.isLoading.collectAsState()
         StopList(stops, isLoading, onClickItem = { stopId -> viewModel.handleBusStopClick(stopId) })
     }
 
@@ -194,34 +197,38 @@ class StopListFragment : Fragment() {
             colors = CardDefaults.cardColors(containerColor = Color.White),
             elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
         ) {
-            Column(modifier = Modifier.padding(15.dp)) {
+            Text(
+                text = stop.stopName,
+                color = Color.Black,
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 15.dp)
+                    .padding(top = 15.dp, bottom = 5.dp)
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 15.dp)
+                    .padding(bottom = 15.dp)
+            ) {
                 Text(
-                    text = stop.stopName,
-                    color = Color.Black,
-                    style = MaterialTheme.typography.titleMedium,
+                    text = stop.stopId,
+                    color = Gray60,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.weight(0.3f)
+                )
+                Text(
+                    text = stop.nextStopName,
+                    color = Gray60,
+                    style = MaterialTheme.typography.bodyMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 5.dp)
+                    textAlign = TextAlign.Right,
+                    modifier = Modifier.weight(0.7f)
                 )
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        text = stop.stopId,
-                        color = Gray60,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.weight(0.3f)
-                    )
-                    Text(
-                        text = stop.nextStopName,
-                        color = Gray60,
-                        style = MaterialTheme.typography.bodyMedium,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        textAlign = TextAlign.Right,
-                        modifier = Modifier.weight(0.7f)
-                    )
-                }
             }
         }
     }

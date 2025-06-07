@@ -1,25 +1,26 @@
 package com.chaeny.busoda.stoplist
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.data.repository.BusStopRepository
 import com.chaeny.busoda.data.repository.GetBusStopResult
 import com.chaeny.busoda.model.BusStop
-import com.chaeny.busoda.ui.event.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -30,23 +31,23 @@ internal class StopListViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _isLoading = MutableLiveData<Boolean>()
-    private val _isNoResult = MutableLiveData<Event<Boolean>>()
-    private val _isNoInternet = MutableLiveData<Event<Boolean>>()
-    private val _isNetworkError = MutableLiveData<Event<Boolean>>()
-    private val _isKeywordTooShort = MutableLiveData<Event<Boolean>>()
-    private val _busStopClicked = MutableLiveData<Event<String>>()
+    private val _isLoading = MutableStateFlow(false)
+    private val _isNoResult = MutableSharedFlow<Boolean>()
+    private val _isNoInternet = MutableSharedFlow<Boolean>()
+    private val _isNetworkError = MutableSharedFlow<Boolean>()
+    private val _isKeywordTooShort = MutableSharedFlow<Boolean>()
+    private val _busStopClicked = MutableSharedFlow<String>()
     private val keyWord: MutableStateFlow<String> =
         MutableStateFlow(savedStateHandle.get(KEYWORD_SAVED_STATE_KEY) ?: EMPTY_KEYWORD)
-    val isLoading: LiveData<Boolean> = _isLoading
-    val isNoResult: LiveData<Event<Boolean>> = _isNoResult
-    val isNoInternet: LiveData<Event<Boolean>> = _isNoInternet
-    val isNetworkError: LiveData<Event<Boolean>> = _isNetworkError
-    val isKeywordTooShort: LiveData<Event<Boolean>> = _isKeywordTooShort
-    val busStopClicked: LiveData<Event<String>> = _busStopClicked
+    val isLoading: StateFlow<Boolean> = _isLoading
+    val isNoResult: SharedFlow<Boolean> = _isNoResult
+    val isNoInternet: SharedFlow<Boolean> = _isNoInternet
+    val isNetworkError: SharedFlow<Boolean> = _isNetworkError
+    val isKeywordTooShort: SharedFlow<Boolean> = _isKeywordTooShort
+    val busStopClicked: SharedFlow<String> = _busStopClicked
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    val busStops: LiveData<List<BusStop>> = keyWord
+    val busStops: StateFlow<List<BusStop>> = keyWord
         .debounce(1000)
         .mapLatest { word ->
             when {
@@ -54,7 +55,11 @@ internal class StopListViewModel @Inject constructor(
                 word.isEmpty() -> emptyList()
                 else -> handleShortKeyword()
             }
-        }.asLiveData()
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
     init {
         viewModelScope.launch {
@@ -70,15 +75,15 @@ internal class StopListViewModel @Inject constructor(
         val updatedStops = when (result) {
             is GetBusStopResult.Success -> getUpdatedStops(result.data)
             is GetBusStopResult.NoResult -> {
-                _isNoResult.value = Event(true)
+                _isNoResult.emit(true)
                 emptyList()
             }
             is GetBusStopResult.NoInternet -> {
-                _isNoInternet.value = Event(true)
+                _isNoInternet.emit(true)
                 emptyList()
             }
             is GetBusStopResult.NetworkError -> {
-                _isNetworkError.value = Event(true)
+                _isNetworkError.emit(true)
                 emptyList()
             }
         }
@@ -97,12 +102,16 @@ internal class StopListViewModel @Inject constructor(
     }
 
     private fun handleShortKeyword(): List<BusStop> {
-        _isKeywordTooShort.value = Event(true)
+        viewModelScope.launch {
+            _isKeywordTooShort.emit(true)
+        }
         return emptyList()
     }
 
     fun handleBusStopClick(stopId: String) {
-        _busStopClicked.value = Event(stopId)
+        viewModelScope.launch {
+            _busStopClicked.emit(stopId)
+        }
     }
 
     fun setKeyWord(word: String) {
