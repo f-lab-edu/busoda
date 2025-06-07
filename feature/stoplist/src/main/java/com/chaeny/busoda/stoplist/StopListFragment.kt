@@ -1,6 +1,7 @@
 package com.chaeny.busoda.stoplist
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -55,6 +56,7 @@ import com.chaeny.busoda.ui.theme.DarkGreen
 import com.chaeny.busoda.ui.theme.Gray40
 import com.chaeny.busoda.ui.theme.Gray60
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -78,6 +80,7 @@ class StopListFragment : Fragment() {
                     Column {
                         SearchBarContent()
                         StopListContent()
+                        CollectCountFlows()
                     }
                 }
             }
@@ -144,6 +147,28 @@ class StopListFragment : Fragment() {
                 viewModel.setKeyWord(it.text)
             }
         )
+    }
+
+    @Composable
+    fun CollectCountFlows() {
+        val startCollect = rememberSaveable { mutableStateOf(true) }
+
+        if (startCollect.value) {
+            val eagerly by viewModel.eagerlyFlow.collectAsState()
+            val lazily by viewModel.lazilyFlow.collectAsState()
+            val ws0 by viewModel.whileSubscribed0Flow.collectAsState()
+            val ws5s by viewModel.whileSubscribed5sFlow.collectAsState()
+            Log.e("CollectCountFlows", "Eagerly: $eagerly")
+            Log.e("CollectCountFlows", "Lazily: $lazily")
+            Log.e("CollectCountFlows", "WS0: $ws0")
+            Log.e("CollectCountFlows", "WS5S: $ws5s")
+        }
+
+        LaunchedEffect(Unit) {
+            delay(10000)
+            startCollect.value = false
+            Log.e("CollectCountFlows", "Collect stop")
+        }
     }
 
     @Composable
