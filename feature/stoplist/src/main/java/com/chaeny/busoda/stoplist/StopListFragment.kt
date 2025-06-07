@@ -72,7 +72,6 @@ class StopListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         subscribeStopSpecificEvent()
-        subscribeStopClickEvent()
 
         return ComposeView(requireContext()).apply {
             setContent {
@@ -81,17 +80,8 @@ class StopListFragment : Fragment() {
                         SearchBarContent()
                         StopListContent()
                         CollectCountFlows()
+                        CollectStopClickEvent()
                     }
-                }
-            }
-        }
-    }
-
-    private fun subscribeStopClickEvent() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.busStopClicked.collect { stopId ->
-                    navigateToStopDetail(stopId)
                 }
             }
         }
@@ -134,6 +124,15 @@ class StopListFragment : Fragment() {
             .fromUri(uri.toUri())
             .build()
         findNavController().navigate(request)
+    }
+
+    @Composable
+    fun CollectStopClickEvent() {
+        LaunchedEffect(Unit) {
+            viewModel.busStopClicked.collect { stopId ->
+                navigateToStopDetail(stopId)
+            }
+        }
     }
 
     @Composable
