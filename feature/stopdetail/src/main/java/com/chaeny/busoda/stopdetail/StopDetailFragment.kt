@@ -13,10 +13,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -42,7 +42,6 @@ class StopDetailFragment : Fragment() {
         val adapter = StopDetailAdapter(viewModel.timer)
         binding.busList.adapter = adapter
         subscribeUi(adapter)
-        bindReceivedData()
         setupRefreshButton()
         subscribeCountdownTimer()
         subscribeRefreshEvent()
@@ -56,21 +55,25 @@ class StopDetailFragment : Fragment() {
         }
 
         viewModel.stopDetail.observe(viewLifecycleOwner) { stopDetail ->
-            with(binding) {
-                //textBusStopId.visibility = View.VISIBLE
-                textBusStopName.text = stopDetail.stopName.ifEmpty {
-                    requireContext().getString(R.string.no_info)
-                }
-            }
+            displayStopId()
+            displayStopName(stopDetail.stopName)
             adapter.submitList(stopDetail.busInfos)
         }
     }
 
-    private fun bindReceivedData() {
+    private fun displayStopId() {
         binding.composeBusStopId.setContent {
             val stopId by viewModel.stopId.observeAsState()
             MaterialTheme {
                 StopId(stopId!!)
+            }
+        }
+    }
+
+    private fun displayStopName(stopName: String) {
+        binding.composeBusStopName.setContent {
+            MaterialTheme {
+                StopName(stopName)
             }
         }
     }
@@ -130,7 +133,22 @@ class StopDetailFragment : Fragment() {
                 .fillMaxWidth()
                 .padding(horizontal = 30.dp),
             textAlign = TextAlign.Center,
-            fontSize = 14.sp
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
+
+    @Composable
+    fun StopName(
+        stopName: String,
+        modifier: Modifier = Modifier
+    ) {
+        Text(
+            text = stopName.ifEmpty { stringResource(R.string.no_info) },
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 30.dp),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.titleMedium
         )
     }
 
@@ -138,6 +156,12 @@ class StopDetailFragment : Fragment() {
     @Composable
     fun StopIdPreview() {
         MaterialTheme { StopId("16206") }
+    }
+
+    @Preview(showBackground = true)
+    @Composable
+    fun StopNamePreview() {
+        MaterialTheme { StopName("화곡역4번출구") }
     }
 
 }

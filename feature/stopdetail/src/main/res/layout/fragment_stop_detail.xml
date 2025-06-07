@@ -14,20 +14,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/text_bus_stop_name"
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/compose_bus_stop_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="30dp"
-        android:gravity="center"
-        android:textColor="?attr/colorOnPrimary"
-        android:textSize="20sp"
-        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/compose_bus_stop_id"
-        tools:text="화곡역4번출구"
-        tools:textColor="@android:color/white" />
+        app:layout_constraintTop_toBottomOf="@id/compose_bus_stop_id" />
 
     <TextView
         android:id="@+id/text_bus_emoji"
@@ -38,7 +31,7 @@
         android:text="@string/bus_emoji"
         android:textSize="30dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_bus_stop_name"
+        app:layout_constraintTop_toBottomOf="@id/compose_bus_stop_name"
         tools:ignore="SpUsage" />
 
     <TextView
@@ -49,7 +42,7 @@
         android:text="@string/stop_emoji"
         android:textSize="30dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_bus_stop_name"
+        app:layout_constraintTop_toBottomOf="@id/compose_bus_stop_name"
         tools:ignore="SpUsage" />
 
     <androidx.recyclerview.widget.RecyclerView
