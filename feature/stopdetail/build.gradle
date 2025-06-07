@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kapt)
 }
@@ -11,6 +12,7 @@ android {
 
     buildFeatures {
         viewBinding = true
+        compose true
     }
 
     defaultConfig {
@@ -36,7 +38,15 @@ android {
 }
 
 dependencies {
+    implementation platform(libs.androidx.compose.bom)
+    implementation libs.androidx.activity.compose
+    implementation libs.androidx.material3
+    implementation libs.androidx.ui
+    implementation libs.androidx.ui.tooling.preview
+    implementation libs.compose.runtime.livedata
+
     implementation libs.hilt.android
+    debugImplementation libs.androidx.ui.tooling
     kapt libs.hilt.compiler
 
     implementation libs.navigation.fragment
