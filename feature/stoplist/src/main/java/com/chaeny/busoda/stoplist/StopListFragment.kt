@@ -45,9 +45,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.fragment.findNavController
 import com.chaeny.busoda.model.BusStop
@@ -71,7 +68,6 @@ class StopListFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        subscribeStopSpecificEvent()
 
         return ComposeView(requireContext()).apply {
             setContent {
@@ -80,34 +76,8 @@ class StopListFragment : Fragment() {
                         SearchBarContent()
                         StopListContent()
                         CollectCountFlows()
+                        CollectStopSpecificEvent()
                         CollectStopClickEvent()
-                    }
-                }
-            }
-        }
-    }
-
-    private fun subscribeStopSpecificEvent() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.isNoResult.collect { isNoResult ->
-                        if (isNoResult) showMessage(R.string.no_result)
-                    }
-                }
-                launch {
-                    viewModel.isNoInternet.collect { isNoInternet ->
-                        if (isNoInternet) showMessage(R.string.no_internet)
-                    }
-                }
-                launch {
-                    viewModel.isNetworkError.collect { isNetworkError ->
-                        if (isNetworkError) showMessage(R.string.network_error)
-                    }
-                }
-                launch {
-                    viewModel.isKeywordTooShort.collect { isKeywordTooShort ->
-                        if (isKeywordTooShort) showMessage(R.string.short_keyword)
                     }
                 }
             }
@@ -124,6 +94,32 @@ class StopListFragment : Fragment() {
             .fromUri(uri.toUri())
             .build()
         findNavController().navigate(request)
+    }
+
+    @Composable
+    fun CollectStopSpecificEvent() {
+        LaunchedEffect(Unit) {
+            launch {
+                viewModel.isNoResult.collect {
+                    showMessage(R.string.no_result)
+                }
+            }
+            launch {
+                viewModel.isNoInternet.collect {
+                    showMessage(R.string.no_internet)
+                }
+            }
+            launch {
+                viewModel.isNetworkError.collect {
+                    showMessage(R.string.network_error)
+                }
+            }
+            launch {
+                viewModel.isKeywordTooShort.collect {
+                    showMessage(R.string.short_keyword)
+                }
+            }
+        }
     }
 
     @Composable
