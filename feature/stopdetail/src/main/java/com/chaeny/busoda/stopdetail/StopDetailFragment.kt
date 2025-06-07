@@ -5,6 +5,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -45,7 +57,7 @@ class StopDetailFragment : Fragment() {
 
         viewModel.stopDetail.observe(viewLifecycleOwner) { stopDetail ->
             with(binding) {
-                textBusStopId.visibility = View.VISIBLE
+                //textBusStopId.visibility = View.VISIBLE
                 textBusStopName.text = stopDetail.stopName.ifEmpty {
                     requireContext().getString(R.string.no_info)
                 }
@@ -55,8 +67,11 @@ class StopDetailFragment : Fragment() {
     }
 
     private fun bindReceivedData() {
-        viewModel.stopId.observe(viewLifecycleOwner) { stopId ->
-            binding.textBusStopId.text = stopId
+        binding.composeBusStopId.setContent {
+            val stopId by viewModel.stopId.observeAsState()
+            MaterialTheme {
+                StopId(stopId!!)
+            }
         }
     }
 
@@ -103,4 +118,26 @@ class StopDetailFragment : Fragment() {
             start()
         }
     }
+
+    @Composable
+    fun StopId(
+        stopId: String,
+        modifier: Modifier = Modifier
+    ) {
+        Text(
+            text = stopId,
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 30.dp),
+            textAlign = TextAlign.Center,
+            fontSize = 14.sp
+        )
+    }
+
+    @Preview(showBackground = true)
+    @Composable
+    fun StopIdPreview() {
+        MaterialTheme { StopId("16206") }
+    }
+
 }

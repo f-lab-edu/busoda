@@ -6,20 +6,13 @@
     android:layout_height="match_parent"
     android:paddingTop="20dp">
 
-    <TextView
-        android:id="@+id/text_bus_stop_id"
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/compose_bus_stop_id"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="30dp"
-        android:gravity="center"
-        android:textColor="?attr/colorOnPrimary"
-        android:textSize="14sp"
-        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="16206"
-        tools:textColor="@android:color/white" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/text_bus_stop_name"
@@ -32,7 +25,7 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_bus_stop_id"
+        app:layout_constraintTop_toBottomOf="@id/compose_bus_stop_id"
         tools:text="화곡역4번출구"
         tools:textColor="@android:color/white" />
 
