@@ -18,17 +18,11 @@
         android:textSize="14sp"
         tools:text="첫번째 버스:" />
 
-    <com.chaeny.busoda.stopdetail.ArrivalTimeView
-        android:id="@+id/text_arrival_time"
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/compose_arrival_time"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="10dp"
-        android:layout_weight="2"
-        android:gravity="right"
-        android:textColor="@android:color/black"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        tools:text="22분 38초 후" />
+        android:layout_weight="2" />
 
     <TextView
         android:id="@+id/text_position"

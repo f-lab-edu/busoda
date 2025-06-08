@@ -4,6 +4,14 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import com.chaeny.busoda.model.BusArrivalInfo
 import com.chaeny.busoda.model.CongestionLevel
 import com.chaeny.busoda.stopdetail.databinding.ArrivalInfoViewBinding
@@ -26,8 +34,11 @@ class ArrivalInfoView @JvmOverloads constructor(
 
                 textCongestion.text = arrivalInfo.getCongestionText()
                 textCongestion.setTextColor(arrivalInfo.getCongestionColor())
-
-                textArrivalTime.bindArrivalTime(timerFlow, arrivalInfo.arrivalTime)
+                composeArrivalTime.setContent {
+                    MaterialTheme {
+                        ArrivalInfoTime("1분 1초 후")
+                    }
+                }
             }
         } else {
             bindEmptyInfo(position)
@@ -37,7 +48,11 @@ class ArrivalInfoView @JvmOverloads constructor(
     private fun bindEmptyInfo(position: Int) {
         with(binding) {
             textInfoTitle.text = context.getString(R.string.nth_bus, position + 1)
-            textArrivalTime.text = context.getString(R.string.no_info)
+            composeArrivalTime.setContent {
+                MaterialTheme {
+                    ArrivalInfoTime(context.getString(R.string.no_info))
+                }
+            }
             textPosition.text = context.getString(R.string.no_data)
             textCongestion.text = context.getString(R.string.no_data)
         }
@@ -62,4 +77,20 @@ class ArrivalInfoView @JvmOverloads constructor(
             else -> context.getColor(R.color.congestion_unknown)
         }
     }
+
+    @Composable
+    fun ArrivalInfoTime(
+        remainingText: String,
+        modifier: Modifier = Modifier
+    ) {
+        Text(
+            text = remainingText,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            textAlign = TextAlign.End,
+            style = MaterialTheme.typography.titleSmall
+        )
+    }
+
 }
