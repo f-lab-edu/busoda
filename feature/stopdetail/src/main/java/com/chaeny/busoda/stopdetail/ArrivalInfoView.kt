@@ -10,6 +10,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.chaeny.busoda.model.BusArrivalInfo
@@ -29,14 +30,27 @@ class ArrivalInfoView @JvmOverloads constructor(
     internal fun bindArrivalInfo(arrivalInfo: BusArrivalInfo?, position: Int, timerFlow: Flow<Int>) {
         if (arrivalInfo != null) {
             with(binding) {
-                textInfoTitle.text = context.getString(R.string.nth_bus, position + 1)
-                textPosition.text = arrivalInfo.position
-
-                textCongestion.text = arrivalInfo.getCongestionText()
-                textCongestion.setTextColor(arrivalInfo.getCongestionColor())
+                composeInfoTitle.setContent {
+                    MaterialTheme {
+                        ArrivalTitle(context.getString(R.string.nth_bus, position + 1))
+                    }
+                }
                 composeArrivalTime.setContent {
                     MaterialTheme {
-                        ArrivalInfoTime("1분 1초 후")
+                        ArrivalTime("1분 1초 후")
+                    }
+                }
+                composePosition.setContent {
+                    MaterialTheme {
+                        ArrivalPosition(arrivalInfo.position)
+                    }
+                }
+                composeCongestion.setContent {
+                    MaterialTheme {
+                        ArrivalCongestion(
+                            congestion = arrivalInfo.getCongestionText(),
+                            textColor = arrivalInfo.getCongestionColor()
+                        )
                     }
                 }
             }
@@ -47,14 +61,29 @@ class ArrivalInfoView @JvmOverloads constructor(
 
     private fun bindEmptyInfo(position: Int) {
         with(binding) {
-            textInfoTitle.text = context.getString(R.string.nth_bus, position + 1)
-            composeArrivalTime.setContent {
+            composeInfoTitle.setContent {
                 MaterialTheme {
-                    ArrivalInfoTime(context.getString(R.string.no_info))
+                    ArrivalTitle(context.getString(R.string.nth_bus, position + 1))
                 }
             }
-            textPosition.text = context.getString(R.string.no_data)
-            textCongestion.text = context.getString(R.string.no_data)
+            composeArrivalTime.setContent {
+                MaterialTheme {
+                    ArrivalTime(context.getString(R.string.no_info))
+                }
+            }
+            composePosition.setContent {
+                MaterialTheme {
+                    ArrivalPosition(context.getString(R.string.no_data))
+                }
+            }
+            composeCongestion.setContent {
+                MaterialTheme {
+                    ArrivalCongestion(
+                        congestion = context.getString(R.string.no_data),
+                        textColor = context.getColor(R.color.congestion_unknown)
+                    )
+                }
+            }
         }
     }
 
@@ -79,13 +108,28 @@ class ArrivalInfoView @JvmOverloads constructor(
     }
 
     @Composable
-    fun ArrivalInfoTime(
-        remainingText: String,
+    fun ArrivalTitle(
+        title: String,
         modifier: Modifier = Modifier
     ) {
         Text(
-            text = remainingText,
-            modifier = Modifier
+            text = title,
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(start = 5.dp),
+            textAlign = TextAlign.Start,
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
+
+    @Composable
+    fun ArrivalTime(
+        time: String,
+        modifier: Modifier = Modifier
+    ) {
+        Text(
+            text = time,
+            modifier = modifier
                 .fillMaxWidth()
                 .padding(end = 10.dp),
             textAlign = TextAlign.End,
@@ -93,4 +137,35 @@ class ArrivalInfoView @JvmOverloads constructor(
         )
     }
 
+    @Composable
+    fun ArrivalPosition(
+        position: String,
+        modifier: Modifier = Modifier
+    ) {
+        Text(
+            text = position,
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            textAlign = TextAlign.End,
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
+
+    @Composable
+    fun ArrivalCongestion(
+        congestion: String,
+        textColor: Int,
+        modifier: Modifier = Modifier
+    ) {
+        Text(
+            text = congestion,
+            color = Color(textColor),
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+            textAlign = TextAlign.End,
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
 }

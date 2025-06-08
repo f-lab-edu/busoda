@@ -8,15 +8,11 @@
     tools:background="?attr/colorPrimary"
     tools:parentTag="LinearLayout">
 
-    <TextView
-        android:id="@+id/text_info_title"
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/compose_info_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="2"
-        android:paddingStart="5dp"
-        android:textColor="@android:color/black"
-        android:textSize="14sp"
-        tools:text="첫번째 버스:" />
+        android:layout_weight="2" />
 
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/compose_arrival_time"
@@ -24,23 +20,16 @@
         android:layout_height="wrap_content"
         android:layout_weight="2" />
 
-    <TextView
-        android:id="@+id/text_position"
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/compose_position"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1.5"
-        android:gravity="right"
-        android:textColor="@android:color/black"
-        android:textSize="14sp"
-        tools:text="11번째 전" />
+        android:layout_weight="1.5" />
 
-    <TextView
-        android:id="@+id/text_congestion"
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/compose_congestion"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1.5"
-        android:gravity="right"
-        android:textSize="14sp"
-        tools:text="매우혼잡" />
+        android:layout_weight="1.5" />
 
 </merge>
