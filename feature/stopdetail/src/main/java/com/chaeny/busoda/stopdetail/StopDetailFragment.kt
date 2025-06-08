@@ -8,14 +8,19 @@ import android.view.ViewGroup
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -24,6 +29,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.chaeny.busoda.stopdetail.databinding.FragmentStopDetailBinding
 import com.chaeny.busoda.ui.event.EventObserver
+import com.chaeny.busoda.ui.theme.DarkGreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -41,8 +47,6 @@ class StopDetailFragment : Fragment() {
         val adapter = StopDetailAdapter(viewModel.timer)
         binding.busList.adapter = adapter
         subscribeUi(adapter)
-        setupRefreshButton()
-        displayBusEmoji()
         subscribeRefreshEvent()
         return binding.root
     }
@@ -56,6 +60,8 @@ class StopDetailFragment : Fragment() {
         viewModel.stopDetail.observe(viewLifecycleOwner) { stopDetail ->
             displayStopId()
             displayStopName(stopDetail.stopName)
+            displayBusEmoji()
+            displayRefreshButton()
             adapter.submitList(stopDetail.busInfos)
         }
     }
@@ -114,14 +120,18 @@ class StopDetailFragment : Fragment() {
     private fun subscribeRefreshEvent() {
         viewModel.refreshEvent.observe(viewLifecycleOwner, EventObserver { isRefresh ->
             if (isRefresh) {
-                startRotateAnimation(binding.refreshButton)
+                startRotateAnimation(binding.composeRefreshButton)
             }
         })
     }
 
-    private fun setupRefreshButton() {
-        binding.refreshButton.setOnClickListener {
-            viewModel.refreshData()
+    private fun displayRefreshButton() {
+        binding.composeRefreshButton.setContent {
+            MaterialTheme {
+                RefreshButton(
+                    onClick = { viewModel.refreshData() }
+                )
+            }
         }
     }
 
@@ -189,6 +199,25 @@ class StopDetailFragment : Fragment() {
         )
     }
 
+    @Composable
+    fun RefreshButton(
+        onClick: () -> Unit,
+        modifier: Modifier = Modifier
+    ) {
+        FloatingActionButton(
+            onClick = onClick,
+            containerColor = DarkGreen,
+            shape = CircleShape,
+            modifier = Modifier.padding(25.dp)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_refresh),
+                contentDescription = stringResource(R.string.refresh),
+                tint = Color.Black
+            )
+        }
+    }
+
     @Preview(showBackground = true)
     @Composable
     fun StopIdPreview() {
@@ -209,6 +238,14 @@ class StopDetailFragment : Fragment() {
                 BusEmoji()
                 StopEmoji()
             }
+        }
+    }
+
+    @Preview(showBackground = true)
+    @Composable
+    fun RefreshButtonPreview() {
+        MaterialTheme {
+            RefreshButton(onClick = {})
         }
     }
 
