@@ -22,28 +22,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/compose_bus_stop_id" />
 
-    <TextView
-        android:id="@+id/text_bus_emoji"
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/compose_bus_emoji"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="35dp"
-        android:rotationY="180"
-        android:text="@string/bus_emoji"
-        android:textSize="30dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/compose_bus_stop_name"
-        tools:ignore="SpUsage" />
+        app:layout_constraintTop_toBottomOf="@id/compose_bus_stop_name" />
 
-    <TextView
-        android:id="@+id/text_stop_emoji"
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/compose_stop_emoji"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="30dp"
-        android:text="@string/stop_emoji"
-        android:textSize="30dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/compose_bus_stop_name"
-        tools:ignore="SpUsage" />
+        app:layout_constraintTop_toBottomOf="@id/compose_bus_stop_name" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/bus_list"
@@ -53,7 +44,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_bus_emoji"
+        app:layout_constraintTop_toBottomOf="@id/compose_bus_emoji"
         tools:listitem="@layout/list_item_bus" />
 
     <ProgressBar

@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -13,19 +14,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import com.chaeny.busoda.stopdetail.databinding.FragmentStopDetailBinding
 import com.chaeny.busoda.ui.event.EventObserver
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class StopDetailFragment : Fragment() {
@@ -43,7 +42,7 @@ class StopDetailFragment : Fragment() {
         binding.busList.adapter = adapter
         subscribeUi(adapter)
         setupRefreshButton()
-        subscribeCountdownTimer()
+        displayBusEmoji()
         subscribeRefreshEvent()
         return binding.root
     }
@@ -78,26 +77,37 @@ class StopDetailFragment : Fragment() {
         }
     }
 
-    private fun subscribeCountdownTimer() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.timer.collect { countdownValue ->
-                    updateBusAnimation(countdownValue)
+//    private fun subscribeCountdownTimer() {
+//        viewLifecycleOwner.lifecycleScope.launch {
+//            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+//                viewModel.timer.collect { countdownValue ->
+//                    updateBusAnimation(countdownValue)
+//                }
+//            }
+//        }
+//    }
+
+//    private fun updateBusAnimation(countdownValue: Int) {
+//        val maxCount = 15
+//        val moveStep = maxCount - countdownValue
+//        val totalDistance = binding.textStopEmoji.left - binding.textBusEmoji.left
+//        val stepDistance = (totalDistance / maxCount).toFloat()
+//        val translationValue = stepDistance * moveStep
+//
+//        ObjectAnimator.ofFloat(binding.textBusEmoji, "translationX", translationValue).apply {
+//            duration = 1000
+//            start()
+//        }
+//    }
+
+    private fun displayBusEmoji() {
+        binding.composeBusEmoji.setContent {
+            MaterialTheme {
+                Row {
+                    BusEmoji()
+                    StopEmoji()
                 }
             }
-        }
-    }
-
-    private fun updateBusAnimation(countdownValue: Int) {
-        val maxCount = 15
-        val moveStep = maxCount - countdownValue
-        val totalDistance = binding.textStopEmoji.left - binding.textBusEmoji.left
-        val stepDistance = (totalDistance / maxCount).toFloat()
-        val translationValue = stepDistance * moveStep
-
-        ObjectAnimator.ofFloat(binding.textBusEmoji, "translationX", translationValue).apply {
-            duration = 1000
-            start()
         }
     }
 
@@ -152,6 +162,31 @@ class StopDetailFragment : Fragment() {
         )
     }
 
+    @Composable
+    fun BusEmoji(
+        modifier: Modifier = Modifier
+    ) {
+        Text(
+            text = stringResource(R.string.bus_emoji),
+            modifier = modifier
+                .padding(start = 35.dp)
+                .graphicsLayer(rotationY = 180f),
+            fontSize = 30.sp
+        )
+    }
+
+    @Composable
+    fun StopEmoji(modifier: Modifier = Modifier) {
+        Text(
+            text = stringResource(R.string.stop_emoji),
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(end = 30.dp),
+            fontSize = 30.sp,
+            textAlign = TextAlign.End
+        )
+    }
+
     @Preview(showBackground = true)
     @Composable
     fun StopIdPreview() {
@@ -162,6 +197,17 @@ class StopDetailFragment : Fragment() {
     @Composable
     fun StopNamePreview() {
         MaterialTheme { StopName("화곡역4번출구") }
+    }
+
+    @Preview(showBackground = true)
+    @Composable
+    fun StopEmojiPreview() {
+        MaterialTheme {
+            Row {
+                BusEmoji()
+                StopEmoji()
+            }
+        }
     }
 
 }
