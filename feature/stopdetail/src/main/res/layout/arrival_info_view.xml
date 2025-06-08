@@ -9,27 +9,8 @@
     tools:parentTag="LinearLayout">
 
     <androidx.compose.ui.platform.ComposeView
-        android:id="@+id/compose_info_title"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="2" />
-
-    <androidx.compose.ui.platform.ComposeView
-        android:id="@+id/compose_arrival_time"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="2" />
-
-    <androidx.compose.ui.platform.ComposeView
-        android:id="@+id/compose_position"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1.5" />
-
-    <androidx.compose.ui.platform.ComposeView
-        android:id="@+id/compose_congestion"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1.5" />
+        android:id="@+id/compose_arrival_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
 </merge>
