@@ -15,11 +15,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.chaeny.busoda.stopdetail.databinding.FragmentStopDetailBinding
@@ -171,18 +171,20 @@ class StopDetailFragment : Fragment() {
             modifier = modifier
                 .padding(start = 35.dp)
                 .graphicsLayer(rotationY = 180f),
-            fontSize = 30.sp
+            fontSize = with(LocalDensity.current) { 30.dp.toSp() }
         )
     }
 
     @Composable
-    fun StopEmoji(modifier: Modifier = Modifier) {
+    fun StopEmoji(
+        modifier: Modifier = Modifier
+    ) {
         Text(
             text = stringResource(R.string.stop_emoji),
             modifier = modifier
                 .fillMaxWidth()
                 .padding(end = 30.dp),
-            fontSize = 30.sp,
+            fontSize = with(LocalDensity.current) { 30.dp.toSp() },
             textAlign = TextAlign.End
         )
     }
