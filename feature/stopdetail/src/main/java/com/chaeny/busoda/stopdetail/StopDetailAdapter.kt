@@ -2,6 +2,19 @@ package com.chaeny.busoda.stopdetail
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -32,8 +45,11 @@ internal class StopDetailAdapter(private val timerFlow: Flow<Int>) :
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(busData: BusInfo) {
             with(binding) {
-                textBusNumber.text = busData.busNumber
-                textNextStop.text = busData.nextStopName
+                composeBusHeader.setContent {
+                    MaterialTheme {
+                        BusInfoHeader(busData.busNumber, busData.nextStopName)
+                    }
+                }
             }
             bindArrivalInfos(busData, binding, timerFlow)
         }
@@ -44,6 +60,40 @@ internal class StopDetailAdapter(private val timerFlow: Flow<Int>) :
                 secondArrivalInfoView.bindArrivalInfo(busData.arrivalInfos.getOrNull(1), 1, timerFlow)
             }
         }
+
+        @Composable
+        fun BusInfoHeader(
+            busNumber: String,
+            nextStopName: String,
+            modifier: Modifier = Modifier
+        ) {
+            Row(
+                modifier = modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.Bottom
+            ) {
+                Text(
+                    text = busNumber,
+                    modifier = Modifier.weight(0.3f),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = nextStopName,
+                    modifier = Modifier
+                        .weight(0.55f)
+                        .padding(end = 5.dp),
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.End,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = stringResource(R.string.way),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+        }
+
     }
 }
 
