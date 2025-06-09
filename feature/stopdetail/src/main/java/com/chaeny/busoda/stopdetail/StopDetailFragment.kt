@@ -10,12 +10,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -23,6 +24,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
@@ -208,12 +210,44 @@ class StopDetailFragment : Fragment() {
             onClick = onClick,
             containerColor = DarkGreen,
             shape = CircleShape,
-            modifier = Modifier.padding(25.dp)
+            modifier = modifier.padding(25.dp)
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_refresh),
                 contentDescription = stringResource(R.string.refresh),
                 tint = Color.Black
+            )
+        }
+    }
+
+    @Composable
+    fun BusInfoHeader(
+        busNumber: String,
+        nextStopName: String,
+        modifier: Modifier = Modifier
+    ) {
+        Row(
+            modifier = modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.Bottom
+        ) {
+            Text(
+                text = busNumber,
+                modifier = Modifier.weight(0.3f),
+                style = MaterialTheme.typography.titleLarge,
+            )
+            Text(
+                text = nextStopName,
+                modifier = Modifier
+                    .weight(0.55f)
+                    .padding(end = 5.dp),
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.End,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = stringResource(R.string.way),
+                style = MaterialTheme.typography.bodyLarge
             )
         }
     }
@@ -246,6 +280,17 @@ class StopDetailFragment : Fragment() {
     fun RefreshButtonPreview() {
         MaterialTheme {
             RefreshButton(onClick = {})
+        }
+    }
+
+    @Preview(showBackground = true)
+    @Composable
+    fun BusInfoHeaderPreview() {
+        MaterialTheme {
+            BusInfoHeader(
+                busNumber = "심야A21",
+                nextStopName = "강서구청사거리.서울디지털대학교"
+            )
         }
     }
 
