@@ -9,6 +9,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -30,7 +35,7 @@ class ArrivalInfoView @JvmOverloads constructor(
     internal fun bindArrivalInfo(arrivalInfo: BusArrivalInfo?, position: Int, timerFlow: Flow<Int>) {
         binding.composeArrivalInfo.setContent {
             MaterialTheme {
-                ArrivalInfo(arrivalInfo, position)
+                ArrivalInfo(arrivalInfo, position, timerFlow)
             }
         }
     }
@@ -55,10 +60,54 @@ class ArrivalInfoView @JvmOverloads constructor(
         }
     }
 
+    private fun setTextRemainingTime(arrivalTime: Long): String {
+        val now = System.currentTimeMillis() / 1000
+        val remainingTime = arrivalTime - now
+        return formattedArrivalTime(remainingTime)
+    }
+
+    private fun formattedArrivalTime(arrivalTime: Long): String {
+        if (arrivalTime <= 0) return context.getString(R.string.no_data)
+
+        val minutes = arrivalTime / 60
+        val seconds = arrivalTime % 60
+
+        return when {
+            minutes > 0 && seconds > 0 -> context.getString(R.string.minutes_seconds, minutes, seconds)
+            minutes > 0 -> context.getString(R.string.minutes, minutes)
+            else -> context.getString(R.string.seconds, seconds)
+        }
+    }
+
+    @Composable
+    fun ArrivalTimeText(
+        arrivalTime: Long?,
+        timerFlow: Flow<Int>,
+        modifier: Modifier = Modifier
+    ) {
+        var displayTime by rememberSaveable { mutableStateOf("") }
+
+        LaunchedEffect(arrivalTime, timerFlow) {
+            if (arrivalTime != null) {
+                timerFlow.collect {
+                    displayTime = setTextRemainingTime(arrivalTime)
+                }
+            }
+        }
+
+        Text(
+            text = displayTime,
+            modifier = modifier,
+            textAlign = TextAlign.End,
+            style = MaterialTheme.typography.titleSmall
+        )
+    }
+
     @Composable
     fun ArrivalInfo(
         arrivalInfo: BusArrivalInfo?,
         position: Int,
+        timerFlow: Flow<Int>,
         modifier: Modifier = Modifier
     ) {
         Row(
@@ -69,15 +118,14 @@ class ArrivalInfoView @JvmOverloads constructor(
                 modifier = Modifier.weight(2f),
                 style = MaterialTheme.typography.bodyMedium
             )
-            Text(
-                text = "22분 38초 후",
-                modifier = Modifier.weight(2f),
-                textAlign = TextAlign.End,
-                style = MaterialTheme.typography.titleSmall
+            ArrivalTimeText(
+                arrivalTime = arrivalInfo?.arrivalTime,
+                timerFlow = timerFlow,
+                modifier = Modifier.weight(2.5f)
             )
             Text(
                 text = arrivalInfo?.position ?: stringResource(R.string.no_data),
-                modifier = Modifier.weight(1.5f),
+                modifier = Modifier.weight(2f),
                 textAlign = TextAlign.End,
                 style = MaterialTheme.typography.bodyMedium
             )
