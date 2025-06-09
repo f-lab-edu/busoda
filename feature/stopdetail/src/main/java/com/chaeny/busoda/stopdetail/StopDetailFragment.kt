@@ -47,6 +47,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.chaeny.busoda.model.BusArrivalInfo
 import com.chaeny.busoda.model.BusInfo
+import com.chaeny.busoda.model.BusStopDetail
 import com.chaeny.busoda.model.CongestionLevel
 import com.chaeny.busoda.stopdetail.databinding.FragmentStopDetailBinding
 import com.chaeny.busoda.ui.event.EventObserver
@@ -67,24 +68,13 @@ class StopDetailFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentStopDetailBinding.inflate(inflater, container, false)
-        subscribeUi()
+        displayStopId()
+        displayStopName()
+        displayBusEmoji()
+        displayRefreshButton()
+        busListContent()
         subscribeRefreshEvent()
         return binding.root
-    }
-
-    private fun subscribeUi() {
-//        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-//            binding.busListLoadingBar.visibility =
-//                if (isLoading) View.VISIBLE else View.GONE
-//        }
-
-        viewModel.stopDetail.observe(viewLifecycleOwner) { stopDetail ->
-            displayStopId()
-            displayStopName(stopDetail.stopName)
-            displayBusEmoji()
-            displayRefreshButton()
-            displayBusList(stopDetail.busInfos, viewModel.timer)
-        }
     }
 
     private fun displayStopId() {
@@ -96,18 +86,21 @@ class StopDetailFragment : Fragment() {
         }
     }
 
-    private fun displayStopName(stopName: String) {
+    private fun displayStopName() {
         binding.composeBusStopName.setContent {
             MaterialTheme {
-                StopName(stopName)
+                val stopDetail by viewModel.stopDetail.observeAsState(initial = BusStopDetail("", emptyList()))
+                StopName(stopDetail.stopName)
             }
         }
     }
 
-    private fun displayBusList(busInfos: List<BusInfo>, timerFlow: Flow<Int>) {
+    private fun busListContent() {
         binding.composeBusList.setContent {
             MaterialTheme {
-                BusList(busInfos, timerFlow, isLoading = true)
+                val stopDetail by viewModel.stopDetail.observeAsState(initial = BusStopDetail("", emptyList()))
+                val isLoading by viewModel.isLoading.observeAsState(initial = false)
+                BusList(stopDetail.busInfos, viewModel.timer, isLoading)
             }
         }
     }
