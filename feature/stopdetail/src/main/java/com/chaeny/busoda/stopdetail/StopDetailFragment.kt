@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -415,6 +417,19 @@ class StopDetailFragment : Fragment() {
         }
     }
 
+    @Composable
+    fun BusList(
+        busInfos: List<BusInfo>,
+        timerFlow: Flow<Int>,
+        modifier: Modifier = Modifier
+    ) {
+        LazyColumn(modifier) {
+            items(busInfos) { busInfo ->
+                BusItem(busInfo, timerFlow)
+            }
+        }
+    }
+
     @Preview(showBackground = true)
     @Composable
     fun StopIdPreview() {
@@ -473,12 +488,40 @@ class StopDetailFragment : Fragment() {
         }
     }
 
+    @Preview(showBackground = true)
+    @Composable
+    fun BusListPreview() {
+        MaterialTheme {
+            BusList(busInfos = dummyBusInfos, timerFlow = flowOf(0))
+        }
+    }
+
     private val now = System.currentTimeMillis() / 1000
     private val dummyArrivalInfo = BusArrivalInfo(now + 158, "2번째 전", CongestionLevel.MEDIUM)
     private val dummyBusInfo = BusInfo(
         "5712", "등촌중학교.백석초등학교", listOf(
             BusArrivalInfo(now + 228, "3번째 전", CongestionLevel.LOW),
             BusArrivalInfo(now + 1039, "10번째 전", CongestionLevel.HIGH)
+        )
+    )
+    private val dummyBusInfos = listOf(
+        BusInfo(
+            "604", "화곡본동시장", listOf(
+                BusArrivalInfo(now + 158, "2번째 전", CongestionLevel.MEDIUM),
+                BusArrivalInfo(now + 978, "9번째 전", CongestionLevel.HIGH)
+            )
+        ),
+        BusInfo(
+            "5712", "화곡본동시장", listOf(
+                BusArrivalInfo(now + 228, "3번째 전", CongestionLevel.LOW),
+                BusArrivalInfo(now + 1039, "10번째 전", CongestionLevel.HIGH)
+            )
+        ),
+        BusInfo(
+            "652", "화곡역1번출구", listOf(
+                BusArrivalInfo(now + 298, "4번째 전", CongestionLevel.MEDIUM),
+                BusArrivalInfo(now + 1100, "11번째 전", CongestionLevel.VERY_HIGH)
+            )
         )
     )
 
