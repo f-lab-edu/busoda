@@ -64,14 +64,12 @@ class StopDetailFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentStopDetailBinding.inflate(inflater, container, false)
-        val adapter = StopDetailAdapter(viewModel.timer)
-        binding.busList.adapter = adapter
-        subscribeUi(adapter)
+        subscribeUi()
         subscribeRefreshEvent()
         return binding.root
     }
 
-    private fun subscribeUi(adapter: StopDetailAdapter) {
+    private fun subscribeUi() {
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             binding.busListLoadingBar.visibility =
                 if (isLoading) View.VISIBLE else View.GONE
@@ -82,7 +80,7 @@ class StopDetailFragment : Fragment() {
             displayStopName(stopDetail.stopName)
             displayBusEmoji()
             displayRefreshButton()
-            adapter.submitList(stopDetail.busInfos)
+            displayBusList(stopDetail.busInfos, viewModel.timer)
         }
     }
 
@@ -99,6 +97,14 @@ class StopDetailFragment : Fragment() {
         binding.composeBusStopName.setContent {
             MaterialTheme {
                 StopName(stopName)
+            }
+        }
+    }
+
+    private fun displayBusList(busInfos: List<BusInfo>, timerFlow: Flow<Int>) {
+        binding.composeBusList.setContent {
+            MaterialTheme {
+                BusList(busInfos, timerFlow)
             }
         }
     }

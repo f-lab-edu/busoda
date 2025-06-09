@@ -1,7 +1,6 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingTop="20dp">
@@ -36,16 +35,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/compose_bus_stop_name" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/bus_list"
-        android:layout_width="match_parent"
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/compose_bus_list"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/compose_bus_emoji"
-        tools:listitem="@layout/list_item_bus" />
+        app:layout_constraintTop_toBottomOf="@id/compose_bus_emoji" />
 
     <ProgressBar
         android:id="@+id/bus_list_loading_bar"
