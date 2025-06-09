@@ -5,8 +5,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -16,6 +18,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -70,10 +73,10 @@ class StopDetailFragment : Fragment() {
     }
 
     private fun subscribeUi() {
-        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            binding.busListLoadingBar.visibility =
-                if (isLoading) View.VISIBLE else View.GONE
-        }
+//        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+//            binding.busListLoadingBar.visibility =
+//                if (isLoading) View.VISIBLE else View.GONE
+//        }
 
         viewModel.stopDetail.observe(viewLifecycleOwner) { stopDetail ->
             displayStopId()
@@ -104,7 +107,7 @@ class StopDetailFragment : Fragment() {
     private fun displayBusList(busInfos: List<BusInfo>, timerFlow: Flow<Int>) {
         binding.composeBusList.setContent {
             MaterialTheme {
-                BusList(busInfos, timerFlow)
+                BusList(busInfos, timerFlow, isLoading = true)
             }
         }
     }
@@ -352,10 +355,10 @@ class StopDetailFragment : Fragment() {
     fun BusArrivalInfo.getCongestionColor(): Color {
         return when (congestion) {
             CongestionLevel.VERY_HIGH -> colorResource(R.color.congestion_very_high)
-            CongestionLevel.HIGH      -> colorResource(R.color.congestion_high)
-            CongestionLevel.MEDIUM    -> colorResource(R.color.congestion_medium)
-            CongestionLevel.LOW       -> colorResource(R.color.congestion_low)
-            else                      -> colorResource(R.color.congestion_unknown)
+            CongestionLevel.HIGH -> colorResource(R.color.congestion_high)
+            CongestionLevel.MEDIUM -> colorResource(R.color.congestion_medium)
+            CongestionLevel.LOW -> colorResource(R.color.congestion_low)
+            else -> colorResource(R.color.congestion_unknown)
         }
     }
 
@@ -427,11 +430,23 @@ class StopDetailFragment : Fragment() {
     fun BusList(
         busInfos: List<BusInfo>,
         timerFlow: Flow<Int>,
+        isLoading: Boolean,
         modifier: Modifier = Modifier
     ) {
-        LazyColumn(modifier) {
-            items(busInfos) { busInfo ->
-                BusItem(busInfo, timerFlow)
+        Box(
+            modifier = modifier.fillMaxSize()
+        ) {
+            LazyColumn {
+                items(busInfos) { busInfo ->
+                    BusItem(busInfo, timerFlow)
+                }
+            }
+
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center),
+                    color = DarkGreen
+                )
             }
         }
     }
@@ -498,7 +513,7 @@ class StopDetailFragment : Fragment() {
     @Composable
     fun BusListPreview() {
         MaterialTheme {
-            BusList(busInfos = dummyBusInfos, timerFlow = flowOf(0))
+            BusList(busInfos = dummyBusInfos, timerFlow = flowOf(0), isLoading = true)
         }
     }
 
