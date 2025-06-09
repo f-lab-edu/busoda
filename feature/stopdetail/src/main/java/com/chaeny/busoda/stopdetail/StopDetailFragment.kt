@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -49,7 +51,6 @@ import com.chaeny.busoda.model.BusArrivalInfo
 import com.chaeny.busoda.model.BusInfo
 import com.chaeny.busoda.model.BusStopDetail
 import com.chaeny.busoda.model.CongestionLevel
-import com.chaeny.busoda.stopdetail.databinding.FragmentStopDetailBinding
 import com.chaeny.busoda.ui.event.EventObserver
 import com.chaeny.busoda.ui.theme.DarkGreen
 import dagger.hilt.android.AndroidEntryPoint
@@ -58,8 +59,6 @@ import kotlinx.coroutines.flow.flowOf
 
 @AndroidEntryPoint
 class StopDetailFragment : Fragment() {
-
-    private lateinit var binding: FragmentStopDetailBinding
     private val viewModel: StopDetailViewModel by viewModels()
 
     override fun onCreateView(
@@ -67,40 +66,12 @@ class StopDetailFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentStopDetailBinding.inflate(inflater, container, false)
-        displayStopId()
-        displayStopName()
-        displayBusEmoji()
-        displayRefreshButton()
-        busListContent()
         subscribeRefreshEvent()
-        return binding.root
-    }
-
-    private fun displayStopId() {
-        binding.composeBusStopId.setContent {
-            val stopId by viewModel.stopId.observeAsState()
-            MaterialTheme {
-                StopId(stopId!!)
-            }
-        }
-    }
-
-    private fun displayStopName() {
-        binding.composeBusStopName.setContent {
-            MaterialTheme {
-                val stopDetail by viewModel.stopDetail.observeAsState(initial = BusStopDetail("", emptyList()))
-                StopName(stopDetail.stopName)
-            }
-        }
-    }
-
-    private fun busListContent() {
-        binding.composeBusList.setContent {
-            MaterialTheme {
-                val stopDetail by viewModel.stopDetail.observeAsState(initial = BusStopDetail("", emptyList()))
-                val isLoading by viewModel.isLoading.observeAsState(initial = false)
-                BusList(stopDetail.busInfos, viewModel.timer, isLoading)
+        return ComposeView(requireContext()).apply {
+            setContent {
+                MaterialTheme {
+                    StopDetailScreen()
+                }
             }
         }
     }
@@ -128,33 +99,12 @@ class StopDetailFragment : Fragment() {
 //        }
 //    }
 
-    private fun displayBusEmoji() {
-        binding.composeBusEmoji.setContent {
-            MaterialTheme {
-                Row {
-                    BusEmoji()
-                    StopEmoji()
-                }
-            }
-        }
-    }
-
     private fun subscribeRefreshEvent() {
         viewModel.refreshEvent.observe(viewLifecycleOwner, EventObserver { isRefresh ->
             if (isRefresh) {
-                startRotateAnimation(binding.composeRefreshButton)
+                //startRotateAnimation(binding.composeRefreshButton)
             }
         })
-    }
-
-    private fun displayRefreshButton() {
-        binding.composeRefreshButton.setContent {
-            MaterialTheme {
-                RefreshButton(
-                    onClick = { viewModel.refreshData() }
-                )
-            }
-        }
     }
 
     private fun startRotateAnimation(view: View) {
@@ -441,6 +391,39 @@ class StopDetailFragment : Fragment() {
                     color = DarkGreen
                 )
             }
+        }
+    }
+
+    @Composable
+    fun StopDetailScreen() {
+        val stopId by viewModel.stopId.observeAsState()
+        val stopDetail by viewModel.stopDetail.observeAsState(initial = BusStopDetail("", emptyList()))
+        val isLoading by viewModel.isLoading.observeAsState(initial = false)
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 20.dp)
+        ) {
+            Column(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                StopId(stopId!!)
+                StopName(stopDetail.stopName)
+                Row {
+                    BusEmoji()
+                    StopEmoji()
+                }
+                BusList(
+                    busInfos = stopDetail.busInfos,
+                    timerFlow = viewModel.timer,
+                    isLoading = isLoading
+                )
+            }
+            RefreshButton(
+                onClick = { viewModel.refreshData() },
+                modifier = Modifier.align(Alignment.BottomEnd)
+            )
         }
     }
 
