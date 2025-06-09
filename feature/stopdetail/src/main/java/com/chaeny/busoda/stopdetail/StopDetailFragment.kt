@@ -6,9 +6,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -36,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.chaeny.busoda.model.BusArrivalInfo
+import com.chaeny.busoda.model.BusInfo
 import com.chaeny.busoda.model.CongestionLevel
 import com.chaeny.busoda.stopdetail.databinding.FragmentStopDetailBinding
 import com.chaeny.busoda.ui.event.EventObserver
@@ -364,6 +370,51 @@ class StopDetailFragment : Fragment() {
         }
     }
 
+    @Composable
+    fun BusItem(
+        busInfo: BusInfo,
+        timerFlow: Flow<Int>,
+        modifier: Modifier = Modifier
+    ) {
+        Card(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 30.dp)
+                .padding(bottom = 15.dp),
+            shape = RoundedCornerShape(15.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        ) {
+            BusInfoHeader(
+                busNumber = busInfo.busNumber,
+                nextStopName = busInfo.nextStopName,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+                    .padding(top = 15.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            ArrivalInfo(
+                arrivalInfo = busInfo.arrivalInfos.getOrNull(0),
+                position = 0,
+                timerFlow = timerFlow,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            ArrivalInfo(
+                arrivalInfo = busInfo.arrivalInfos.getOrNull(1),
+                position = 1,
+                timerFlow = timerFlow,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+                    .padding(bottom = 15.dp)
+            )
+        }
+    }
+
     @Preview(showBackground = true)
     @Composable
     fun StopIdPreview() {
@@ -414,7 +465,21 @@ class StopDetailFragment : Fragment() {
         }
     }
 
+    @Preview(showBackground = true)
+    @Composable
+    fun BusItemPreview() {
+        MaterialTheme {
+            BusItem(busInfo = dummyBusInfo, timerFlow = flowOf(0))
+        }
+    }
+
     private val now = System.currentTimeMillis() / 1000
     private val dummyArrivalInfo = BusArrivalInfo(now + 158, "2번째 전", CongestionLevel.MEDIUM)
+    private val dummyBusInfo = BusInfo(
+        "5712", "등촌중학교.백석초등학교", listOf(
+            BusArrivalInfo(now + 228, "3번째 전", CongestionLevel.LOW),
+            BusArrivalInfo(now + 1039, "10번째 전", CongestionLevel.HIGH)
+        )
+    )
 
 }
