@@ -14,13 +14,18 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -30,10 +35,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.chaeny.busoda.model.BusArrivalInfo
+import com.chaeny.busoda.model.CongestionLevel
 import com.chaeny.busoda.stopdetail.databinding.FragmentStopDetailBinding
 import com.chaeny.busoda.ui.event.EventObserver
 import com.chaeny.busoda.ui.theme.DarkGreen
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 @AndroidEntryPoint
 class StopDetailFragment : Fragment() {
@@ -254,6 +263,107 @@ class StopDetailFragment : Fragment() {
         }
     }
 
+    @Composable
+    fun ArrivalTimeText(
+        arrivalTime: Long?,
+        timerFlow: Flow<Int>,
+        modifier: Modifier = Modifier
+    ) {
+        var displayTime by rememberSaveable { mutableStateOf("") }
+
+        LaunchedEffect(arrivalTime, timerFlow) {
+            if (arrivalTime != null) {
+                timerFlow.collect {
+                    displayTime = setTextRemainingTime(arrivalTime)
+                }
+            }
+        }
+
+        Text(
+            text = displayTime,
+            modifier = modifier,
+            textAlign = TextAlign.End,
+            style = MaterialTheme.typography.titleSmall
+        )
+    }
+
+    @Composable
+    fun ArrivalInfo(
+        arrivalInfo: BusArrivalInfo?,
+        position: Int,
+        timerFlow: Flow<Int>,
+        modifier: Modifier = Modifier
+    ) {
+        Row(
+            modifier = modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = stringResource(R.string.nth_bus, position + 1),
+                modifier = Modifier.weight(2f),
+                style = MaterialTheme.typography.bodyMedium
+            )
+            ArrivalTimeText(
+                arrivalTime = arrivalInfo?.arrivalTime,
+                timerFlow = timerFlow,
+                modifier = Modifier.weight(2.5f)
+            )
+            Text(
+                text = arrivalInfo?.position ?: stringResource(R.string.no_data),
+                modifier = Modifier.weight(2f),
+                textAlign = TextAlign.End,
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = arrivalInfo?.getCongestionText() ?: stringResource(R.string.no_data),
+                color = arrivalInfo?.getCongestionColor() ?: colorResource(R.color.congestion_unknown),
+                modifier = Modifier.weight(1.5f),
+                textAlign = TextAlign.End,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
+
+    @Composable
+    fun BusArrivalInfo.getCongestionText(): String {
+        return when (congestion) {
+            CongestionLevel.VERY_HIGH -> stringResource(R.string.congestion_very_high)
+            CongestionLevel.HIGH -> stringResource(R.string.congestion_high)
+            CongestionLevel.MEDIUM -> stringResource(R.string.congestion_medium)
+            CongestionLevel.LOW -> stringResource(R.string.congestion_low)
+            else -> stringResource(R.string.no_data)
+        }
+    }
+
+    @Composable
+    fun BusArrivalInfo.getCongestionColor(): Color {
+        return when (congestion) {
+            CongestionLevel.VERY_HIGH -> colorResource(R.color.congestion_very_high)
+            CongestionLevel.HIGH      -> colorResource(R.color.congestion_high)
+            CongestionLevel.MEDIUM    -> colorResource(R.color.congestion_medium)
+            CongestionLevel.LOW       -> colorResource(R.color.congestion_low)
+            else                      -> colorResource(R.color.congestion_unknown)
+        }
+    }
+
+    private fun setTextRemainingTime(arrivalTime: Long): String {
+        val now = System.currentTimeMillis() / 1000
+        val remainingTime = arrivalTime - now
+        return formattedArrivalTime(remainingTime)
+    }
+
+    private fun formattedArrivalTime(arrivalTime: Long): String {
+        if (arrivalTime <= 0) return requireContext().getString(R.string.no_data)
+
+        val minutes = arrivalTime / 60
+        val seconds = arrivalTime % 60
+
+        return when {
+            minutes > 0 && seconds > 0 -> requireContext().getString(R.string.minutes_seconds, minutes, seconds)
+            minutes > 0 -> requireContext().getString(R.string.minutes, minutes)
+            else -> requireContext().getString(R.string.seconds, seconds)
+        }
+    }
+
     @Preview(showBackground = true)
     @Composable
     fun StopIdPreview() {
@@ -295,5 +405,16 @@ class StopDetailFragment : Fragment() {
             )
         }
     }
+
+    @Preview(showBackground = true)
+    @Composable
+    fun ArrivalInfoPreview() {
+        MaterialTheme {
+            ArrivalInfo(arrivalInfo = dummyArrivalInfo, position = 0, timerFlow = flowOf(0))
+        }
+    }
+
+    private val now = System.currentTimeMillis() / 1000
+    private val dummyArrivalInfo = BusArrivalInfo(now + 158, "2번째 전", CongestionLevel.MEDIUM)
 
 }
