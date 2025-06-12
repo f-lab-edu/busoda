@@ -26,12 +26,12 @@ internal class StopDetailViewModel @Inject constructor(
     private val _stopDetail = MutableLiveData<BusStopDetail>()
     private val _isLoading = MutableLiveData<Boolean>()
     private val _stopId = MutableLiveData<String>(savedStateHandle.get(BUS_STOP_ID))
-    private val _refreshEvent = MutableSharedFlow<Boolean>()
+    private val _refreshEvent = MutableSharedFlow<Unit>()
     private val _timer = MutableStateFlow(currentCount)
     val stopDetail: LiveData<BusStopDetail> = _stopDetail
     val isLoading: LiveData<Boolean> = _isLoading
     val stopId: LiveData<String> = _stopId
-    val refreshEvent: SharedFlow<Boolean> = _refreshEvent
+    val refreshEvent: SharedFlow<Unit> = _refreshEvent
     val timer: StateFlow<Int> = _timer
 
     init {
@@ -64,7 +64,7 @@ internal class StopDetailViewModel @Inject constructor(
     fun refreshData() {
         currentCount = 15
         viewModelScope.launch {
-            _refreshEvent.emit(true)
+            _refreshEvent.emit(Unit)
         }
         asyncDataLoad()
     }

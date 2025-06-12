@@ -57,7 +57,6 @@ import com.chaeny.busoda.model.BusStopDetail
 import com.chaeny.busoda.model.CongestionLevel
 import com.chaeny.busoda.ui.theme.DarkGreen
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
@@ -162,7 +161,6 @@ class StopDetailFragment : Fragment() {
     @Composable
     fun RefreshButton(
         onClick: () -> Unit,
-        isRefreshing: Boolean,
         modifier: Modifier = Modifier
     ) {
         var rotation by remember { mutableFloatStateOf(0f) }
@@ -175,8 +173,8 @@ class StopDetailFragment : Fragment() {
             )
         )
 
-        LaunchedEffect(isRefreshing) {
-            if (isRefreshing) {
+        LaunchedEffect(Unit) {
+            viewModel.refreshEvent.collect {
                 rotation += 180f
             }
         }
@@ -408,17 +406,6 @@ class StopDetailFragment : Fragment() {
         val stopId by viewModel.stopId.observeAsState()
         val stopDetail by viewModel.stopDetail.observeAsState(initial = BusStopDetail("", emptyList()))
         val isLoading by viewModel.isLoading.observeAsState(initial = false)
-        var isRefreshing by rememberSaveable { mutableStateOf(false) }
-
-        LaunchedEffect(Unit) {
-            viewModel.refreshEvent.collect { refreshEvent ->
-                isRefreshing = refreshEvent
-                if (refreshEvent) {
-                    delay(500)
-                    isRefreshing = false
-                }
-            }
-        }
 
         Box(
             modifier = Modifier
@@ -442,7 +429,6 @@ class StopDetailFragment : Fragment() {
             }
             RefreshButton(
                 onClick = { viewModel.refreshData() },
-                isRefreshing = isRefreshing,
                 modifier = Modifier.align(Alignment.BottomEnd)
             )
         }
@@ -475,7 +461,7 @@ class StopDetailFragment : Fragment() {
     @Composable
     fun RefreshButtonPreview() {
         MaterialTheme {
-            RefreshButton(onClick = {}, isRefreshing = true)
+            RefreshButton(onClick = {})
         }
     }
 
