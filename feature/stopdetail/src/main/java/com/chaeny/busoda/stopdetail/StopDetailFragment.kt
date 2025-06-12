@@ -1,10 +1,12 @@
 package com.chaeny.busoda.stopdetail
 
-import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,7 +30,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -51,9 +55,9 @@ import com.chaeny.busoda.model.BusArrivalInfo
 import com.chaeny.busoda.model.BusInfo
 import com.chaeny.busoda.model.BusStopDetail
 import com.chaeny.busoda.model.CongestionLevel
-import com.chaeny.busoda.ui.event.EventObserver
 import com.chaeny.busoda.ui.theme.DarkGreen
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
@@ -66,7 +70,6 @@ class StopDetailFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        subscribeRefreshEvent()
         return ComposeView(requireContext()).apply {
             setContent {
                 MaterialTheme {
@@ -98,21 +101,6 @@ class StopDetailFragment : Fragment() {
 //            start()
 //        }
 //    }
-
-    private fun subscribeRefreshEvent() {
-        viewModel.refreshEvent.observe(viewLifecycleOwner, EventObserver { isRefresh ->
-            if (isRefresh) {
-                //startRotateAnimation(binding.composeRefreshButton)
-            }
-        })
-    }
-
-    private fun startRotateAnimation(view: View) {
-        ObjectAnimator.ofFloat(view, View.ROTATION, 0f, 180f).apply {
-            duration = 500
-            start()
-        }
-    }
 
     @Composable
     fun StopId(
@@ -174,13 +162,34 @@ class StopDetailFragment : Fragment() {
     @Composable
     fun RefreshButton(
         onClick: () -> Unit,
+        isRefreshing: Boolean,
         modifier: Modifier = Modifier
     ) {
+        var rotation by remember { mutableFloatStateOf(0f) }
+
+        val animRotation by animateFloatAsState(
+            targetValue = rotation,
+            animationSpec = tween(
+                durationMillis = 500,
+                easing = LinearEasing
+            )
+        )
+
+        LaunchedEffect(isRefreshing) {
+            if (isRefreshing) {
+                rotation += 180f
+            }
+        }
+
         FloatingActionButton(
             onClick = onClick,
             containerColor = DarkGreen,
             shape = CircleShape,
-            modifier = modifier.padding(25.dp)
+            modifier = modifier
+                .padding(25.dp)
+                .graphicsLayer {
+                    rotationZ = animRotation
+                }
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_refresh),
@@ -399,6 +408,17 @@ class StopDetailFragment : Fragment() {
         val stopId by viewModel.stopId.observeAsState()
         val stopDetail by viewModel.stopDetail.observeAsState(initial = BusStopDetail("", emptyList()))
         val isLoading by viewModel.isLoading.observeAsState(initial = false)
+        var isRefreshing by rememberSaveable { mutableStateOf(false) }
+
+        LaunchedEffect(Unit) {
+            viewModel.refreshEvent.collect { refreshEvent ->
+                isRefreshing = refreshEvent
+                if (refreshEvent) {
+                    delay(500)
+                    isRefreshing = false
+                }
+            }
+        }
 
         Box(
             modifier = Modifier
@@ -422,6 +442,7 @@ class StopDetailFragment : Fragment() {
             }
             RefreshButton(
                 onClick = { viewModel.refreshData() },
+                isRefreshing = isRefreshing,
                 modifier = Modifier.align(Alignment.BottomEnd)
             )
         }
@@ -454,7 +475,7 @@ class StopDetailFragment : Fragment() {
     @Composable
     fun RefreshButtonPreview() {
         MaterialTheme {
-            RefreshButton(onClick = {})
+            RefreshButton(onClick = {}, isRefreshing = true)
         }
     }
 
