@@ -48,6 +48,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -132,6 +134,9 @@ class StopDetailFragment : Fragment() {
     }
 
     @Composable
+    fun Dp.toSp(): TextUnit = with(LocalDensity.current) { toSp() }
+
+    @Composable
     fun BusEmoji(
         modifier: Modifier = Modifier
     ) {
@@ -140,7 +145,7 @@ class StopDetailFragment : Fragment() {
             modifier = modifier
                 .padding(start = 35.dp)
                 .graphicsLayer(rotationY = 180f),
-            fontSize = with(LocalDensity.current) { 30.dp.toSp() }
+            fontSize = 30.dp.toSp()
         )
     }
 
@@ -153,7 +158,7 @@ class StopDetailFragment : Fragment() {
             modifier = modifier
                 .fillMaxWidth()
                 .padding(end = 30.dp),
-            fontSize = with(LocalDensity.current) { 30.dp.toSp() },
+            fontSize = 30.dp.toSp(),
             textAlign = TextAlign.End
         )
     }
