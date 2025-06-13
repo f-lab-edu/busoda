@@ -392,7 +392,11 @@ class StopDetailFragment : Fragment() {
             modifier = modifier.fillMaxSize()
         ) {
             LazyColumn {
-                items(busInfos) { busInfo ->
+                items(
+                    items = busInfos,
+                    //key = { busInfo -> busInfo.busNumber }
+                    key = { busInfo -> busInfo.hashCode() }
+                ) { busInfo ->
                     BusItem(busInfo, timerFlow)
                 }
             }
