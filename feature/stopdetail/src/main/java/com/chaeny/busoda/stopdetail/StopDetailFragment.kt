@@ -394,7 +394,6 @@ class StopDetailFragment : Fragment() {
             LazyColumn {
                 items(
                     items = busInfos,
-                    //key = { busInfo -> busInfo.busNumber }
                     key = { busInfo -> busInfo.hashCode() }
                 ) { busInfo ->
                     BusItem(busInfo, timerFlow)
@@ -411,13 +410,13 @@ class StopDetailFragment : Fragment() {
     }
 
     @Composable
-    fun StopDetailScreen() {
+    fun StopDetailScreen(modifier: Modifier = Modifier) {
         val stopId by viewModel.stopId.observeAsState()
         val stopDetail by viewModel.stopDetail.observeAsState(initial = BusStopDetail("", emptyList()))
         val isLoading by viewModel.isLoading.observeAsState(initial = false)
 
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .padding(top = 20.dp)
         ) {
