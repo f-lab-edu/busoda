@@ -176,7 +176,6 @@ class StopListFragment : Fragment() {
     ) {
         Card(
             modifier = modifier
-                .fillMaxWidth()
                 .padding(horizontal = 30.dp)
                 .padding(bottom = 15.dp),
             onClick = { onClick(stop.stopId) },
@@ -191,13 +190,11 @@ class StopListFragment : Fragment() {
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
-                    .fillMaxWidth()
                     .padding(horizontal = 15.dp)
                     .padding(top = 15.dp, bottom = 5.dp)
             )
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
                     .padding(horizontal = 15.dp)
                     .padding(bottom = 15.dp)
             ) {

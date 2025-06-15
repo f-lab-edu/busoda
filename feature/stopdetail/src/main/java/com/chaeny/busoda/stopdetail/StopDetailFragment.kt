@@ -344,7 +344,6 @@ class StopDetailFragment : Fragment() {
     ) {
         Card(
             modifier = modifier
-                .fillMaxWidth()
                 .padding(horizontal = 30.dp)
                 .padding(bottom = 15.dp),
             shape = RoundedCornerShape(15.dp),
@@ -355,7 +354,6 @@ class StopDetailFragment : Fragment() {
                 busNumber = busInfo.busNumber,
                 nextStopName = busInfo.nextStopName,
                 modifier = Modifier
-                    .fillMaxWidth()
                     .padding(horizontal = 20.dp)
                     .padding(top = 15.dp)
             )
@@ -365,7 +363,6 @@ class StopDetailFragment : Fragment() {
                 position = 0,
                 timerFlow = timerFlow,
                 modifier = Modifier
-                    .fillMaxWidth()
                     .padding(horizontal = 20.dp)
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -374,7 +371,6 @@ class StopDetailFragment : Fragment() {
                 position = 1,
                 timerFlow = timerFlow,
                 modifier = Modifier
-                    .fillMaxWidth()
                     .padding(horizontal = 20.dp)
                     .padding(bottom = 15.dp)
             )
@@ -411,7 +407,7 @@ class StopDetailFragment : Fragment() {
 
     @Composable
     fun StopDetailScreen(modifier: Modifier = Modifier) {
-        val stopId by viewModel.stopId.observeAsState()
+        val stopId by viewModel.stopId.observeAsState(initial = "")
         val stopDetail by viewModel.stopDetail.observeAsState(initial = BusStopDetail("", emptyList()))
         val isLoading by viewModel.isLoading.observeAsState(initial = false)
 
@@ -423,7 +419,7 @@ class StopDetailFragment : Fragment() {
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
-                StopId(stopId!!)
+                StopId(stopId)
                 StopName(stopDetail.stopName)
                 Row {
                     BusEmoji()
