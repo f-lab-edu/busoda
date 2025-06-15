@@ -52,7 +52,6 @@ import com.chaeny.busoda.ui.theme.DarkGreen
 import com.chaeny.busoda.ui.theme.Gray40
 import com.chaeny.busoda.ui.theme.Gray60
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -96,24 +95,12 @@ class StopListFragment : Fragment() {
     @Composable
     fun CollectStopSpecificEvent() {
         LaunchedEffect(Unit) {
-            launch {
-                viewModel.isNoResult.collect {
-                    showMessage(R.string.no_result)
-                }
-            }
-            launch {
-                viewModel.isNoInternet.collect {
-                    showMessage(R.string.no_internet)
-                }
-            }
-            launch {
-                viewModel.isNetworkError.collect {
-                    showMessage(R.string.network_error)
-                }
-            }
-            launch {
-                viewModel.isKeywordTooShort.collect {
-                    showMessage(R.string.short_keyword)
+            viewModel.searchEvent.collect { event ->
+                when (event) {
+                    is GetSearchEvent.NoResult -> showMessage(R.string.no_result)
+                    is GetSearchEvent.NoInternet -> showMessage(R.string.no_internet)
+                    is GetSearchEvent.NetworkError -> showMessage(R.string.network_error)
+                    is GetSearchEvent.ShortKeyword -> showMessage(R.string.short_keyword)
                 }
             }
         }
@@ -169,7 +156,7 @@ class StopListFragment : Fragment() {
                     stringResource(R.string.stop_search), color = Color.Gray
                 )
             },
-            modifier = Modifier
+            modifier = modifier
                 .focusRequester(focusRequester)
                 .fillMaxWidth()
                 .padding(horizontal = 36.dp)
@@ -189,7 +176,6 @@ class StopListFragment : Fragment() {
     ) {
         Card(
             modifier = modifier
-                .fillMaxWidth()
                 .padding(horizontal = 30.dp)
                 .padding(bottom = 15.dp),
             onClick = { onClick(stop.stopId) },
@@ -204,13 +190,11 @@ class StopListFragment : Fragment() {
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
-                    .fillMaxWidth()
                     .padding(horizontal = 15.dp)
                     .padding(top = 15.dp, bottom = 5.dp)
             )
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
                     .padding(horizontal = 15.dp)
                     .padding(bottom = 15.dp)
             ) {
