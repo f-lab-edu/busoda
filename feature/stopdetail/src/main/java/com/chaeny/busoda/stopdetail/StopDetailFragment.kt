@@ -27,7 +27,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableFloatStateOf
@@ -60,11 +62,13 @@ import com.chaeny.busoda.model.CongestionLevel
 import com.chaeny.busoda.ui.theme.DarkGreen
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 
 @AndroidEntryPoint
 class StopDetailFragment : Fragment() {
     private val viewModel: StopDetailViewModel by viewModels()
+    private val LocalTimerFlow = compositionLocalOf<Flow<Int>> {
+        error("")
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -238,9 +242,9 @@ class StopDetailFragment : Fragment() {
     @Composable
     fun ArrivalTimeText(
         arrivalTime: Long?,
-        timerFlow: Flow<Int>,
         modifier: Modifier = Modifier
     ) {
+        val timerFlow = LocalTimerFlow.current
         var displayTime by rememberSaveable { mutableStateOf("") }
 
         LaunchedEffect(arrivalTime, timerFlow) {
@@ -263,7 +267,6 @@ class StopDetailFragment : Fragment() {
     fun ArrivalInfo(
         arrivalInfo: BusArrivalInfo?,
         position: Int,
-        timerFlow: Flow<Int>,
         modifier: Modifier = Modifier
     ) {
         Row(
@@ -274,11 +277,12 @@ class StopDetailFragment : Fragment() {
                 modifier = Modifier.weight(2f),
                 style = MaterialTheme.typography.bodyMedium
             )
-            ArrivalTimeText(
-                arrivalTime = arrivalInfo?.arrivalTime,
-                timerFlow = timerFlow,
-                modifier = Modifier.weight(2.5f)
-            )
+            CompositionLocalProvider(LocalTimerFlow provides viewModel.timer) {
+                ArrivalTimeText(
+                    arrivalTime = arrivalInfo?.arrivalTime,
+                    modifier = Modifier.weight(2.5f)
+                )
+            }
             Text(
                 text = arrivalInfo?.position ?: stringResource(R.string.no_data),
                 modifier = Modifier.weight(2f),
@@ -339,7 +343,6 @@ class StopDetailFragment : Fragment() {
     @Composable
     fun BusItem(
         busInfo: BusInfo,
-        timerFlow: Flow<Int>,
         modifier: Modifier = Modifier
     ) {
         Card(
@@ -361,7 +364,6 @@ class StopDetailFragment : Fragment() {
             ArrivalInfo(
                 arrivalInfo = busInfo.arrivalInfos.getOrNull(0),
                 position = 0,
-                timerFlow = timerFlow,
                 modifier = Modifier
                     .padding(horizontal = 20.dp)
             )
@@ -369,7 +371,6 @@ class StopDetailFragment : Fragment() {
             ArrivalInfo(
                 arrivalInfo = busInfo.arrivalInfos.getOrNull(1),
                 position = 1,
-                timerFlow = timerFlow,
                 modifier = Modifier
                     .padding(horizontal = 20.dp)
                     .padding(bottom = 15.dp)
@@ -380,7 +381,6 @@ class StopDetailFragment : Fragment() {
     @Composable
     fun BusList(
         busInfos: List<BusInfo>,
-        timerFlow: Flow<Int>,
         isLoading: Boolean,
         modifier: Modifier = Modifier
     ) {
@@ -392,7 +392,7 @@ class StopDetailFragment : Fragment() {
                     items = busInfos,
                     key = { busInfo -> busInfo.hashCode() }
                 ) { busInfo ->
-                    BusItem(busInfo, timerFlow)
+                    BusItem(busInfo)
                 }
             }
 
@@ -427,7 +427,6 @@ class StopDetailFragment : Fragment() {
                 }
                 BusList(
                     busInfos = stopDetail.busInfos,
-                    timerFlow = viewModel.timer,
                     isLoading = isLoading
                 )
             }
@@ -484,7 +483,7 @@ class StopDetailFragment : Fragment() {
     @Composable
     fun ArrivalInfoPreview() {
         MaterialTheme {
-            ArrivalInfo(arrivalInfo = dummyArrivalInfo, position = 0, timerFlow = flowOf(0))
+            ArrivalInfo(arrivalInfo = dummyArrivalInfo, position = 0)
         }
     }
 
@@ -492,7 +491,7 @@ class StopDetailFragment : Fragment() {
     @Composable
     fun BusItemPreview() {
         MaterialTheme {
-            BusItem(busInfo = dummyBusInfo, timerFlow = flowOf(0))
+            BusItem(busInfo = dummyBusInfo)
         }
     }
 
@@ -500,7 +499,7 @@ class StopDetailFragment : Fragment() {
     @Composable
     fun BusListPreview() {
         MaterialTheme {
-            BusList(busInfos = dummyBusInfos, timerFlow = flowOf(0), isLoading = true)
+            BusList(busInfos = dummyBusInfos, isLoading = true)
         }
     }
 
