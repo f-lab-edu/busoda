@@ -157,12 +157,28 @@ class StopListFragment : Fragment() {
             Log.e("CollectCountFlows", "Lazily: $lazily")
             Log.e("CollectCountFlows", "WS0: $ws0")
             Log.e("CollectCountFlows", "WS5S: $ws5s")
+
+            LaunchedEffect(Unit) {
+                Log.e("CollectCountFlows", "Second LaunchedEffect")
+            }
         }
 
         LaunchedEffect(Unit) {
             delay(10000)
             startCollect.value = false
-            Log.e("CollectCountFlows", "Collect stop")
+            Log.e("CollectCountFlows", "1. Collect stop")
+            delay(10000)
+            startCollect.value = true
+            Log.e("CollectCountFlows", "2. Collect restart")
+            delay(10000)
+            startCollect.value = false
+            Log.e("CollectCountFlows", "3. Collect stop")
+            delay(10000)
+            startCollect.value = true
+            Log.e("CollectCountFlows", "4. Collect restart")
+            delay(10000)
+            startCollect.value = false
+            Log.e("CollectCountFlows", "5. Collect stop")
         }
     }
 
