@@ -1,5 +1,6 @@
 package com.chaeny.busoda.stoplist
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,14 +14,17 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -45,6 +49,46 @@ internal class StopListViewModel @Inject constructor(
     val isNetworkError: SharedFlow<Boolean> = _isNetworkError
     val isKeywordTooShort: SharedFlow<Boolean> = _isKeywordTooShort
     val busStopClicked: SharedFlow<String> = _busStopClicked
+
+    val countFlow = flow {
+        var count = 0
+        while (true) {
+            delay(1000)
+            emit(count++)
+        }
+    }
+
+    val eagerlyFlow = countFlow
+        .onEach { Log.e("CountFlows", "Eagerly emit: $it") }
+        .stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = -1
+    )
+
+    val lazilyFlow = countFlow
+        .onEach { Log.e("CountFlows", "Lazily emit: $it") }
+        .stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Lazily,
+        initialValue = -1
+    )
+
+    val whileSubscribed0Flow = countFlow
+        .onEach { Log.e("CountFlows", "WS0 emit: $it") }
+        .stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(0),
+        initialValue = -1
+    )
+
+    val whileSubscribed5sFlow = countFlow
+        .onEach { Log.e("CountFlows", "WS5S emit: $it") }
+        .stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = -1
+    )
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     val busStops: StateFlow<List<BusStop>> = keyWord
