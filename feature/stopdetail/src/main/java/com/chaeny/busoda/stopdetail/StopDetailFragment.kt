@@ -29,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -245,12 +246,13 @@ class StopDetailFragment : Fragment() {
         modifier: Modifier = Modifier
     ) {
         val timerFlow = LocalTimerFlow.current
+        val currentTime by viewModel.currentTime.collectAsState()
         var displayTime by rememberSaveable { mutableStateOf("") }
 
         LaunchedEffect(arrivalTime, timerFlow) {
             if (arrivalTime != null) {
                 timerFlow.collect {
-                    displayTime = setTextRemainingTime(arrivalTime)
+                    displayTime = setTextRemainingTime(arrivalTime, currentTime)
                 }
             }
         }
@@ -321,9 +323,8 @@ class StopDetailFragment : Fragment() {
         }
     }
 
-    private fun setTextRemainingTime(arrivalTime: Long): String {
-        val now = System.currentTimeMillis() / 1000
-        val remainingTime = arrivalTime - now
+    private fun setTextRemainingTime(arrivalTime: Long, currentTime: Long): String {
+        val remainingTime = arrivalTime - currentTime
         return formattedArrivalTime(remainingTime)
     }
 
