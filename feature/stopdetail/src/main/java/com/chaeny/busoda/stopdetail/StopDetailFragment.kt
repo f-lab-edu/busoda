@@ -8,6 +8,7 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -85,29 +86,6 @@ class StopDetailFragment : Fragment() {
         }
     }
 
-//    private fun subscribeCountdownTimer() {
-//        viewLifecycleOwner.lifecycleScope.launch {
-//            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-//                viewModel.timer.collect { countdownValue ->
-//                    updateBusAnimation(countdownValue)
-//                }
-//            }
-//        }
-//    }
-
-//    private fun updateBusAnimation(countdownValue: Int) {
-//        val maxCount = 15
-//        val moveStep = maxCount - countdownValue
-//        val totalDistance = binding.textStopEmoji.left - binding.textBusEmoji.left
-//        val stepDistance = (totalDistance / maxCount).toFloat()
-//        val translationValue = stepDistance * moveStep
-//
-//        ObjectAnimator.ofFloat(binding.textBusEmoji, "translationX", translationValue).apply {
-//            duration = 1000
-//            start()
-//        }
-//    }
-
     @Composable
     fun StopId(
         stopId: String,
@@ -145,13 +123,32 @@ class StopDetailFragment : Fragment() {
     fun BusEmoji(
         modifier: Modifier = Modifier
     ) {
-        Text(
-            text = stringResource(R.string.bus_emoji),
-            modifier = modifier
-                .padding(start = 35.dp)
-                .graphicsLayer(rotationY = 180f),
-            fontSize = 30.dp.toSp()
-        )
+        BoxWithConstraints {
+            val timerValue by viewModel.timer.collectAsState(initial = 15)
+            val startPadding = 35.dp
+            val endPadding = 30.dp
+            val totalDistance = maxWidth - startPadding - endPadding * 2
+            val progress = (15 - timerValue) / 15f
+            val moveAnimation by animateFloatAsState(
+                targetValue = progress,
+                animationSpec = tween(
+                    durationMillis = 1000,
+                    easing = LinearEasing
+                )
+            )
+            val translationValue = totalDistance * moveAnimation
+
+            Text(
+                text = stringResource(R.string.bus_emoji),
+                modifier = modifier
+                    .padding(start = startPadding)
+                    .graphicsLayer {
+                        rotationY = 180f
+                        this.translationX = translationValue.toPx()
+                    },
+                fontSize = 30.dp.toSp()
+            )
+        }
     }
 
     @Composable
