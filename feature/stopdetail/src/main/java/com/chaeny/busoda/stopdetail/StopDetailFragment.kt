@@ -33,7 +33,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,7 +58,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.chaeny.busoda.model.BusArrivalInfo
 import com.chaeny.busoda.model.BusInfo
-import com.chaeny.busoda.model.BusStopDetail
 import com.chaeny.busoda.model.CongestionLevel
 import com.chaeny.busoda.ui.theme.DarkGreen
 import dagger.hilt.android.AndroidEntryPoint
@@ -405,9 +403,9 @@ class StopDetailFragment : Fragment() {
 
     @Composable
     fun StopDetailScreen(modifier: Modifier = Modifier) {
-        val stopId by viewModel.stopId.observeAsState(initial = "")
-        val stopDetail by viewModel.stopDetail.observeAsState(initial = BusStopDetail("", emptyList()))
-        val isLoading by viewModel.isLoading.observeAsState(initial = false)
+        val stopId by viewModel.stopId.collectAsState()
+        val stopDetail by viewModel.stopDetail.collectAsState()
+        val isLoading by viewModel.isLoading.collectAsState()
 
         Box(
             modifier = modifier
