@@ -28,10 +28,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -61,14 +59,10 @@ import com.chaeny.busoda.model.BusInfo
 import com.chaeny.busoda.model.CongestionLevel
 import com.chaeny.busoda.ui.theme.DarkGreen
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.Flow
 
 @AndroidEntryPoint
 class StopDetailFragment : Fragment() {
     private val viewModel: StopDetailViewModel by viewModels()
-    private val LocalTimerFlow = compositionLocalOf<Flow<Int>> {
-        error("")
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -240,16 +234,11 @@ class StopDetailFragment : Fragment() {
         arrivalTime: Long?,
         modifier: Modifier = Modifier
     ) {
-        val timerFlow = LocalTimerFlow.current
         val currentTime by viewModel.currentTime.collectAsState()
         var displayTime by rememberSaveable { mutableStateOf("") }
 
-        LaunchedEffect(arrivalTime, timerFlow) {
-            if (arrivalTime != null) {
-                timerFlow.collect {
-                    displayTime = setTextRemainingTime(arrivalTime, currentTime)
-                }
-            }
+        if (arrivalTime != null) {
+            displayTime = setTextRemainingTime(arrivalTime, currentTime)
         }
 
         Text(
@@ -274,12 +263,10 @@ class StopDetailFragment : Fragment() {
                 modifier = Modifier.weight(2f),
                 style = MaterialTheme.typography.bodyMedium
             )
-            CompositionLocalProvider(LocalTimerFlow provides viewModel.timer) {
-                ArrivalTimeText(
-                    arrivalTime = arrivalInfo?.arrivalTime,
-                    modifier = Modifier.weight(2.5f)
-                )
-            }
+            ArrivalTimeText(
+                arrivalTime = arrivalInfo?.arrivalTime,
+                modifier = Modifier.weight(2.5f)
+            )
             Text(
                 text = arrivalInfo?.position ?: stringResource(R.string.no_data),
                 modifier = Modifier.weight(2f),
