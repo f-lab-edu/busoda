@@ -32,12 +32,12 @@ internal class StopListViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _isLoading = MutableStateFlow(false)
-    private val _searchEvent = MutableSharedFlow<GetSearchEvent>()
+    private val _searchEvent = MutableSharedFlow<SearchEvent>()
     private val _busStopClicked = MutableSharedFlow<String>()
     private val keyWord: MutableStateFlow<String> =
         MutableStateFlow(savedStateHandle.get(KEYWORD_SAVED_STATE_KEY) ?: EMPTY_KEYWORD)
     val isLoading: StateFlow<Boolean> = _isLoading
-    val searchEvent : SharedFlow<GetSearchEvent> = _searchEvent
+    val searchEvent : SharedFlow<SearchEvent> = _searchEvent
     val busStopClicked: SharedFlow<String> = _busStopClicked
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
@@ -69,15 +69,15 @@ internal class StopListViewModel @Inject constructor(
         val updatedStops = when (result) {
             is GetBusStopResult.Success -> getUpdatedStops(result.data)
             is GetBusStopResult.NoResult -> {
-                _searchEvent.emit(GetSearchEvent.NoResult)
+                _searchEvent.emit(SearchEvent.NoResult)
                 emptyList()
             }
             is GetBusStopResult.NoInternet -> {
-                _searchEvent.emit(GetSearchEvent.NoInternet)
+                _searchEvent.emit(SearchEvent.NoInternet)
                 emptyList()
             }
             is GetBusStopResult.NetworkError -> {
-                _searchEvent.emit(GetSearchEvent.NetworkError)
+                _searchEvent.emit(SearchEvent.NetworkError)
                 emptyList()
             }
         }
@@ -97,7 +97,7 @@ internal class StopListViewModel @Inject constructor(
 
     private fun handleShortKeyword(): List<BusStop> {
         viewModelScope.launch {
-            _searchEvent.emit(GetSearchEvent.ShortKeyword)
+            _searchEvent.emit(SearchEvent.ShortKeyword)
         }
         return emptyList()
     }

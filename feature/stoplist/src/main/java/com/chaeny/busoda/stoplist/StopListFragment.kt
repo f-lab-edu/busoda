@@ -97,10 +97,10 @@ class StopListFragment : Fragment() {
         LaunchedEffect(Unit) {
             viewModel.searchEvent.collect { event ->
                 when (event) {
-                    is GetSearchEvent.NoResult -> showMessage(R.string.no_result)
-                    is GetSearchEvent.NoInternet -> showMessage(R.string.no_internet)
-                    is GetSearchEvent.NetworkError -> showMessage(R.string.network_error)
-                    is GetSearchEvent.ShortKeyword -> showMessage(R.string.short_keyword)
+                    SearchEvent.NoResult -> showMessage(R.string.no_result)
+                    SearchEvent.NoInternet -> showMessage(R.string.no_internet)
+                    SearchEvent.NetworkError -> showMessage(R.string.network_error)
+                    SearchEvent.ShortKeyword -> showMessage(R.string.short_keyword)
                 }
             }
         }
