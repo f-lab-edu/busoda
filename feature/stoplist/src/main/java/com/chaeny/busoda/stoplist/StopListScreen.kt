@@ -1,17 +1,30 @@
 package com.chaeny.busoda.stoplist
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -19,15 +32,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.chaeny.busoda.model.BusStop
+import com.chaeny.busoda.ui.theme.DarkGreen
 import com.chaeny.busoda.ui.theme.Gray40
+import com.chaeny.busoda.ui.theme.Gray60
 
 @Composable
 fun StopListScreen() {
     val viewModel: StopListViewModel = hiltViewModel()
-    SearchBarContent(viewModel)
+    Column {
+        SearchBarContent(viewModel)
+        StopListContent(viewModel)
+    }
 }
 
 @Composable
@@ -42,6 +63,13 @@ private fun SearchBarContent(viewModel: StopListViewModel) {
             viewModel.setKeyWord(it.text)
         }
     )
+}
+
+@Composable
+private fun StopListContent(viewModel: StopListViewModel) {
+    val stops by viewModel.busStops.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    StopList(stops, isLoading, onClickItem = {})
 }
 
 @Composable
@@ -77,6 +105,81 @@ private fun SearchBar(
     }
 }
 
+@Composable
+fun StopItem(
+    stop: BusStop,
+    onClick: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .padding(horizontal = 30.dp)
+            .padding(bottom = 15.dp),
+        onClick = { onClick(stop.stopId) },
+        shape = RoundedCornerShape(15.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Text(
+            text = stop.stopName,
+            color = Color.Black,
+            style = MaterialTheme.typography.titleMedium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier
+                .padding(horizontal = 15.dp)
+                .padding(top = 15.dp, bottom = 5.dp)
+        )
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 15.dp)
+                .padding(bottom = 15.dp)
+        ) {
+            Text(
+                text = stop.stopId,
+                color = Gray60,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.weight(0.3f)
+            )
+            Text(
+                text = stop.nextStopName,
+                color = Gray60,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Right,
+                modifier = Modifier.weight(0.7f)
+            )
+        }
+    }
+}
+
+@Composable
+fun StopList(
+    stops: List<BusStop>,
+    isLoading: Boolean,
+    onClickItem: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(modifier = modifier
+        .fillMaxSize()
+        .padding(top = 20.dp)
+    ) {
+        LazyColumn {
+            items(stops) { stop ->
+                StopItem(stop, onClickItem)
+            }
+        }
+
+        if (isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center),
+                color = DarkGreen
+            )
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun SearchBarPreview() {
@@ -85,3 +188,31 @@ fun SearchBarPreview() {
         onKeywordChange = {}
     )
 }
+
+@Preview(showBackground = true)
+@Composable
+fun StopItemPreview() {
+    StopItem(
+        BusStop("정류장ID", "정류장", "다음정류장"),
+        onClick = {}
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun StopListPreview() {
+    StopList(stops = dummyData, isLoading = true, onClickItem = {})
+}
+
+private val dummyData = listOf(
+    BusStop("16206", "화곡역4번출구", "화곡본동시장"),
+    BusStop("16206", "화곡역4번출구", "화곡본동시장"),
+    BusStop("16206", "화곡역4번출구", "화곡본동시장"),
+    BusStop("16206", "화곡역4번출구", "화곡본동시장"),
+    BusStop("16206", "화곡역4번출구", "화곡본동시장"),
+    BusStop("16146", "화곡본동시장", "한국폴리텍1.서울강서대학교"),
+    BusStop("16146", "화곡본동시장", "한국폴리텍1.서울강서대학교"),
+    BusStop("16146", "화곡본동시장", "한국폴리텍1.서울강서대학교"),
+    BusStop("16146", "화곡본동시장", "한국폴리텍1.서울강서대학교"),
+    BusStop("16146", "화곡본동시장", "한국폴리텍1.서울강서대학교")
+)
