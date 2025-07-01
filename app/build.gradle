@@ -74,4 +74,5 @@ dependencies {
     implementation project(":feature:stoplist")
     implementation project(":feature:stopdetail")
     implementation project(":core:ui-impl")
+    implementation project(":core:ui")
 }
