@@ -45,12 +45,27 @@ import com.chaeny.busoda.ui.theme.Gray40
 import com.chaeny.busoda.ui.theme.Gray60
 
 @Composable
-fun StopListScreen() {
+fun StopListScreen(
+    onStopClick: (String) -> Unit = {}
+) {
     val viewModel: StopListViewModel = hiltViewModel()
     Column {
         SearchBarContent(viewModel)
         StopListContent(viewModel)
         CollectStopSpecificEvent(viewModel)
+        CollectStopClickEvent(onStopClick, viewModel)
+    }
+}
+
+@Composable
+private fun CollectStopClickEvent(
+    onStopClick: (String) -> Unit,
+    viewModel: StopListViewModel
+) {
+    LaunchedEffect(Unit) {
+        viewModel.busStopClicked.collect { stopId ->
+            onStopClick(stopId)
+        }
     }
 }
 
