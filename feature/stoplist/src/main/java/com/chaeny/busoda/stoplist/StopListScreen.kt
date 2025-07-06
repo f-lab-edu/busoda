@@ -1,5 +1,6 @@
 package com.chaeny.busoda.stoplist
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
@@ -48,6 +50,24 @@ fun StopListScreen() {
     Column {
         SearchBarContent(viewModel)
         StopListContent(viewModel)
+        CollectStopSpecificEvent(viewModel)
+    }
+}
+
+@Composable
+private fun CollectStopSpecificEvent(viewModel: StopListViewModel) {
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.searchEvent.collect { event ->
+            val messageResId = when (event) {
+                SearchEvent.NoResult -> R.string.no_result
+                SearchEvent.NoInternet -> R.string.no_internet
+                SearchEvent.NetworkError -> R.string.network_error
+                SearchEvent.ShortKeyword -> R.string.short_keyword
+            }
+            Toast.makeText(context, context.getString(messageResId), Toast.LENGTH_SHORT).show()
+        }
     }
 }
 
@@ -106,7 +126,7 @@ private fun SearchBar(
 }
 
 @Composable
-fun StopItem(
+private fun StopItem(
     stop: BusStop,
     onClick: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -155,7 +175,7 @@ fun StopItem(
 }
 
 @Composable
-fun StopList(
+private fun StopList(
     stops: List<BusStop>,
     isLoading: Boolean,
     onClickItem: (String) -> Unit,
@@ -182,7 +202,7 @@ fun StopList(
 
 @Preview(showBackground = true)
 @Composable
-fun SearchBarPreview() {
+private fun SearchBarPreview() {
     SearchBar(
         keyword = TextFieldValue(""),
         onKeywordChange = {}
@@ -191,7 +211,7 @@ fun SearchBarPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun StopItemPreview() {
+private fun StopItemPreview() {
     StopItem(
         BusStop("정류장ID", "정류장", "다음정류장"),
         onClick = {}
@@ -200,7 +220,7 @@ fun StopItemPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun StopListPreview() {
+private fun StopListPreview() {
     StopList(stops = dummyData, isLoading = true, onClickItem = {})
 }
 
