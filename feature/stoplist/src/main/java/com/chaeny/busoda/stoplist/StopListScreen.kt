@@ -104,7 +104,7 @@ private fun SearchBarContent(viewModel: StopListViewModel) {
 private fun StopListContent(viewModel: StopListViewModel) {
     val stops by viewModel.busStops.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
-    StopList(stops, isLoading, onClickItem = {})
+    StopList(stops, isLoading, onClickItem = { stopId -> viewModel.handleBusStopClick(stopId) })
 }
 
 @Composable

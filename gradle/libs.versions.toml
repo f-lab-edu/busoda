@@ -10,7 +10,7 @@ material = "1.12.0"
 compileSdk = "35"
 minSdk = "31"
 targetSdk = "35"
-navigation = "2.8.5"
+navigation = "2.9.0"
 coreTesting = "2.2.0"
 coroutines = "1.7.3"
 hilt = "2.52"
@@ -45,6 +45,7 @@ tikxml-processor = { group = "com.tickaroo.tikxml", name = "processor", version.
 androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycle" }
 navigation-fragment = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigation" }
 navigation-ui = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigation" }
+navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
