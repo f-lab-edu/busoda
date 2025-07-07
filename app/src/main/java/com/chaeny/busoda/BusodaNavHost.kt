@@ -1,10 +1,10 @@
 package com.chaeny.busoda
 
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.chaeny.busoda.stopdetail.StopDetailScreen
 import com.chaeny.busoda.stoplist.StopListScreen
 
 @Composable
@@ -28,7 +28,7 @@ fun BusodaNavGraph(
             route = "stop_detail/{stopId}"
         ) { navBackStackEntry ->
             val stopId = navBackStackEntry.arguments?.getString("stopId") ?: ""
-            Text(text = stopId)
+            StopDetailScreen(stopId)
         }
     }
 }
