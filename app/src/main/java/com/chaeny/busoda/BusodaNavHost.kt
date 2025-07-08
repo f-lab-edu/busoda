@@ -27,8 +27,7 @@ fun BusodaNavGraph(
         composable(
             route = "stop_detail/{stopId}"
         ) { navBackStackEntry ->
-            val stopId = navBackStackEntry.arguments?.getString("stopId") ?: ""
-            StopDetailScreen(stopId)
+            StopDetailScreen()
         }
     }
 }

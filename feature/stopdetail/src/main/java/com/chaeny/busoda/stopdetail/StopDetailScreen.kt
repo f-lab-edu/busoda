@@ -56,11 +56,10 @@ import com.chaeny.busoda.ui.theme.DarkGreen
 
 @Composable
 fun StopDetailScreen(
-    stopId: String,
     modifier: Modifier = Modifier
 ) {
     val viewModel: StopDetailViewModel = hiltViewModel()
-    //val stopId by viewModel.stopId.collectAsState()
+    val stopId by viewModel.stopId.collectAsState()
     val stopDetail by viewModel.stopDetail.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
