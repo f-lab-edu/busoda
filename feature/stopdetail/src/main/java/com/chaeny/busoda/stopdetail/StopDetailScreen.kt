@@ -1,20 +1,95 @@
 package com.chaeny.busoda.stopdetail
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.chaeny.busoda.model.BusArrivalInfo
+import com.chaeny.busoda.model.BusInfo
+import com.chaeny.busoda.model.CongestionLevel
+import com.chaeny.busoda.ui.theme.DarkGreen
 
 @Composable
-fun StopDetailScreen(stopId: String) {
+fun StopDetailScreen(
+    stopId: String,
+    modifier: Modifier = Modifier
+) {
     val viewModel: StopDetailViewModel = hiltViewModel()
-    StopId(stopId)
+    //val stopId by viewModel.stopId.collectAsState()
+    val stopDetail by viewModel.stopDetail.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(top = 20.dp)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            StopId(stopId)
+            StopName(stopDetail.stopName)
+            Row {
+                BusEmoji(viewModel)
+                StopEmoji()
+            }
+            BusList(
+                busInfos = stopDetail.busInfos,
+                isLoading = isLoading,
+                viewModel = viewModel
+            )
+        }
+        RefreshButton(
+            viewModel = viewModel,
+            onClick = { viewModel.refreshData() },
+            modifier = Modifier.align(Alignment.BottomEnd)
+        )
+    }
 }
 
 @Composable
@@ -32,8 +107,320 @@ private fun StopId(
     )
 }
 
+@Composable
+private fun StopName(
+    stopName: String,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = stopName.ifEmpty { stringResource(R.string.no_info) },
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 30.dp),
+        textAlign = TextAlign.Center,
+        style = MaterialTheme.typography.titleMedium
+    )
+}
+
+@Composable
+private fun Dp.toSp(): TextUnit = with(LocalDensity.current) { toSp() }
+
+@Composable
+private fun BusEmoji(
+    viewModel: StopDetailViewModel,
+    modifier: Modifier = Modifier
+) {
+    BoxWithConstraints {
+        val timerValue by viewModel.timer.collectAsState(initial = 15)
+        val startPadding = 35.dp
+        val endPadding = 30.dp
+        val totalDistance = maxWidth - startPadding - endPadding * 2
+        val progress = (15 - timerValue) / 15f
+        val moveAnimation by animateFloatAsState(
+            targetValue = progress,
+            animationSpec = tween(
+                durationMillis = 1000,
+                easing = LinearEasing
+            )
+        )
+        val translationValue = totalDistance * moveAnimation
+
+        Text(
+            text = stringResource(R.string.bus_emoji),
+            modifier = modifier
+                .padding(start = startPadding)
+                .graphicsLayer {
+                    rotationY = 180f
+                    this.translationX = translationValue.toPx()
+                },
+            fontSize = 30.dp.toSp()
+        )
+    }
+}
+
+@Composable
+private fun StopEmoji(
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = stringResource(R.string.stop_emoji),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(end = 30.dp),
+        fontSize = 30.dp.toSp(),
+        textAlign = TextAlign.End
+    )
+}
+
+@Composable
+private fun RefreshButton(
+    viewModel: StopDetailViewModel,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var rotation by remember { mutableFloatStateOf(0f) }
+
+    val animRotation by animateFloatAsState(
+        targetValue = rotation,
+        animationSpec = tween(
+            durationMillis = 500,
+            easing = LinearEasing
+        )
+    )
+
+    LaunchedEffect(Unit) {
+        viewModel.refreshEvent.collect {
+            rotation += 180f
+        }
+    }
+
+    FloatingActionButton(
+        onClick = onClick,
+        containerColor = DarkGreen,
+        shape = CircleShape,
+        modifier = modifier
+            .padding(25.dp)
+            .graphicsLayer {
+                rotationZ = animRotation
+            }
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_refresh),
+            contentDescription = stringResource(R.string.refresh),
+            tint = Color.Black
+        )
+    }
+}
+
+@Composable
+private fun BusInfoHeader(
+    busNumber: String,
+    nextStopName: String,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.Bottom
+    ) {
+        Text(
+            text = busNumber,
+            modifier = Modifier.weight(0.3f),
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = nextStopName,
+            modifier = Modifier
+                .weight(0.55f)
+                .padding(end = 5.dp),
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.End,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+        Text(
+            text = stringResource(R.string.way),
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
+}
+
+@Composable
+private fun ArrivalTimeText(
+    arrivalTime: Long?,
+    viewModel: StopDetailViewModel,
+    modifier: Modifier = Modifier
+) {
+    val currentTime by viewModel.currentTime.collectAsState()
+    var displayTime by rememberSaveable { mutableStateOf("") }
+
+    if (arrivalTime != null) {
+        displayTime = setTextRemainingTime(arrivalTime, currentTime)
+    }
+
+    Text(
+        text = displayTime,
+        modifier = modifier,
+        textAlign = TextAlign.End,
+        style = MaterialTheme.typography.titleSmall
+    )
+}
+
+@Composable
+private fun ArrivalInfo(
+    arrivalInfo: BusArrivalInfo?,
+    position: Int,
+    viewModel: StopDetailViewModel,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier.fillMaxWidth()
+    ) {
+        Text(
+            text = stringResource(R.string.nth_bus, position + 1),
+            modifier = Modifier.weight(2f),
+            style = MaterialTheme.typography.bodyMedium
+        )
+        ArrivalTimeText(
+            arrivalTime = arrivalInfo?.arrivalTime,
+            viewModel = viewModel,
+            modifier = Modifier.weight(2.5f)
+        )
+        Text(
+            text = arrivalInfo?.position ?: stringResource(R.string.no_data),
+            modifier = Modifier.weight(2f),
+            textAlign = TextAlign.End,
+            style = MaterialTheme.typography.bodyMedium
+        )
+        Text(
+            text = arrivalInfo?.getCongestionText() ?: stringResource(R.string.no_data),
+            color = arrivalInfo?.getCongestionColor() ?: colorResource(R.color.congestion_unknown),
+            modifier = Modifier.weight(1.5f),
+            textAlign = TextAlign.End,
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
+}
+
+@Composable
+private fun BusArrivalInfo.getCongestionText(): String {
+    return when (congestion) {
+        CongestionLevel.VERY_HIGH -> stringResource(R.string.congestion_very_high)
+        CongestionLevel.HIGH -> stringResource(R.string.congestion_high)
+        CongestionLevel.MEDIUM -> stringResource(R.string.congestion_medium)
+        CongestionLevel.LOW -> stringResource(R.string.congestion_low)
+        else -> stringResource(R.string.no_data)
+    }
+}
+
+@Composable
+private fun BusArrivalInfo.getCongestionColor(): Color {
+    return when (congestion) {
+        CongestionLevel.VERY_HIGH -> colorResource(R.color.congestion_very_high)
+        CongestionLevel.HIGH -> colorResource(R.color.congestion_high)
+        CongestionLevel.MEDIUM -> colorResource(R.color.congestion_medium)
+        CongestionLevel.LOW -> colorResource(R.color.congestion_low)
+        else -> colorResource(R.color.congestion_unknown)
+    }
+}
+
+@Composable
+private fun setTextRemainingTime(arrivalTime: Long, currentTime: Long): String {
+    val remainingTime = arrivalTime - currentTime
+    return formattedArrivalTime(remainingTime)
+}
+
+@Composable
+private fun formattedArrivalTime(arrivalTime: Long): String {
+    val context = LocalContext.current
+
+    if (arrivalTime <= 0) return context.getString(R.string.no_data)
+    val minutes = arrivalTime / 60
+    val seconds = arrivalTime % 60
+    return when {
+        minutes > 0 && seconds > 0 -> context.getString(R.string.minutes_seconds, minutes, seconds)
+        minutes > 0 -> context.getString(R.string.minutes, minutes)
+        else -> context.getString(R.string.seconds, seconds)
+    }
+}
+
+@Composable
+private fun BusItem(
+    busInfo: BusInfo,
+    viewModel: StopDetailViewModel,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .padding(horizontal = 30.dp)
+            .padding(bottom = 15.dp),
+        shape = RoundedCornerShape(15.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        BusInfoHeader(
+            busNumber = busInfo.busNumber,
+            nextStopName = busInfo.nextStopName,
+            modifier = Modifier
+                .padding(horizontal = 20.dp)
+                .padding(top = 15.dp)
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        ArrivalInfo(
+            arrivalInfo = busInfo.arrivalInfos.getOrNull(0),
+            position = 0,
+            viewModel = viewModel,
+            modifier = Modifier
+                .padding(horizontal = 20.dp)
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        ArrivalInfo(
+            arrivalInfo = busInfo.arrivalInfos.getOrNull(1),
+            position = 1,
+            viewModel = viewModel,
+            modifier = Modifier
+                .padding(horizontal = 20.dp)
+                .padding(bottom = 15.dp)
+        )
+    }
+}
+
+@Composable
+private fun BusList(
+    busInfos: List<BusInfo>,
+    isLoading: Boolean,
+    viewModel: StopDetailViewModel,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier.fillMaxSize()
+    ) {
+        LazyColumn {
+            items(
+                items = busInfos,
+                key = { busInfo -> busInfo.hashCode() }
+            ) { busInfo ->
+                BusItem(busInfo, viewModel)
+            }
+        }
+
+        if (isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center),
+                color = DarkGreen
+            )
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun StopIdPreview() {
     MaterialTheme { StopId("16206") }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun StopNamePreview() {
+    MaterialTheme { StopName("화곡역4번출구") }
 }
