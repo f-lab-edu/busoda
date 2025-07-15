@@ -31,7 +31,7 @@ fun BusodaNavGraph(
             route = "stop_detail/{stopId}",
             arguments = listOf(navArgument("stopId") { type = NavType.StringType }),
             deepLinks = listOf(navDeepLink { uriPattern = "busoda://stop_detail/{stopId}" })
-        ) { navBackStackEntry ->
+        ) {
             StopDetailScreen()
         }
     }

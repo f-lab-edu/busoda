@@ -49,8 +49,6 @@ dependencies {
     debugImplementation libs.androidx.ui.tooling
     kapt libs.hilt.compiler
 
-    implementation libs.navigation.fragment
-    implementation libs.navigation.ui
     implementation libs.androidx.lifecycle.livedata.ktx
 
     implementation libs.androidx.core.ktx
