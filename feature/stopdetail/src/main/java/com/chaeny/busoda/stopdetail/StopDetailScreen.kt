@@ -36,8 +36,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -45,13 +43,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.chaeny.busoda.model.BusArrivalInfo
 import com.chaeny.busoda.model.BusInfo
-import com.chaeny.busoda.model.CongestionLevel
 import com.chaeny.busoda.ui.theme.DarkGreen
 
 @Composable
@@ -120,9 +115,6 @@ private fun StopName(
         style = MaterialTheme.typography.titleMedium
     )
 }
-
-@Composable
-private fun Dp.toSp(): TextUnit = with(LocalDensity.current) { toSp() }
 
 @Composable
 private fun BusEmoji(
@@ -298,48 +290,6 @@ private fun ArrivalInfo(
             textAlign = TextAlign.End,
             style = MaterialTheme.typography.bodyMedium
         )
-    }
-}
-
-@Composable
-private fun BusArrivalInfo.getCongestionText(): String {
-    return when (congestion) {
-        CongestionLevel.VERY_HIGH -> stringResource(R.string.congestion_very_high)
-        CongestionLevel.HIGH -> stringResource(R.string.congestion_high)
-        CongestionLevel.MEDIUM -> stringResource(R.string.congestion_medium)
-        CongestionLevel.LOW -> stringResource(R.string.congestion_low)
-        else -> stringResource(R.string.no_data)
-    }
-}
-
-@Composable
-private fun BusArrivalInfo.getCongestionColor(): Color {
-    return when (congestion) {
-        CongestionLevel.VERY_HIGH -> colorResource(R.color.congestion_very_high)
-        CongestionLevel.HIGH -> colorResource(R.color.congestion_high)
-        CongestionLevel.MEDIUM -> colorResource(R.color.congestion_medium)
-        CongestionLevel.LOW -> colorResource(R.color.congestion_low)
-        else -> colorResource(R.color.congestion_unknown)
-    }
-}
-
-@Composable
-private fun setTextRemainingTime(arrivalTime: Long, currentTime: Long): String {
-    val remainingTime = arrivalTime - currentTime
-    return formattedArrivalTime(remainingTime)
-}
-
-@Composable
-private fun formattedArrivalTime(arrivalTime: Long): String {
-    val context = LocalContext.current
-
-    if (arrivalTime <= 0) return context.getString(R.string.no_data)
-    val minutes = arrivalTime / 60
-    val seconds = arrivalTime % 60
-    return when {
-        minutes > 0 && seconds > 0 -> context.getString(R.string.minutes_seconds, minutes, seconds)
-        minutes > 0 -> context.getString(R.string.minutes, minutes)
-        else -> context.getString(R.string.seconds, seconds)
     }
 }
 
