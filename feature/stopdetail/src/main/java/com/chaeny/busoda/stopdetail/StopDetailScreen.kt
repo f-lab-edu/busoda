@@ -24,8 +24,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -51,6 +53,8 @@ import com.chaeny.busoda.model.BusStopDetail
 import com.chaeny.busoda.ui.theme.DarkGreen
 import kotlinx.coroutines.flow.SharedFlow
 
+private val LocalCurrentTime = compositionLocalOf<Long> { 0L }
+
 @Composable
 fun StopDetailScreen(
     modifier: Modifier = Modifier
@@ -62,16 +66,17 @@ fun StopDetailScreen(
     val timerValue by viewModel.timer.collectAsState(initial = 15)
     val currentTime by viewModel.currentTime.collectAsState()
 
-    StopDetailContent(
-        stopId = stopId,
-        stopDetail = stopDetail,
-        isLoading = isLoading,
-        timer = timerValue,
-        currentTime = currentTime,
-        refreshEvent = viewModel.refreshEvent,
-        onRefresh = { viewModel.refreshData() },
-        modifier = modifier
-    )
+    CompositionLocalProvider(LocalCurrentTime provides currentTime) {
+        StopDetailContent(
+            stopId = stopId,
+            stopDetail = stopDetail,
+            isLoading = isLoading,
+            timer = timerValue,
+            refreshEvent = viewModel.refreshEvent,
+            onRefresh = { viewModel.refreshData() },
+            modifier = modifier
+        )
+    }
 }
 
 @Composable
@@ -80,7 +85,6 @@ private fun StopDetailContent(
     stopDetail: BusStopDetail,
     isLoading: Boolean,
     timer: Int,
-    currentTime: Long,
     refreshEvent: SharedFlow<Unit>,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
@@ -101,8 +105,7 @@ private fun StopDetailContent(
             }
             BusList(
                 busInfos = stopDetail.busInfos,
-                isLoading = isLoading,
-                currentTime = currentTime
+                isLoading = isLoading
             )
         }
         RefreshButton(
@@ -265,9 +268,9 @@ private fun BusInfoHeader(
 @Composable
 private fun ArrivalTimeText(
     arrivalTime: Long?,
-    currentTime: Long,
     modifier: Modifier = Modifier
 ) {
+    val currentTime = LocalCurrentTime.current
     var displayTime by rememberSaveable { mutableStateOf("") }
 
     if (arrivalTime != null) {
@@ -286,7 +289,6 @@ private fun ArrivalTimeText(
 private fun ArrivalInfo(
     arrivalInfo: BusArrivalInfo?,
     position: Int,
-    currentTime: Long,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -299,7 +301,6 @@ private fun ArrivalInfo(
         )
         ArrivalTimeText(
             arrivalTime = arrivalInfo?.arrivalTime,
-            currentTime = currentTime,
             modifier = Modifier.weight(2.5f)
         )
         Text(
@@ -321,7 +322,6 @@ private fun ArrivalInfo(
 @Composable
 private fun BusItem(
     busInfo: BusInfo,
-    currentTime: Long,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -343,7 +343,6 @@ private fun BusItem(
         ArrivalInfo(
             arrivalInfo = busInfo.arrivalInfos.getOrNull(0),
             position = 0,
-            currentTime = currentTime,
             modifier = Modifier
                 .padding(horizontal = 20.dp)
         )
@@ -351,7 +350,6 @@ private fun BusItem(
         ArrivalInfo(
             arrivalInfo = busInfo.arrivalInfos.getOrNull(1),
             position = 1,
-            currentTime = currentTime,
             modifier = Modifier
                 .padding(horizontal = 20.dp)
                 .padding(bottom = 15.dp)
@@ -363,7 +361,6 @@ private fun BusItem(
 private fun BusList(
     busInfos: List<BusInfo>,
     isLoading: Boolean,
-    currentTime: Long,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -374,10 +371,7 @@ private fun BusList(
                 items = busInfos,
                 key = { busInfo -> busInfo.hashCode() }
             ) { busInfo ->
-                BusItem(
-                    busInfo = busInfo,
-                    currentTime = currentTime
-                )
+                BusItem(busInfo)
             }
         }
 
