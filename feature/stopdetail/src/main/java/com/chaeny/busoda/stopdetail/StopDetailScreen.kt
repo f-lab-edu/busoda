@@ -47,7 +47,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.chaeny.busoda.model.BusArrivalInfo
 import com.chaeny.busoda.model.BusInfo
+import com.chaeny.busoda.model.BusStopDetail
 import com.chaeny.busoda.ui.theme.DarkGreen
+import kotlinx.coroutines.flow.SharedFlow
 
 @Composable
 fun StopDetailScreen(
@@ -57,7 +59,32 @@ fun StopDetailScreen(
     val stopId by viewModel.stopId.collectAsState()
     val stopDetail by viewModel.stopDetail.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+    val timerValue by viewModel.timer.collectAsState(initial = 15)
+    val currentTime by viewModel.currentTime.collectAsState()
 
+    StopDetailContent(
+        stopId = stopId,
+        stopDetail = stopDetail,
+        isLoading = isLoading,
+        timer = timerValue,
+        currentTime = currentTime,
+        refreshEvent = viewModel.refreshEvent,
+        onRefresh = { viewModel.refreshData() },
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun StopDetailContent(
+    stopId: String,
+    stopDetail: BusStopDetail,
+    isLoading: Boolean,
+    timer: Int,
+    currentTime: Long,
+    refreshEvent: SharedFlow<Unit>,
+    onRefresh: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -69,18 +96,18 @@ fun StopDetailScreen(
             StopId(stopId)
             StopName(stopDetail.stopName)
             Row {
-                BusEmoji(viewModel)
+                BusEmoji(timer = timer)
                 StopEmoji()
             }
             BusList(
                 busInfos = stopDetail.busInfos,
                 isLoading = isLoading,
-                viewModel = viewModel
+                currentTime = currentTime
             )
         }
         RefreshButton(
-            viewModel = viewModel,
-            onClick = { viewModel.refreshData() },
+            refreshEvent = refreshEvent,
+            onClick = onRefresh,
             modifier = Modifier.align(Alignment.BottomEnd)
         )
     }
@@ -118,15 +145,14 @@ private fun StopName(
 
 @Composable
 private fun BusEmoji(
-    viewModel: StopDetailViewModel,
+    timer: Int,
     modifier: Modifier = Modifier
 ) {
     BoxWithConstraints {
-        val timerValue by viewModel.timer.collectAsState(initial = 15)
         val startPadding = 35.dp
         val endPadding = 30.dp
         val totalDistance = maxWidth - startPadding - endPadding * 2
-        val progress = (15 - timerValue) / 15f
+        val progress = (15 - timer) / 15f
         val moveAnimation by animateFloatAsState(
             targetValue = progress,
             animationSpec = tween(
@@ -165,7 +191,7 @@ private fun StopEmoji(
 
 @Composable
 private fun RefreshButton(
-    viewModel: StopDetailViewModel,
+    refreshEvent: SharedFlow<Unit>,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -180,7 +206,7 @@ private fun RefreshButton(
     )
 
     LaunchedEffect(Unit) {
-        viewModel.refreshEvent.collect {
+        refreshEvent.collect {
             rotation += 180f
         }
     }
@@ -239,10 +265,9 @@ private fun BusInfoHeader(
 @Composable
 private fun ArrivalTimeText(
     arrivalTime: Long?,
-    viewModel: StopDetailViewModel,
+    currentTime: Long,
     modifier: Modifier = Modifier
 ) {
-    val currentTime by viewModel.currentTime.collectAsState()
     var displayTime by rememberSaveable { mutableStateOf("") }
 
     if (arrivalTime != null) {
@@ -261,7 +286,7 @@ private fun ArrivalTimeText(
 private fun ArrivalInfo(
     arrivalInfo: BusArrivalInfo?,
     position: Int,
-    viewModel: StopDetailViewModel,
+    currentTime: Long,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -274,7 +299,7 @@ private fun ArrivalInfo(
         )
         ArrivalTimeText(
             arrivalTime = arrivalInfo?.arrivalTime,
-            viewModel = viewModel,
+            currentTime = currentTime,
             modifier = Modifier.weight(2.5f)
         )
         Text(
@@ -296,7 +321,7 @@ private fun ArrivalInfo(
 @Composable
 private fun BusItem(
     busInfo: BusInfo,
-    viewModel: StopDetailViewModel,
+    currentTime: Long,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -318,7 +343,7 @@ private fun BusItem(
         ArrivalInfo(
             arrivalInfo = busInfo.arrivalInfos.getOrNull(0),
             position = 0,
-            viewModel = viewModel,
+            currentTime = currentTime,
             modifier = Modifier
                 .padding(horizontal = 20.dp)
         )
@@ -326,7 +351,7 @@ private fun BusItem(
         ArrivalInfo(
             arrivalInfo = busInfo.arrivalInfos.getOrNull(1),
             position = 1,
-            viewModel = viewModel,
+            currentTime = currentTime,
             modifier = Modifier
                 .padding(horizontal = 20.dp)
                 .padding(bottom = 15.dp)
@@ -338,7 +363,7 @@ private fun BusItem(
 private fun BusList(
     busInfos: List<BusInfo>,
     isLoading: Boolean,
-    viewModel: StopDetailViewModel,
+    currentTime: Long,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -349,7 +374,10 @@ private fun BusList(
                 items = busInfos,
                 key = { busInfo -> busInfo.hashCode() }
             ) { busInfo ->
-                BusItem(busInfo, viewModel)
+                BusItem(
+                    busInfo = busInfo,
+                    currentTime = currentTime
+                )
             }
         }
 
