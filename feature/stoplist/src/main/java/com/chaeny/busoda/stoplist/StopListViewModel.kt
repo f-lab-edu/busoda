@@ -32,18 +32,12 @@ internal class StopListViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _isLoading = MutableStateFlow(false)
-    private val _isNoResult = MutableSharedFlow<Boolean>()
-    private val _isNoInternet = MutableSharedFlow<Boolean>()
-    private val _isNetworkError = MutableSharedFlow<Boolean>()
-    private val _isKeywordTooShort = MutableSharedFlow<Boolean>()
+    private val _searchEvent = MutableSharedFlow<SearchEvent>()
     private val _busStopClicked = MutableSharedFlow<String>()
     private val keyWord: MutableStateFlow<String> =
         MutableStateFlow(savedStateHandle.get(KEYWORD_SAVED_STATE_KEY) ?: EMPTY_KEYWORD)
     val isLoading: StateFlow<Boolean> = _isLoading
-    val isNoResult: SharedFlow<Boolean> = _isNoResult
-    val isNoInternet: SharedFlow<Boolean> = _isNoInternet
-    val isNetworkError: SharedFlow<Boolean> = _isNetworkError
-    val isKeywordTooShort: SharedFlow<Boolean> = _isKeywordTooShort
+    val searchEvent : SharedFlow<SearchEvent> = _searchEvent
     val busStopClicked: SharedFlow<String> = _busStopClicked
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
@@ -75,15 +69,15 @@ internal class StopListViewModel @Inject constructor(
         val updatedStops = when (result) {
             is GetBusStopResult.Success -> getUpdatedStops(result.data)
             is GetBusStopResult.NoResult -> {
-                _isNoResult.emit(true)
+                _searchEvent.emit(SearchEvent.NoResult)
                 emptyList()
             }
             is GetBusStopResult.NoInternet -> {
-                _isNoInternet.emit(true)
+                _searchEvent.emit(SearchEvent.NoInternet)
                 emptyList()
             }
             is GetBusStopResult.NetworkError -> {
-                _isNetworkError.emit(true)
+                _searchEvent.emit(SearchEvent.NetworkError)
                 emptyList()
             }
         }
@@ -103,7 +97,7 @@ internal class StopListViewModel @Inject constructor(
 
     private fun handleShortKeyword(): List<BusStop> {
         viewModelScope.launch {
-            _isKeywordTooShort.emit(true)
+            _searchEvent.emit(SearchEvent.ShortKeyword)
         }
         return emptyList()
     }

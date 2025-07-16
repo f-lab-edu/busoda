@@ -61,8 +61,7 @@ dependencies {
     implementation libs.hilt.android
     kapt libs.hilt.compiler
 
-    implementation libs.navigation.fragment
-    implementation libs.navigation.ui
+    implementation libs.navigation.compose
 
     implementation libs.androidx.core.ktx
     implementation libs.androidx.appcompat
@@ -74,4 +73,5 @@ dependencies {
     implementation project(":feature:stoplist")
     implementation project(":feature:stopdetail")
     implementation project(":core:ui-impl")
+    implementation project(":core:ui")
 }
