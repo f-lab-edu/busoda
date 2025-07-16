@@ -127,7 +127,8 @@ private fun StopId(
             .fillMaxWidth()
             .padding(horizontal = 30.dp),
         textAlign = TextAlign.Center,
-        style = MaterialTheme.typography.bodyMedium
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onBackground
     )
 }
 
@@ -142,7 +143,8 @@ private fun StopName(
             .fillMaxWidth()
             .padding(horizontal = 30.dp),
         textAlign = TextAlign.Center,
-        style = MaterialTheme.typography.titleMedium
+        style = MaterialTheme.typography.titleMedium,
+        color = MaterialTheme.colorScheme.onBackground
     )
 }
 
