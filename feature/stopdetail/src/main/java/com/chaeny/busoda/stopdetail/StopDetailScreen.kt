@@ -369,10 +369,7 @@ private fun BusList(
         modifier = modifier.fillMaxSize()
     ) {
         LazyColumn {
-            items(
-                items = busInfos,
-                key = { busInfo -> busInfo.hashCode() }
-            ) { busInfo ->
+            items(busInfos) { busInfo ->
                 BusItem(busInfo)
             }
         }

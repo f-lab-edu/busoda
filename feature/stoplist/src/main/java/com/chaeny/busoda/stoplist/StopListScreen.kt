@@ -201,7 +201,10 @@ private fun StopList(
         .padding(top = 20.dp)
     ) {
         LazyColumn {
-            items(stops) { stop ->
+            items(
+                items = stops,
+                key = { stop -> stop.stopId }
+            ) { stop ->
                 StopItem(stop, onClickItem)
             }
         }
