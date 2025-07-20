@@ -10,7 +10,7 @@ material = "1.12.0"
 compileSdk = "35"
 minSdk = "31"
 targetSdk = "35"
-navigation = "2.8.5"
+navigation = "2.9.0"
 coreTesting = "2.2.0"
 coroutines = "1.7.3"
 hilt = "2.52"
@@ -21,6 +21,7 @@ tikxml = "0.8.13"
 lifecycle = "2.6.1"
 composeBom = "2025.05.01"
 activityCompose = "1.10.1"
+hilt-navigation-compose = "1.2.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -33,6 +34,7 @@ core-testing = { group = "androidx.arch.core", name = "core-testing", version.re
 coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
+hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hilt-navigation-compose" }
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
@@ -41,8 +43,7 @@ tikxml-core = { group = "com.tickaroo.tikxml", name = "core", version.ref = "tik
 tikxml-retrofit = { group = "com.tickaroo.tikxml", name = "retrofit-converter", version.ref = "tikxml" }
 tikxml-processor = { group = "com.tickaroo.tikxml", name = "processor", version.ref = "tikxml" }
 androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycle" }
-navigation-fragment = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigation" }
-navigation-ui = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigation" }
+navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }

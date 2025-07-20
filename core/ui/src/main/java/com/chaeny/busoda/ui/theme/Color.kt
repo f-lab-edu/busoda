@@ -14,3 +14,5 @@ val Gray40 = Color(0xFFADAEB0)
 val Gray60 = Color(0xFF5D5E64)
 val DarkGreen = Color(0xFF80AF81)
 
+val White = Color(0xFFFFFFFF)
+val Black = Color(0xFF000000)
