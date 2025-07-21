@@ -49,12 +49,17 @@ fun StopListScreen(
     onStopClick: (String) -> Unit = {}
 ) {
     val viewModel: StopListViewModel = hiltViewModel()
-    Column {
-        SearchBarContent(viewModel)
-        StopListContent(viewModel)
-        CollectStopSpecificEvent(viewModel)
-        CollectStopClickEvent(onStopClick, viewModel)
-    }
+    val stops by viewModel.busStops.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+
+    CollectStopSpecificEvent(viewModel)
+    CollectStopClickEvent(onStopClick, viewModel)
+    StopListContent(
+        stops = stops,
+        isLoading = isLoading,
+        onKeywordChange = viewModel::setKeyWord,
+        onStopClick = viewModel::handleBusStopClick
+    )
 }
 
 @Composable
@@ -87,7 +92,22 @@ private fun CollectStopSpecificEvent(viewModel: StopListViewModel) {
 }
 
 @Composable
-private fun SearchBarContent(viewModel: StopListViewModel) {
+private fun StopListContent(
+    stops: List<BusStop>,
+    isLoading: Boolean,
+    onKeywordChange: (String) -> Unit,
+    onStopClick: (String) -> Unit
+) {
+    Column {
+        SearchBarContent(onKeywordChange)
+        StopList(stops, isLoading, onStopClick)
+    }
+}
+
+@Composable
+private fun SearchBarContent(
+    setKeyWord: (String) -> Unit
+) {
     var keyword by rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue(""))
     }
@@ -95,16 +115,9 @@ private fun SearchBarContent(viewModel: StopListViewModel) {
         keyword,
         onKeywordChange = {
             keyword = it.copy(selection = TextRange(it.text.length))
-            viewModel.setKeyWord(it.text)
+            setKeyWord(it.text)
         }
     )
-}
-
-@Composable
-private fun StopListContent(viewModel: StopListViewModel) {
-    val stops by viewModel.busStops.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-    StopList(stops, isLoading, onClickItem = { stopId -> viewModel.handleBusStopClick(stopId) })
 }
 
 @Composable
