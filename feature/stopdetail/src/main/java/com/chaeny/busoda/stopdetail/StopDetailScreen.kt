@@ -21,6 +21,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -94,6 +95,19 @@ private fun StopDetailContent(
             .fillMaxSize()
             .padding(top = 20.dp)
     ) {
+        IconButton(
+            onClick = {},
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(start = 30.dp)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_bookmark),
+                contentDescription = stringResource(R.string.bookmark),
+                tint = MaterialTheme.colorScheme.onBackground
+            )
+        }
+
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
