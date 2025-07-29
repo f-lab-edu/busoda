@@ -21,6 +21,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "Busoda"
 include ':app'
+include ':feature:favorites'
 include ':feature:stoplist'
 include ':feature:stopdetail'
 include ':core:data'
