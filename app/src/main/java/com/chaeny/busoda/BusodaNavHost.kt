@@ -22,7 +22,11 @@ fun BusodaNavGraph(
         composable(
             route = "favorites"
         ) {
-            FavoritesScreen()
+            FavoritesScreen(
+                onButtonClick = {
+                    navController.navigate("stop_list")
+                }
+            )
         }
         composable(
             route = "stop_list"
