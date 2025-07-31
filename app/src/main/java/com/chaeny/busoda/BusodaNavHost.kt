@@ -23,7 +23,7 @@ fun BusodaNavGraph(
             route = "favorites"
         ) {
             FavoritesScreen(
-                onButtonClick = {
+                onSearchBarClick = {
                     navController.navigate("stop_list")
                 }
             )
