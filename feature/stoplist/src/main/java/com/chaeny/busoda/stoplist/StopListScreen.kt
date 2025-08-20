@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -214,10 +214,10 @@ private fun StopList(
         .padding(top = 20.dp)
     ) {
         LazyColumn {
-            items(
+            itemsIndexed(
                 items = stops,
-                key = { stop -> stop.stopId }
-            ) { stop ->
+                key = { index, stop -> "$index-${stop.stopId}" }
+            ) { index, stop ->
                 StopItem(stop, onClickItem)
             }
         }
