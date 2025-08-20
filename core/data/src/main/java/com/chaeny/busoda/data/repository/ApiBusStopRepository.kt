@@ -32,12 +32,14 @@ class ApiBusStopRepository @Inject constructor(
     private fun StopListResponse.toBusStopList(): List<BusStop> {
         val busStops = msgBody?.busStops
 
-        val mappedBusStops = busStops?.map { busStop ->
-            BusStop(
-                stopId = busStop.stopId.orEmpty(),
-                stopName = busStop.stopName.orEmpty().replaceStopNameEntities()
-            )
-        }.orEmpty()
+        val mappedBusStops = busStops
+            ?.filter { busStop -> busStop.stopId.orEmpty() != "0" }
+            ?.map { busStop ->
+                BusStop(
+                    stopId = busStop.stopId.orEmpty(),
+                    stopName = busStop.stopName.orEmpty().replaceStopNameEntities()
+                )
+            }.orEmpty()
 
         return mappedBusStops
     }
