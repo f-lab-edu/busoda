@@ -13,6 +13,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -31,6 +33,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
@@ -128,25 +131,38 @@ private fun SearchBar(
 ) {
     val focusRequester = remember { FocusRequester() }
 
-    TextField(
-        value = keyword,
-        onValueChange = onKeywordChange,
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = Color.Transparent,
-            unfocusedContainerColor = Color.Transparent,
-            focusedIndicatorColor = Gray40
-        ),
-        placeholder = {
-            Text(
-                stringResource(R.string.stop_search), color = Color.Gray
-            )
-        },
+    Row(
         modifier = modifier
-            .focusRequester(focusRequester)
             .fillMaxWidth()
-            .padding(horizontal = 36.dp)
-            .padding(top = 20.dp)
-    )
+            .padding(top = 20.dp, start = 20.dp, end = 36.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(onClick = {}) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_back),
+                contentDescription = stringResource(R.string.arrow_back),
+                tint = Color.Gray
+            )
+        }
+
+        TextField(
+            value = keyword,
+            onValueChange = onKeywordChange,
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                focusedIndicatorColor = Gray40
+            ),
+            placeholder = {
+                Text(
+                    stringResource(R.string.stop_search), color = Color.Gray
+                )
+            },
+            modifier = modifier
+                .weight(1f)
+                .focusRequester(focusRequester)
+        )
+    }
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
