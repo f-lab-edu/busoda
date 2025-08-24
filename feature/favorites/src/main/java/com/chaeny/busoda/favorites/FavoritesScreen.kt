@@ -31,10 +31,10 @@ import com.chaeny.busoda.ui.theme.Gray60
 
 @Composable
 fun FavoritesScreen(
-    onSearchBarClick: () -> Unit
+    navigateToStopList: () -> Unit
 ) {
     Column {
-        SearchBar(onClick = onSearchBarClick)
+        SearchBar(navigateToStopList = navigateToStopList)
         //FavoritesGuide()
         FavoritesStopList(stops = dummyData, onClickItem = {})
     }
@@ -42,7 +42,7 @@ fun FavoritesScreen(
 
 @Composable
 private fun SearchBar(
-    onClick: () -> Unit,
+    navigateToStopList: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     TextField(
@@ -62,7 +62,7 @@ private fun SearchBar(
             .fillMaxWidth()
             .padding(horizontal = 36.dp)
             .padding(top = 20.dp)
-            .clickable { onClick() }
+            .clickable { navigateToStopList() }
     )
 }
 
@@ -154,7 +154,7 @@ private fun StopItem(
 @Preview(showBackground = true)
 @Composable
 private fun SearchBarPreview() {
-    SearchBar(onClick = {})
+    SearchBar(navigateToStopList = {})
 }
 
 @Preview(showBackground = true)
@@ -166,7 +166,7 @@ private fun FavoritesGuidePreview() {
 @Preview(showBackground = true)
 @Composable
 private fun FavoritesScreenPreview() {
-    FavoritesScreen(onSearchBarClick = {})
+    FavoritesScreen(navigateToStopList = {})
 }
 
 @Preview(showBackground = true)

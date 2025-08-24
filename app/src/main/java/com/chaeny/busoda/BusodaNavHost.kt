@@ -23,7 +23,7 @@ fun BusodaNavGraph(
             route = "favorites"
         ) {
             FavoritesScreen(
-                onSearchBarClick = {
+                navigateToStopList = {
                     navController.navigate("stop_list")
                 }
             )
@@ -32,10 +32,10 @@ fun BusodaNavGraph(
             route = "stop_list"
         ) {
             StopListScreen(
-                onStopClick = { stopId ->
+                navigateToStopDetail = { stopId ->
                     navController.navigate("stop_detail/$stopId")
                 },
-                onBackClick = { navController.popBackStack() }
+                navigateBack = { navController.popBackStack() }
             )
         }
         composable(

@@ -49,32 +49,32 @@ import com.chaeny.busoda.ui.theme.Gray60
 
 @Composable
 fun StopListScreen(
-    onStopClick: (String) -> Unit = {},
-    onBackClick: () -> Unit
+    navigateToStopDetail: (String) -> Unit = {},
+    navigateBack: () -> Unit
 ) {
     val viewModel: StopListViewModel = hiltViewModel()
     val stops by viewModel.busStops.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
     CollectStopSpecificEvent(viewModel)
-    CollectStopClickEvent(onStopClick, viewModel)
+    CollectStopClickEvent(navigateToStopDetail, viewModel)
     StopListContent(
         stops = stops,
         isLoading = isLoading,
         onKeywordChange = viewModel::setKeyWord,
         onStopClick = viewModel::handleBusStopClick,
-        onBackClick = onBackClick
+        navigateBack = navigateBack
     )
 }
 
 @Composable
 private fun CollectStopClickEvent(
-    onStopClick: (String) -> Unit,
+    navigateToStopDetail: (String) -> Unit,
     viewModel: StopListViewModel
 ) {
     LaunchedEffect(Unit) {
         viewModel.busStopClicked.collect { stopId ->
-            onStopClick(stopId)
+            navigateToStopDetail(stopId)
         }
     }
 }
@@ -102,12 +102,12 @@ private fun StopListContent(
     isLoading: Boolean,
     onKeywordChange: (String) -> Unit,
     onStopClick: (String) -> Unit,
-    onBackClick: () -> Unit
+    navigateBack: () -> Unit
 ) {
     Column {
         SearchBarContent(
             setKeyWord = onKeywordChange,
-            onBackClick = onBackClick
+            navigateBack = navigateBack
         )
         StopList(stops, isLoading, onStopClick)
     }
@@ -116,7 +116,7 @@ private fun StopListContent(
 @Composable
 private fun SearchBarContent(
     setKeyWord: (String) -> Unit,
-    onBackClick: () -> Unit
+    navigateBack: () -> Unit
 ) {
     var keyword by rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue(""))
@@ -127,7 +127,7 @@ private fun SearchBarContent(
             keyword = it.copy(selection = TextRange(it.text.length))
             setKeyWord(it.text)
         },
-        onBackClick = onBackClick
+        navigateBack = navigateBack
     )
 }
 
@@ -135,7 +135,7 @@ private fun SearchBarContent(
 private fun SearchBar(
     keyword: TextFieldValue,
     onKeywordChange: (TextFieldValue) -> Unit,
-    onBackClick: () -> Unit,
+    navigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val focusRequester = remember { FocusRequester() }
@@ -146,7 +146,7 @@ private fun SearchBar(
             .padding(top = 20.dp, start = 20.dp, end = 36.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = onBackClick) {
+        IconButton(onClick = navigateBack) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_back),
                 contentDescription = stringResource(R.string.arrow_back),
@@ -262,7 +262,7 @@ private fun SearchBarPreview() {
     SearchBar(
         keyword = TextFieldValue(""),
         onKeywordChange = {},
-        onBackClick = {}
+        navigateBack = {}
     )
 }
 
