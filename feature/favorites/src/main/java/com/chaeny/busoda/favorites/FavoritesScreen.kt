@@ -58,7 +58,7 @@ private fun CollectFavoriteStopClickEvent(
     viewModel: FavoritesViewModel
 ) {
     LaunchedEffect(Unit) {
-        viewModel.favoriteStopClicked.collect { stopId ->
+        viewModel.favoritesStopNavigationEvent.collect { stopId ->
             navigateToStopDetail(stopId)
         }
     }

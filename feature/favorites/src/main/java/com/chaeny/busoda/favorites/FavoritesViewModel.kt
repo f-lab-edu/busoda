@@ -18,9 +18,9 @@ internal class FavoritesViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _favorites = MutableStateFlow<List<BusStop>>(emptyList())
-    private val _favoriteStopClicked = MutableSharedFlow<String>()
+    private val _favoritesStopNavigationEvent = MutableSharedFlow<String>()
     val favorites: StateFlow<List<BusStop>> = _favorites
-    val favoriteStopClicked: SharedFlow<String> = _favoriteStopClicked
+    val favoritesStopNavigationEvent: SharedFlow<String> = _favoritesStopNavigationEvent
 
     init {
         loadFavorites()
@@ -34,7 +34,7 @@ internal class FavoritesViewModel @Inject constructor(
 
     fun handleFavoriteStopClick(stopId: String) {
         viewModelScope.launch {
-            _favoriteStopClicked.emit(stopId)
+            _favoritesStopNavigationEvent.emit(stopId)
         }
     }
 }
