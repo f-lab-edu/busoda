@@ -49,7 +49,8 @@ import com.chaeny.busoda.ui.theme.Gray60
 
 @Composable
 fun StopListScreen(
-    onStopClick: (String) -> Unit = {}
+    onStopClick: (String) -> Unit = {},
+    onBackClick: () -> Unit
 ) {
     val viewModel: StopListViewModel = hiltViewModel()
     val stops by viewModel.busStops.collectAsState()
@@ -61,7 +62,8 @@ fun StopListScreen(
         stops = stops,
         isLoading = isLoading,
         onKeywordChange = viewModel::setKeyWord,
-        onStopClick = viewModel::handleBusStopClick
+        onStopClick = viewModel::handleBusStopClick,
+        onBackClick = onBackClick
     )
 }
 
@@ -99,17 +101,22 @@ private fun StopListContent(
     stops: List<BusStop>,
     isLoading: Boolean,
     onKeywordChange: (String) -> Unit,
-    onStopClick: (String) -> Unit
+    onStopClick: (String) -> Unit,
+    onBackClick: () -> Unit
 ) {
     Column {
-        SearchBarContent(onKeywordChange)
+        SearchBarContent(
+            setKeyWord = onKeywordChange,
+            onBackClick = onBackClick
+        )
         StopList(stops, isLoading, onStopClick)
     }
 }
 
 @Composable
 private fun SearchBarContent(
-    setKeyWord: (String) -> Unit
+    setKeyWord: (String) -> Unit,
+    onBackClick: () -> Unit
 ) {
     var keyword by rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue(""))
@@ -119,7 +126,8 @@ private fun SearchBarContent(
         onKeywordChange = {
             keyword = it.copy(selection = TextRange(it.text.length))
             setKeyWord(it.text)
-        }
+        },
+        onBackClick = onBackClick
     )
 }
 
@@ -127,6 +135,7 @@ private fun SearchBarContent(
 private fun SearchBar(
     keyword: TextFieldValue,
     onKeywordChange: (TextFieldValue) -> Unit,
+    onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val focusRequester = remember { FocusRequester() }
@@ -137,7 +146,7 @@ private fun SearchBar(
             .padding(top = 20.dp, start = 20.dp, end = 36.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = {}) {
+        IconButton(onClick = onBackClick) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_back),
                 contentDescription = stringResource(R.string.arrow_back),
@@ -252,7 +261,8 @@ private fun StopList(
 private fun SearchBarPreview() {
     SearchBar(
         keyword = TextFieldValue(""),
-        onKeywordChange = {}
+        onKeywordChange = {},
+        onBackClick = {}
     )
 }
 

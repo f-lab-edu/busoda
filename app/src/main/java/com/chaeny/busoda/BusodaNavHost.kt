@@ -34,7 +34,8 @@ fun BusodaNavGraph(
             StopListScreen(
                 onStopClick = { stopId ->
                     navController.navigate("stop_detail/$stopId")
-                }
+                },
+                onBackClick = { navController.popBackStack() }
             )
         }
         composable(
