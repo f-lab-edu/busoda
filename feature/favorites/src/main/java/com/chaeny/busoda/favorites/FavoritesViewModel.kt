@@ -2,6 +2,7 @@ package com.chaeny.busoda.favorites
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.chaeny.busoda.data.repository.FavoriteRepository
 import com.chaeny.busoda.model.BusStop
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -12,20 +13,24 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-internal class FavoritesViewModel @Inject constructor() : ViewModel() {
+internal class FavoritesViewModel @Inject constructor(
+    private val favoriteRepository: FavoriteRepository
+) : ViewModel() {
 
-    private val _favorites = MutableStateFlow(
-        listOf(
-            BusStop("02218", "남대문경찰서.서울역10번출구", "숭례문"),
-            BusStop("03119", "신용산역3번출구", "신용산지하차도"),
-            BusStop("19114", "영등포역", "신길역5호선"),
-            BusStop("19113", "영등포역.패어필드호텔", "경방타임스퀘어.신세계백화점")
-        )
-    )
+    private val _favorites = MutableStateFlow<List<BusStop>>(emptyList())
     private val _favoriteStopClicked = MutableSharedFlow<String>()
-
     val favorites: StateFlow<List<BusStop>> = _favorites
     val favoriteStopClicked: SharedFlow<String> = _favoriteStopClicked
+
+    init {
+        loadFavorites()
+    }
+
+    private fun loadFavorites() {
+        viewModelScope.launch {
+            _favorites.value = favoriteRepository.getFavorites()
+        }
+    }
 
     fun handleFavoriteStopClick(stopId: String) {
         viewModelScope.launch {
