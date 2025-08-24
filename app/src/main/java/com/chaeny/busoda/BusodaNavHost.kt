@@ -25,6 +25,9 @@ fun BusodaNavGraph(
             FavoritesScreen(
                 navigateToStopList = {
                     navController.navigate("stop_list")
+                },
+                navigateToStopDetail = { stopId ->
+                    navController.navigate("stop_detail/$stopId")
                 }
             )
         }

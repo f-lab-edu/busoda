@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -34,7 +35,8 @@ import com.chaeny.busoda.ui.theme.Gray60
 
 @Composable
 fun FavoritesScreen(
-    navigateToStopList: () -> Unit
+    navigateToStopList: () -> Unit,
+    navigateToStopDetail: (String) -> Unit = {}
 ) {
     val viewModel: FavoritesViewModel = hiltViewModel()
     val favorites by viewModel.favorites.collectAsState()
@@ -42,7 +44,23 @@ fun FavoritesScreen(
     Column {
         SearchBar(navigateToStopList = navigateToStopList)
         //FavoritesGuide()
-        FavoritesStopList(stops = favorites, onClickItem = {})
+        FavoritesStopList(
+            stops = favorites,
+            onClickItem = viewModel::handleFavoriteStopClick
+        )
+    }
+    CollectFavoriteStopClickEvent(navigateToStopDetail, viewModel)
+}
+
+@Composable
+private fun CollectFavoriteStopClickEvent(
+    navigateToStopDetail: (String) -> Unit,
+    viewModel: FavoritesViewModel
+) {
+    LaunchedEffect(Unit) {
+        viewModel.favoriteStopClicked.collect { stopId ->
+            navigateToStopDetail(stopId)
+        }
     }
 }
 
