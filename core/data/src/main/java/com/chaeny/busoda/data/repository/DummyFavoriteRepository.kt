@@ -6,7 +6,7 @@ import kotlinx.coroutines.delay
 
 class DummyFavoriteRepository @Inject constructor() : FavoriteRepository {
 
-    private val dummyData = listOf(
+    private val dummyData = mutableListOf(
         BusStop("02218", "남대문경찰서.서울역10번출구", "숭례문"),
         BusStop("03119", "신용산역3번출구", "신용산지하차도"),
         BusStop("19114", "영등포역", "신길역5호선"),
@@ -16,5 +16,9 @@ class DummyFavoriteRepository @Inject constructor() : FavoriteRepository {
     override suspend fun getFavorites(): List<BusStop> {
         delay(3000)
         return dummyData
+    }
+
+    override suspend fun addFavorite(stop: BusStop) {
+        dummyData.add(stop)
     }
 }

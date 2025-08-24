@@ -4,6 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chaeny.busoda.data.repository.BusStopDetailRepository
+import com.chaeny.busoda.data.repository.FavoriteRepository
+import com.chaeny.busoda.model.BusStop
 import com.chaeny.busoda.model.BusStopDetail
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -17,6 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class StopDetailViewModel @Inject constructor(
     private val busStopDetailRepository: BusStopDetailRepository,
+    private val favoriteRepository: FavoriteRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -69,6 +72,14 @@ internal class StopDetailViewModel @Inject constructor(
             _refreshEvent.emit(Unit)
         }
         asyncDataLoad()
+    }
+
+    fun addToFavorites() {
+        viewModelScope.launch {
+            favoriteRepository.addFavorite(
+                BusStop("99999", "TEST STOP", "TEST NEXT STOP")
+            )
+        }
     }
 
     companion object {

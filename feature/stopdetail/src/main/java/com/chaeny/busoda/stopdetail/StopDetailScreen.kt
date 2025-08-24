@@ -74,7 +74,8 @@ fun StopDetailScreen(
             isLoading = isLoading,
             timer = timerValue,
             refreshEvent = viewModel.refreshEvent,
-            onRefresh = { viewModel.refreshData() },
+            onRefresh = viewModel::refreshData,
+            onAddToFavorites = viewModel::addToFavorites,
             modifier = modifier
         )
     }
@@ -88,6 +89,7 @@ private fun StopDetailContent(
     timer: Int,
     refreshEvent: SharedFlow<Unit>,
     onRefresh: () -> Unit,
+    onAddToFavorites: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -96,7 +98,7 @@ private fun StopDetailContent(
             .padding(top = 20.dp)
     ) {
         IconButton(
-            onClick = {},
+            onClick = onAddToFavorites,
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .padding(start = 30.dp)
