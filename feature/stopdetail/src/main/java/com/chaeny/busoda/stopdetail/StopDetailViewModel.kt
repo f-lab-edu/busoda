@@ -77,7 +77,11 @@ internal class StopDetailViewModel @Inject constructor(
     fun addToFavorites() {
         viewModelScope.launch {
             favoriteRepository.addFavorite(
-                BusStop("99999", "TEST STOP", "TEST NEXT STOP")
+                BusStop(
+                    _stopId.value,
+                    _stopDetail.value.stopName,
+                    _stopDetail.value.busInfos.firstOrNull()?.nextStopName ?: ""
+                )
             )
         }
     }
