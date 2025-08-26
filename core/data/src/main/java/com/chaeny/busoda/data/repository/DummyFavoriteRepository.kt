@@ -2,7 +2,8 @@ package com.chaeny.busoda.data.repository
 
 import com.chaeny.busoda.model.BusStop
 import jakarta.inject.Inject
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class DummyFavoriteRepository @Inject constructor() : FavoriteRepository {
 
@@ -13,9 +14,8 @@ class DummyFavoriteRepository @Inject constructor() : FavoriteRepository {
         BusStop("19113", "영등포역.패어필드호텔", "경방타임스퀘어.신세계백화점")
     )
 
-    override suspend fun getFavorites(): List<BusStop> {
-        delay(3000)
-        return dummyData
+    override fun getFavorites(): Flow<List<BusStop>> {
+        return MutableStateFlow(dummyData)
     }
 
     override suspend fun addFavorite(stop: BusStop) {

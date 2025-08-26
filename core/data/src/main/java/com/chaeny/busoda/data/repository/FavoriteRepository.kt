@@ -1,8 +1,9 @@
 package com.chaeny.busoda.data.repository
 
 import com.chaeny.busoda.model.BusStop
+import kotlinx.coroutines.flow.Flow
 
 interface FavoriteRepository {
-    suspend fun getFavorites(): List<BusStop>
     suspend fun addFavorite(stop: BusStop)
+    fun getFavorites(): Flow<List<BusStop>>
 }
