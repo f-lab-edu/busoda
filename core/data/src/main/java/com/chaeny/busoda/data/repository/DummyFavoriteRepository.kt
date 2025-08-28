@@ -1,7 +1,7 @@
 package com.chaeny.busoda.data.repository
 
 import com.chaeny.busoda.model.BusStop
-import jakarta.inject.Inject
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
