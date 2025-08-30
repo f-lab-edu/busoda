@@ -21,19 +21,7 @@ class RoomFavoriteRepository @Inject constructor(
         }
     }
 
-    private fun BusStop.toFavoriteStop(): FavoriteStop {
-        return FavoriteStop(
-            stopId = this.stopId,
-            stopName = this.stopName,
-            nextStopName = this.nextStopName
-        )
-    }
+    private fun BusStop.toFavoriteStop() = FavoriteStop(stopId, stopName, nextStopName)
 
-    private fun FavoriteStop.toBusStop(): BusStop {
-        return BusStop(
-            stopId = this.stopId,
-            stopName = this.stopName,
-            nextStopName = this.nextStopName
-        )
-    }
+    private fun FavoriteStop.toBusStop() = BusStop(stopId, stopName, nextStopName)
 }
