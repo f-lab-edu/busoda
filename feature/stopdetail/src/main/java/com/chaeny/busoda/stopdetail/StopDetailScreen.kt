@@ -16,6 +16,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Autorenew
+import androidx.compose.material.icons.filled.BookmarkAdd
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -40,7 +43,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -104,7 +106,7 @@ private fun StopDetailContent(
                 .padding(start = 30.dp)
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_bookmark),
+                imageVector = Icons.Filled.BookmarkAdd,
                 contentDescription = stringResource(R.string.bookmark),
                 tint = MaterialTheme.colorScheme.onBackground
             )
@@ -243,7 +245,7 @@ private fun RefreshButton(
             }
     ) {
         Icon(
-            painter = painterResource(id = R.drawable.ic_refresh),
+            imageVector = Icons.Filled.Autorenew,
             contentDescription = stringResource(R.string.refresh),
             tint = Color.Black
         )
