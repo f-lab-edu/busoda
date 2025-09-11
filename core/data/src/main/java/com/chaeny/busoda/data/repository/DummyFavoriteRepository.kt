@@ -18,6 +18,10 @@ class DummyFavoriteRepository @Inject constructor() : FavoriteRepository {
         return MutableStateFlow(dummyData)
     }
 
+    override fun isFavorite(stopId: String): Flow<Boolean> {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun addFavorite(stop: BusStop) {
         dummyData.add(stop)
     }
