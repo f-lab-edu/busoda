@@ -1,5 +1,6 @@
 package com.chaeny.busoda.data.repository
 
+import com.chaeny.busoda.data.model.StopListItem
 import com.chaeny.busoda.data.model.StopListResponse
 import com.chaeny.busoda.data.network.BusApiService
 import com.chaeny.busoda.data.util.replaceStopNameEntities
@@ -32,13 +33,19 @@ class ApiBusStopRepository @Inject constructor(
     private fun StopListResponse.toBusStopList(): List<BusStop> {
         val busStops = msgBody?.busStops
 
-        val mappedBusStops = busStops?.map { busStop ->
-            BusStop(
-                stopId = busStop.stopId.orEmpty(),
-                stopName = busStop.stopName.orEmpty().replaceStopNameEntities()
-            )
-        }.orEmpty()
+        val mappedBusStops = busStops
+            ?.filter { it.isValidStop() }
+            ?.map { busStop ->
+                BusStop(
+                    stopId = busStop.stopId.orEmpty(),
+                    stopName = busStop.stopName.orEmpty().replaceStopNameEntities()
+                )
+            }.orEmpty()
 
         return mappedBusStops
+    }
+
+    private fun StopListItem.isValidStop(): Boolean {
+        return stopId.orEmpty() != "0"
     }
 }
