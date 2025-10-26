@@ -10,9 +10,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -31,8 +37,10 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -46,25 +54,32 @@ import com.chaeny.busoda.ui.theme.Gray60
 
 @Composable
 fun StopListScreen(
-    onStopClick: (String) -> Unit = {}
+    navigateToStopDetail: (String) -> Unit = {},
+    navigateBack: () -> Unit
 ) {
     val viewModel: StopListViewModel = hiltViewModel()
-    Column {
-        SearchBarContent(viewModel)
-        StopListContent(viewModel)
-        CollectStopSpecificEvent(viewModel)
-        CollectStopClickEvent(onStopClick, viewModel)
-    }
+    val stops by viewModel.busStops.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+
+    CollectStopSpecificEvent(viewModel)
+    CollectStopClickEvent(navigateToStopDetail, viewModel)
+    StopListContent(
+        stops = stops,
+        isLoading = isLoading,
+        onKeywordChange = viewModel::setKeyWord,
+        onStopClick = viewModel::handleBusStopClick,
+        navigateBack = navigateBack
+    )
 }
 
 @Composable
 private fun CollectStopClickEvent(
-    onStopClick: (String) -> Unit,
+    navigateToStopDetail: (String) -> Unit,
     viewModel: StopListViewModel
 ) {
     LaunchedEffect(Unit) {
         viewModel.busStopClicked.collect { stopId ->
-            onStopClick(stopId)
+            navigateToStopDetail(stopId)
         }
     }
 }
@@ -87,7 +102,27 @@ private fun CollectStopSpecificEvent(viewModel: StopListViewModel) {
 }
 
 @Composable
-private fun SearchBarContent(viewModel: StopListViewModel) {
+private fun StopListContent(
+    stops: List<BusStop>,
+    isLoading: Boolean,
+    onKeywordChange: (String) -> Unit,
+    onStopClick: (String) -> Unit,
+    navigateBack: () -> Unit
+) {
+    Column {
+        SearchBarContent(
+            setKeyWord = onKeywordChange,
+            navigateBack = navigateBack
+        )
+        StopList(stops, isLoading, onStopClick)
+    }
+}
+
+@Composable
+private fun SearchBarContent(
+    setKeyWord: (String) -> Unit,
+    navigateBack: () -> Unit
+) {
     var keyword by rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue(""))
     }
@@ -95,45 +130,60 @@ private fun SearchBarContent(viewModel: StopListViewModel) {
         keyword,
         onKeywordChange = {
             keyword = it.copy(selection = TextRange(it.text.length))
-            viewModel.setKeyWord(it.text)
-        }
+            setKeyWord(it.text)
+        },
+        navigateBack = navigateBack
     )
-}
-
-@Composable
-private fun StopListContent(viewModel: StopListViewModel) {
-    val stops by viewModel.busStops.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-    StopList(stops, isLoading, onClickItem = { stopId -> viewModel.handleBusStopClick(stopId) })
 }
 
 @Composable
 private fun SearchBar(
     keyword: TextFieldValue,
     onKeywordChange: (TextFieldValue) -> Unit,
+    navigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
 
-    TextField(
-        value = keyword,
-        onValueChange = onKeywordChange,
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = Color.Transparent,
-            unfocusedContainerColor = Color.Transparent,
-            focusedIndicatorColor = Gray40
-        ),
-        placeholder = {
-            Text(
-                stringResource(R.string.stop_search), color = Color.Gray
-            )
-        },
+    Row(
         modifier = modifier
-            .focusRequester(focusRequester)
             .fillMaxWidth()
-            .padding(horizontal = 36.dp)
-            .padding(top = 20.dp)
-    )
+            .padding(top = 20.dp, start = 20.dp, end = 36.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(onClick = navigateBack) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBackIos,
+                contentDescription = stringResource(R.string.arrow_back),
+                tint = Color.Gray
+            )
+        }
+
+        TextField(
+            value = keyword,
+            onValueChange = onKeywordChange,
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Search
+            ),
+            keyboardActions = KeyboardActions(
+                onSearch = { focusManager.clearFocus() }
+            ),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                focusedIndicatorColor = Gray40
+            ),
+            placeholder = {
+                Text(
+                    stringResource(R.string.stop_search), color = Color.Gray
+                )
+            },
+            modifier = modifier
+                .weight(1f)
+                .focusRequester(focusRequester)
+        )
+    }
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
@@ -223,7 +273,8 @@ private fun StopList(
 private fun SearchBarPreview() {
     SearchBar(
         keyword = TextFieldValue(""),
-        onKeywordChange = {}
+        onKeywordChange = {},
+        navigateBack = {}
     )
 }
 
