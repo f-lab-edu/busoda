@@ -35,13 +35,17 @@ internal class FavoritesViewModel @Inject constructor(
         }
     }
 
-    fun handleFavoriteStopClick(stopId: String) {
+    fun handleIntent(intent: ClickFavoriteStopIntent) {
         viewModelScope.launch {
-            _favoritesStopNavigationEvent.emit(stopId)
+            _favoritesStopNavigationEvent.emit(intent.stopId)
         }
     }
 }
 
 data class FavoritesUiState(
     val favorites: List<BusStop> = emptyList()
+)
+
+data class ClickFavoriteStopIntent(
+    val stopId: String
 )

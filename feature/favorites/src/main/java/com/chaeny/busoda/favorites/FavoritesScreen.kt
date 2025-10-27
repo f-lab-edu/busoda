@@ -46,7 +46,9 @@ fun FavoritesScreen(
         //FavoritesGuide()
         FavoritesStopList(
             stops = uiState.favorites,
-            onClickItem = viewModel::handleFavoriteStopClick
+            onClickItem = { stopId ->
+                viewModel.handleIntent(ClickFavoriteStopIntent(stopId))
+            }
         )
     }
     CollectFavoriteStopClickEvent(navigateToStopDetail, viewModel)
