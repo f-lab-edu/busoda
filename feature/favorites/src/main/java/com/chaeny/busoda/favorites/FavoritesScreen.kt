@@ -39,13 +39,13 @@ fun FavoritesScreen(
     navigateToStopDetail: (String) -> Unit = {}
 ) {
     val viewModel: FavoritesViewModel = hiltViewModel()
-    val favorites by viewModel.favorites.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
 
     Column {
         SearchBar(navigateToStopList = navigateToStopList)
         //FavoritesGuide()
         FavoritesStopList(
-            stops = favorites,
+            stops = uiState.favorites,
             onClickItem = viewModel::handleFavoriteStopClick
         )
     }
