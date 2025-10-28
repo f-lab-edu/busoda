@@ -43,13 +43,16 @@ fun FavoritesScreen(
 
     Column {
         SearchBar(navigateToStopList = navigateToStopList)
-        //FavoritesGuide()
-        FavoritesStopList(
-            stops = uiState.favorites,
-            onClickItem = { stopId ->
-                viewModel.handleIntent(ClickFavoriteStopIntent(stopId))
-            }
-        )
+        if (uiState.favorites.isEmpty()) {
+            FavoritesGuide()
+        } else {
+            FavoritesStopList(
+                stops = uiState.favorites,
+                onClickItem = { stopId ->
+                    viewModel.handleIntent(ClickFavoriteStopIntent(stopId))
+                }
+            )
+        }
     }
     CollectFavoriteStopClickEvent(navigateToStopDetail, viewModel)
 }
@@ -102,6 +105,7 @@ private fun FavoritesGuide(
     ) {
         Text(
             text = stringResource(R.string.guide),
+            color = Color.Gray,
             style = MaterialTheme.typography.bodyLarge
         )
     }
