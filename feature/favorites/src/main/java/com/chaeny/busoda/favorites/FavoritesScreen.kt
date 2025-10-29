@@ -1,6 +1,7 @@
 package com.chaeny.busoda.favorites
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,14 +13,20 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,6 +47,7 @@ fun FavoritesScreen(
 ) {
     val viewModel: FavoritesViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
+    var showBottomSheet by remember { mutableStateOf(false) }
 
     Column {
         SearchBar(navigateToStopList = navigateToStopList)
@@ -50,10 +58,21 @@ fun FavoritesScreen(
                 stops = uiState.favorites,
                 onClickItem = { stopId ->
                     viewModel.handleIntent(ClickFavoriteStopIntent(stopId))
+                },
+                onLongClickItem = {
+                    showBottomSheet = true
                 }
             )
         }
     }
+
+    if (showBottomSheet) {
+        DeletePopup(
+            onDismiss = { showBottomSheet = false },
+            onConfirm = { showBottomSheet = false }
+        )
+    }
+
     CollectFavoriteStopClickEvent(navigateToStopDetail, viewModel)
 }
 
@@ -115,6 +134,7 @@ private fun FavoritesGuide(
 private fun FavoritesStopList(
     stops: List<BusStop>,
     onClickItem: (String) -> Unit,
+    onLongClickItem: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier
@@ -126,7 +146,7 @@ private fun FavoritesStopList(
                 items = stops,
                 key = { stop -> stop.stopId }
             ) { stop ->
-                StopItem(stop, onClickItem)
+                StopItem(stop, onClickItem, onLongClickItem)
             }
         }
     }
@@ -136,13 +156,17 @@ private fun FavoritesStopList(
 private fun StopItem(
     stop: BusStop,
     onClick: (String) -> Unit,
+    onLongClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier
             .padding(horizontal = 30.dp)
-            .padding(bottom = 15.dp),
-        onClick = { onClick(stop.stopId) },
+            .padding(bottom = 15.dp)
+            .combinedClickable(
+                onClick = { onClick(stop.stopId) },
+                onLongClick = { onLongClick() }
+            ),
         shape = RoundedCornerShape(15.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
@@ -181,6 +205,26 @@ private fun StopItem(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DeletePopup(
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    ModalBottomSheet(onDismissRequest = onDismiss) {
+        Column(modifier = Modifier.padding(bottom = 10.dp)) {
+            Row {
+                TextButton(onClick = onDismiss, modifier = Modifier.weight(1f)) {
+                    Text("취소")
+                }
+                TextButton(onClick = onConfirm, modifier = Modifier.weight(1f)) {
+                    Text("삭제")
+                }
+            }
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun SearchBarPreview() {
@@ -202,7 +246,9 @@ private fun FavoritesScreenPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun FavoritesStopListPreview() {
-    FavoritesStopList(stops = dummyData, onClickItem = {})
+    FavoritesStopList(
+        stops = dummyData, onClickItem = {}, onLongClickItem = {}
+    )
 }
 
 private val dummyData = listOf(
