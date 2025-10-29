@@ -39,11 +39,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.chaeny.busoda.model.BusStop
 import com.chaeny.busoda.ui.theme.Gray60
+import com.chaeny.busoda.ui.theme.MainGreen
 
 @Composable
 fun FavoritesScreen(
     navigateToStopList: () -> Unit,
-    navigateToStopDetail: (String) -> Unit = {}
+    navigateToStopDetail: (String) -> Unit
 ) {
     val viewModel: FavoritesViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
@@ -211,14 +212,17 @@ private fun DeletePopup(
     onDismiss: () -> Unit,
     onConfirm: () -> Unit
 ) {
-    ModalBottomSheet(onDismissRequest = onDismiss) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = MainGreen
+    ) {
         Column(modifier = Modifier.padding(bottom = 10.dp)) {
             Row {
                 TextButton(onClick = onDismiss, modifier = Modifier.weight(1f)) {
-                    Text("취소")
+                    Text(stringResource(R.string.cancel))
                 }
                 TextButton(onClick = onConfirm, modifier = Modifier.weight(1f)) {
-                    Text("삭제")
+                    Text(stringResource(R.string.delete))
                 }
             }
         }
@@ -240,7 +244,10 @@ private fun FavoritesGuidePreview() {
 @Preview(showBackground = true)
 @Composable
 private fun FavoritesScreenPreview() {
-    FavoritesScreen(navigateToStopList = {})
+    FavoritesScreen(
+        navigateToStopList = {},
+        navigateToStopDetail = {}
+    )
 }
 
 @Preview(showBackground = true)
