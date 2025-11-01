@@ -4,4 +4,5 @@
     <string name="guide">Add your favorites</string>
     <string name="cancel">Cancel</string>
     <string name="delete">Delete</string>
+    <string name="delete_confirmation">Delete %s bus stop?</string>
 </resources>

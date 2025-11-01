@@ -63,8 +63,9 @@ fun FavoritesScreen(
         }
     }
 
-    if (uiState.selectedStop != null) {
+    uiState.selectedStop?.let { stop ->
         DeletePopup(
+            stopName = stop.stopName,
             onDismiss = {
                 viewModel.handleIntent(FavoritesIntent.CancelDelete)
             },
@@ -213,6 +214,7 @@ private fun StopItem(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DeletePopup(
+    stopName: String,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit
 ) {
@@ -221,11 +223,22 @@ private fun DeletePopup(
         containerColor = MainGreen
     ) {
         Column(modifier = Modifier.padding(bottom = 10.dp)) {
+            Text(
+                text = stringResource(R.string.delete_confirmation, stopName),
+                modifier = Modifier
+                    .padding(horizontal = 25.dp, vertical = 15.dp)
+            )
             Row {
-                TextButton(onClick = onDismiss, modifier = Modifier.weight(1f)) {
+                TextButton(
+                    onClick = onDismiss,
+                    modifier = Modifier.weight(1f)
+                ) {
                     Text(stringResource(R.string.cancel))
                 }
-                TextButton(onClick = onConfirm, modifier = Modifier.weight(1f)) {
+                TextButton(
+                    onClick = onConfirm,
+                    modifier = Modifier.weight(1f)
+                ) {
                     Text(stringResource(R.string.delete))
                 }
             }
