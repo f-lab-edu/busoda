@@ -15,6 +15,9 @@ interface FavoriteStopDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFavorite(stop: FavoriteStop)
 
+    @Query("DELETE FROM favorite_stops WHERE stopId = :stopId")
+    suspend fun deleteFavorite(stopId: String)
+
     @Query("SELECT EXISTS(SELECT 1 FROM favorite_stops WHERE stopId = :stopId LIMIT 1)")
     fun isFavorite(stopId: String): Flow<Boolean>
 }
