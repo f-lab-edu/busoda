@@ -48,6 +48,14 @@ internal class FavoritesViewModel @Inject constructor(
             is FavoritesIntent.CancelDelete -> {
                 _uiState.value = _uiState.value.copy(selectedStop = null)
             }
+            is FavoritesIntent.ConfirmDelete -> {
+                _uiState.value.selectedStop?.let { stop ->
+                    viewModelScope.launch {
+                        favoriteRepository.deleteFavorite(stop.stopId)
+                        _uiState.value = _uiState.value.copy(selectedStop = null)
+                    }
+                }
+            }
         }
     }
 }
@@ -61,4 +69,5 @@ sealed class FavoritesIntent {
     data class ClickStop(val stopId: String) : FavoritesIntent()
     data class DeleteStop(val stop: BusStop) : FavoritesIntent()
     data object CancelDelete : FavoritesIntent()
+    data object ConfirmDelete : FavoritesIntent()
 }

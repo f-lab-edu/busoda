@@ -68,7 +68,9 @@ fun FavoritesScreen(
             onDismiss = {
                 viewModel.handleIntent(FavoritesIntent.CancelDelete)
             },
-            onConfirm = {}
+            onConfirm = {
+                viewModel.handleIntent(FavoritesIntent.ConfirmDelete)
+            }
         )
     }
 
