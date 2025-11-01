@@ -24,9 +24,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -48,7 +45,6 @@ fun FavoritesScreen(
 ) {
     val viewModel: FavoritesViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
-    var showBottomSheet by remember { mutableStateOf(false) }
 
     Column {
         SearchBar(navigateToStopList = navigateToStopList)
@@ -58,19 +54,19 @@ fun FavoritesScreen(
             FavoritesStopList(
                 stops = uiState.favorites,
                 onClickItem = { stopId ->
-                    viewModel.handleIntent(ClickFavoriteStopIntent(stopId))
+                    viewModel.handleIntent(FavoritesIntent.ClickFavoriteStop(stopId))
                 },
-                onLongClickItem = {
-                    showBottomSheet = true
+                onLongClickItem = { stop ->
+                    viewModel.handleIntent(FavoritesIntent.LongClickFavoriteStop(stop))
                 }
             )
         }
     }
 
-    if (showBottomSheet) {
+    if (uiState.selectedStop != null) {
         DeletePopup(
-            onDismiss = { showBottomSheet = false },
-            onConfirm = { showBottomSheet = false }
+            onDismiss = {},
+            onConfirm = {}
         )
     }
 
@@ -135,7 +131,7 @@ private fun FavoritesGuide(
 private fun FavoritesStopList(
     stops: List<BusStop>,
     onClickItem: (String) -> Unit,
-    onLongClickItem: () -> Unit,
+    onLongClickItem: (BusStop) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier
@@ -147,7 +143,11 @@ private fun FavoritesStopList(
                 items = stops,
                 key = { stop -> stop.stopId }
             ) { stop ->
-                StopItem(stop, onClickItem, onLongClickItem)
+                StopItem(
+                    stop = stop,
+                    onClick = onClickItem,
+                    onLongClick = { onLongClickItem(stop) }
+                )
             }
         }
     }

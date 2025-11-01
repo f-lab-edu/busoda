@@ -35,17 +35,26 @@ internal class FavoritesViewModel @Inject constructor(
         }
     }
 
-    fun handleIntent(intent: ClickFavoriteStopIntent) {
-        viewModelScope.launch {
-            _favoritesStopNavigationEvent.emit(intent.stopId)
+    fun handleIntent(intent: FavoritesIntent) {
+        when (intent) {
+            is FavoritesIntent.ClickFavoriteStop -> {
+                viewModelScope.launch {
+                    _favoritesStopNavigationEvent.emit(intent.stopId)
+                }
+            }
+            is FavoritesIntent.LongClickFavoriteStop -> {
+                _uiState.value = _uiState.value.copy(selectedStop = intent.stop)
+            }
         }
     }
 }
 
 data class FavoritesUiState(
-    val favorites: List<BusStop> = emptyList()
+    val favorites: List<BusStop> = emptyList(),
+    val selectedStop: BusStop? = null
 )
 
-data class ClickFavoriteStopIntent(
-    val stopId: String
-)
+sealed class FavoritesIntent {
+    data class ClickFavoriteStop(val stopId: String) : FavoritesIntent()
+    data class LongClickFavoriteStop(val stop: BusStop) : FavoritesIntent()
+}
