@@ -37,13 +37,16 @@ internal class FavoritesViewModel @Inject constructor(
 
     fun handleIntent(intent: FavoritesIntent) {
         when (intent) {
-            is FavoritesIntent.ClickFavoriteStop -> {
+            is FavoritesIntent.ClickStop -> {
                 viewModelScope.launch {
                     _favoritesStopNavigationEvent.emit(intent.stopId)
                 }
             }
-            is FavoritesIntent.LongClickFavoriteStop -> {
+            is FavoritesIntent.DeleteStop -> {
                 _uiState.value = _uiState.value.copy(selectedStop = intent.stop)
+            }
+            is FavoritesIntent.CancelDelete -> {
+                _uiState.value = _uiState.value.copy(selectedStop = null)
             }
         }
     }
@@ -55,6 +58,7 @@ data class FavoritesUiState(
 )
 
 sealed class FavoritesIntent {
-    data class ClickFavoriteStop(val stopId: String) : FavoritesIntent()
-    data class LongClickFavoriteStop(val stop: BusStop) : FavoritesIntent()
+    data class ClickStop(val stopId: String) : FavoritesIntent()
+    data class DeleteStop(val stop: BusStop) : FavoritesIntent()
+    data object CancelDelete : FavoritesIntent()
 }
