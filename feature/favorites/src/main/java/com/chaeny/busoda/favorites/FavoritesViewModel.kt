@@ -17,11 +17,11 @@ internal class FavoritesViewModel @Inject constructor(
     private val favoriteRepository: FavoriteRepository
 ) : ViewModel() {
 
-    private val _favoritesStopNavigationEvent = MutableSharedFlow<String>()
-    val favoritesStopNavigationEvent: SharedFlow<String> = _favoritesStopNavigationEvent
-
     private val _uiState = MutableStateFlow(FavoritesUiState())
     val uiState: StateFlow<FavoritesUiState> = _uiState
+
+    private val _effect = MutableSharedFlow<FavoritesEffect>()
+    val effect: SharedFlow<FavoritesEffect> = _effect
 
     init {
         collectFavorites()
@@ -42,7 +42,9 @@ internal class FavoritesViewModel @Inject constructor(
         when (intent) {
             is FavoritesIntent.NavigateToDetail -> {
                 viewModelScope.launch {
-                    _favoritesStopNavigationEvent.emit(intent.stopId)
+                    _effect.emit(
+                        FavoritesEffect.NavigateToStopDetail(intent.stopId)
+                    )
                 }
             }
             is FavoritesIntent.ConfirmDeleteFavorite -> {
@@ -79,4 +81,8 @@ sealed class FavoritesIntent {
     data class RequestDeleteFavorite(val stop: BusStop) : FavoritesIntent()
     data object CancelDeleteFavorite : FavoritesIntent()
     data object ConfirmDeleteFavorite : FavoritesIntent()
+}
+
+sealed class FavoritesEffect {
+    data class NavigateToStopDetail(val stopId: String) : FavoritesEffect()
 }

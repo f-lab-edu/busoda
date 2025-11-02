@@ -46,6 +46,8 @@ fun FavoritesScreen(
     val viewModel: FavoritesViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
 
+    CollectEffect(viewModel, navigateToStopDetail)
+
     Column {
         SearchBar(navigateToStopList = navigateToStopList)
         if (uiState.favorites.isEmpty()) {
@@ -74,18 +76,20 @@ fun FavoritesScreen(
             }
         )
     }
-
-    CollectFavoriteStopClickEvent(navigateToStopDetail, viewModel)
 }
 
 @Composable
-private fun CollectFavoriteStopClickEvent(
-    navigateToStopDetail: (String) -> Unit,
-    viewModel: FavoritesViewModel
+private fun CollectEffect(
+    viewModel: FavoritesViewModel,
+    navigateToStopDetail: (String) -> Unit
 ) {
     LaunchedEffect(Unit) {
-        viewModel.favoritesStopNavigationEvent.collect { stopId ->
-            navigateToStopDetail(stopId)
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is FavoritesEffect.NavigateToStopDetail -> {
+                    navigateToStopDetail(effect.stopId)
+                }
+            }
         }
     }
 }
