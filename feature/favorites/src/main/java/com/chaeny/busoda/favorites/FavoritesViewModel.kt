@@ -40,19 +40,19 @@ internal class FavoritesViewModel @Inject constructor(
         _uiState.value = reduce(currentState, intent)
 
         when (intent) {
-            is FavoritesIntent.ClickStop -> {
+            is FavoritesIntent.NavigateToDetail -> {
                 viewModelScope.launch {
                     _favoritesStopNavigationEvent.emit(intent.stopId)
                 }
             }
-            is FavoritesIntent.ConfirmDelete -> {
+            is FavoritesIntent.ConfirmDeleteFavorite -> {
                 currentState.selectedStop?.let { stop ->
                     viewModelScope.launch {
                         favoriteRepository.deleteFavorite(stop.stopId)
                     }
                 }
             }
-            is FavoritesIntent.DeleteStop, FavoritesIntent.CancelDelete -> {}
+            else -> {}
         }
     }
 
@@ -61,10 +61,10 @@ internal class FavoritesViewModel @Inject constructor(
         intent: FavoritesIntent
     ): FavoritesUiState {
         return when (intent) {
-            is FavoritesIntent.ClickStop -> currentState
-            is FavoritesIntent.DeleteStop -> currentState.copy(selectedStop = intent.stop)
-            is FavoritesIntent.CancelDelete -> currentState.copy(selectedStop = null)
-            is FavoritesIntent.ConfirmDelete -> currentState.copy(selectedStop = null)
+            is FavoritesIntent.NavigateToDetail -> currentState
+            is FavoritesIntent.RequestDeleteFavorite -> currentState.copy(selectedStop = intent.stop)
+            is FavoritesIntent.CancelDeleteFavorite -> currentState.copy(selectedStop = null)
+            is FavoritesIntent.ConfirmDeleteFavorite -> currentState.copy(selectedStop = null)
         }
     }
 }
@@ -75,8 +75,8 @@ data class FavoritesUiState(
 )
 
 sealed class FavoritesIntent {
-    data class ClickStop(val stopId: String) : FavoritesIntent()
-    data class DeleteStop(val stop: BusStop) : FavoritesIntent()
-    data object CancelDelete : FavoritesIntent()
-    data object ConfirmDelete : FavoritesIntent()
+    data class NavigateToDetail(val stopId: String) : FavoritesIntent()
+    data class RequestDeleteFavorite(val stop: BusStop) : FavoritesIntent()
+    data object CancelDeleteFavorite : FavoritesIntent()
+    data object ConfirmDeleteFavorite : FavoritesIntent()
 }

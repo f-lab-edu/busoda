@@ -54,10 +54,10 @@ fun FavoritesScreen(
             FavoritesStopList(
                 stops = uiState.favorites,
                 onClickItem = { stopId ->
-                    viewModel.handleIntent(FavoritesIntent.ClickStop(stopId))
+                    viewModel.handleIntent(FavoritesIntent.NavigateToDetail(stopId))
                 },
                 onLongClickItem = { stop ->
-                    viewModel.handleIntent(FavoritesIntent.DeleteStop(stop))
+                    viewModel.handleIntent(FavoritesIntent.RequestDeleteFavorite(stop))
                 }
             )
         }
@@ -67,10 +67,10 @@ fun FavoritesScreen(
         DeletePopup(
             stopName = stop.stopName,
             onDismiss = {
-                viewModel.handleIntent(FavoritesIntent.CancelDelete)
+                viewModel.handleIntent(FavoritesIntent.CancelDeleteFavorite)
             },
             onConfirm = {
-                viewModel.handleIntent(FavoritesIntent.ConfirmDelete)
+                viewModel.handleIntent(FavoritesIntent.ConfirmDeleteFavorite)
             }
         )
     }
