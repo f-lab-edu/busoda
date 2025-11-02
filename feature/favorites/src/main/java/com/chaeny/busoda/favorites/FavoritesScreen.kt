@@ -1,5 +1,6 @@
 package com.chaeny.busoda.favorites
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
@@ -27,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -83,11 +85,18 @@ private fun CollectEffect(
     viewModel: FavoritesViewModel,
     navigateToStopDetail: (String) -> Unit
 ) {
+    val context = LocalContext.current
+
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
                 is FavoritesEffect.NavigateToStopDetail -> {
                     navigateToStopDetail(effect.stopId)
+                }
+                is FavoritesEffect.ShowDeleteSuccess -> {
+                    Toast.makeText(
+                        context, context.getString(R.string.delete_success), Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }

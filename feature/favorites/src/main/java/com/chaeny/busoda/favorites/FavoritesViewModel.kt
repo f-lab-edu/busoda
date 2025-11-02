@@ -51,6 +51,7 @@ internal class FavoritesViewModel @Inject constructor(
                 currentState.selectedStop?.let { stop ->
                     viewModelScope.launch {
                         favoriteRepository.deleteFavorite(stop.stopId)
+                        _effect.emit(FavoritesEffect.ShowDeleteSuccess)
                     }
                 }
             }
@@ -85,4 +86,5 @@ sealed class FavoritesIntent {
 
 sealed class FavoritesEffect {
     data class NavigateToStopDetail(val stopId: String) : FavoritesEffect()
+    data object ShowDeleteSuccess : FavoritesEffect()
 }

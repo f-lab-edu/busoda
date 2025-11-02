@@ -5,4 +5,5 @@
     <string name="cancel">Cancel</string>
     <string name="delete">Delete</string>
     <string name="delete_confirmation">Delete %s bus stop?</string>
+    <string name="delete_success">Removed from favorites</string>
 </resources>
