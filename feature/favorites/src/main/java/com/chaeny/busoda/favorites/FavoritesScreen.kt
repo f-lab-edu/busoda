@@ -67,7 +67,7 @@ fun FavoritesScreen(
         }
     }
 
-    uiState.selectedStop?.let { stop ->
+    uiState.deletePopup?.let { stop ->
         DeletePopup(
             stopName = stop.stopName,
             onDismiss = {
