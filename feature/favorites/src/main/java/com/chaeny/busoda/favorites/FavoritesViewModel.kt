@@ -36,38 +36,27 @@ internal class FavoritesViewModel @Inject constructor(
     }
 
     fun handleIntent(intent: FavoritesIntent) {
-        val currentState = _uiState.value
-        _uiState.value = reduce(currentState, intent)
-
         when (intent) {
             is FavoritesIntent.NavigateToDetail -> {
                 viewModelScope.launch {
-                    _effect.emit(
-                        FavoritesEffect.NavigateToStopDetail(intent.stopId)
-                    )
+                    _effect.emit(FavoritesEffect.NavigateToStopDetail(intent.stopId))
                 }
             }
+            is FavoritesIntent.RequestDeleteFavorite -> {
+                _uiState.value = _uiState.value.copy(selectedStop = intent.stop)
+            }
+            is FavoritesIntent.CancelDeleteFavorite -> {
+                _uiState.value = _uiState.value.copy(selectedStop = null)
+            }
             is FavoritesIntent.ConfirmDeleteFavorite -> {
-                currentState.selectedStop?.let { stop ->
+                _uiState.value.selectedStop?.let { stop ->
                     viewModelScope.launch {
                         favoriteRepository.deleteFavorite(stop.stopId)
+                        _uiState.value = _uiState.value.copy(selectedStop = null)
                         _effect.emit(FavoritesEffect.ShowDeleteSuccess)
                     }
                 }
             }
-            else -> {}
-        }
-    }
-
-    private fun reduce(
-        currentState: FavoritesUiState,
-        intent: FavoritesIntent
-    ): FavoritesUiState {
-        return when (intent) {
-            is FavoritesIntent.NavigateToDetail -> currentState
-            is FavoritesIntent.RequestDeleteFavorite -> currentState.copy(selectedStop = intent.stop)
-            is FavoritesIntent.CancelDeleteFavorite -> currentState.copy(selectedStop = null)
-            is FavoritesIntent.ConfirmDeleteFavorite -> currentState.copy(selectedStop = null)
         }
     }
 }
