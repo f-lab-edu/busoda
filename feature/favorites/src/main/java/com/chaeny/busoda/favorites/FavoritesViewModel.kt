@@ -43,16 +43,17 @@ internal class FavoritesViewModel @Inject constructor(
                 }
             }
             is FavoritesIntent.RequestDeleteFavorite -> {
-                _uiState.value = _uiState.value.copy(deletePopup = intent.stop)
+                _uiState.value = _uiState.value.copy(popup = Popup.Delete(intent.stop))
             }
             is FavoritesIntent.CancelDeleteFavorite -> {
-                _uiState.value = _uiState.value.copy(deletePopup = null)
+                _uiState.value = _uiState.value.copy(popup = null)
             }
             is FavoritesIntent.ConfirmDeleteFavorite -> {
-                _uiState.value.deletePopup?.let { stop ->
+                val popup = _uiState.value.popup
+                if (popup is Popup.Delete) {
                     viewModelScope.launch {
-                        favoriteRepository.deleteFavorite(stop.stopId)
-                        _uiState.value = _uiState.value.copy(deletePopup = null)
+                        favoriteRepository.deleteFavorite(popup.stop.stopId)
+                        _uiState.value = _uiState.value.copy(popup = null)
                         _effect.emit(FavoritesEffect.ShowDeleteSuccess)
                     }
                 }
@@ -63,8 +64,12 @@ internal class FavoritesViewModel @Inject constructor(
 
 data class FavoritesUiState(
     val favorites: List<BusStop> = emptyList(),
-    val deletePopup: BusStop? = null
+    val popup: Popup? = null
 )
+
+sealed class Popup {
+    data class Delete(val stop: BusStop) : Popup()
+}
 
 sealed class FavoritesIntent {
     data class NavigateToDetail(val stopId: String) : FavoritesIntent()
