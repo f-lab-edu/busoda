@@ -4,6 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chaeny.busoda.data.repository.FavoriteRepository
 import com.chaeny.busoda.model.BusStop
+import com.chaeny.busoda.mvi.SideEffect
+import com.chaeny.busoda.mvi.UiIntent
+import com.chaeny.busoda.mvi.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -62,23 +65,23 @@ internal class FavoritesViewModel @Inject constructor(
     }
 }
 
-data class FavoritesUiState(
-    val favorites: List<BusStop> = emptyList(),
-    val popup: Popup? = null
-)
-
 sealed class Popup {
     data class Delete(val stop: BusStop) : Popup()
 }
 
-sealed class FavoritesIntent {
+data class FavoritesUiState(
+    val favorites: List<BusStop> = emptyList(),
+    val popup: Popup? = null
+) : UiState
+
+sealed class FavoritesIntent : UiIntent {
     data class NavigateToDetail(val stopId: String) : FavoritesIntent()
     data class RequestDeleteFavorite(val stop: BusStop) : FavoritesIntent()
     data object CancelDeleteFavorite : FavoritesIntent()
     data object ConfirmDeleteFavorite : FavoritesIntent()
 }
 
-sealed class FavoritesEffect {
+sealed class FavoritesEffect : SideEffect {
     data class NavigateToStopDetail(val stopId: String) : FavoritesEffect()
     data object ShowDeleteSuccess : FavoritesEffect()
 }
