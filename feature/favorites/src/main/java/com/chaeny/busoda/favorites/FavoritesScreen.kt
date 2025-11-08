@@ -28,6 +28,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -188,6 +189,7 @@ private fun StopItem(
         modifier = modifier
             .padding(horizontal = 30.dp)
             .padding(bottom = 15.dp)
+            .clip(RoundedCornerShape(15.dp))
             .combinedClickable(
                 onClick = { onClick(stop.stopId) },
                 onLongClick = { onLongClick() }
