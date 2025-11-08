@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="stop_search">Search for bus stop</string>
+    <string name="guide">Add your favorites</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="delete_confirmation">Delete %s bus stop?</string>
+    <string name="delete_success">Removed from favorites</string>
+</resources>

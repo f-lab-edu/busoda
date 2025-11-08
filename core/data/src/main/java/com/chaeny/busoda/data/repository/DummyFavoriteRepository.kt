@@ -25,4 +25,8 @@ class DummyFavoriteRepository @Inject constructor() : FavoriteRepository {
     override suspend fun addFavorite(stop: BusStop) {
         dummyData.add(stop)
     }
+
+    override suspend fun deleteFavorite(stopId: String) {
+        dummyData.removeIf { it.stopId == stopId }
+    }
 }

@@ -1,34 +1,77 @@
 package com.chaeny.busoda.favorites
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chaeny.busoda.data.repository.FavoriteRepository
 import com.chaeny.busoda.model.BusStop
+import com.chaeny.busoda.mvi.BaseViewModel
+import com.chaeny.busoda.mvi.SideEffect
+import com.chaeny.busoda.mvi.UiIntent
+import com.chaeny.busoda.mvi.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 internal class FavoritesViewModel @Inject constructor(
-    favoriteRepository: FavoriteRepository
-) : ViewModel() {
+    private val favoriteRepository: FavoriteRepository
+) : BaseViewModel<FavoritesIntent, FavoritesUiState, FavoritesEffect>(
+    initialState = FavoritesUiState()
+) {
 
-    private val _favoritesStopNavigationEvent = MutableSharedFlow<String>()
-    val favoritesStopNavigationEvent: SharedFlow<String> = _favoritesStopNavigationEvent
-    val favorites: StateFlow<List<BusStop>> = favoriteRepository.getFavorites().stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = emptyList()
-    )
+    init {
+        collectFavorites()
+    }
 
-    fun handleFavoriteStopClick(stopId: String) {
+    private fun collectFavorites() {
         viewModelScope.launch {
-            _favoritesStopNavigationEvent.emit(stopId)
+            favoriteRepository.getFavorites().collect { favorites ->
+                setState { copy(favorites = favorites) }
+            }
         }
     }
+
+    override fun onIntent(intent: FavoritesIntent) {
+        when (intent) {
+            is FavoritesIntent.NavigateToDetail -> {
+                postSideEffect(FavoritesEffect.NavigateToStopDetail(intent.stopId))
+            }
+            is FavoritesIntent.RequestDeleteFavorite -> {
+                setState { copy(popup = Popup.Delete(intent.stop)) }
+            }
+            is FavoritesIntent.CancelDeleteFavorite -> {
+                setState { copy(popup = null) }
+            }
+            is FavoritesIntent.ConfirmDeleteFavorite -> {
+                val popup = currentState.popup
+                if (popup is Popup.Delete) {
+                    viewModelScope.launch {
+                        favoriteRepository.deleteFavorite(popup.stop.stopId)
+                        setState { copy(popup = null) }
+                        postSideEffect(FavoritesEffect.ShowDeleteSuccess)
+                    }
+                }
+            }
+        }
+    }
+}
+
+sealed class Popup {
+    data class Delete(val stop: BusStop) : Popup()
+}
+
+data class FavoritesUiState(
+    val favorites: List<BusStop> = emptyList(),
+    val popup: Popup? = null
+) : UiState
+
+sealed class FavoritesIntent : UiIntent {
+    data class NavigateToDetail(val stopId: String) : FavoritesIntent()
+    data class RequestDeleteFavorite(val stop: BusStop) : FavoritesIntent()
+    data object CancelDeleteFavorite : FavoritesIntent()
+    data object ConfirmDeleteFavorite : FavoritesIntent()
+}
+
+sealed class FavoritesEffect : SideEffect {
+    data class NavigateToStopDetail(val stopId: String) : FavoritesEffect()
+    data object ShowDeleteSuccess : FavoritesEffect()
 }
