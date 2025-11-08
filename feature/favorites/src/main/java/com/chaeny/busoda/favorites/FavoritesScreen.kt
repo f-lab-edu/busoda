@@ -63,10 +63,10 @@ fun FavoritesScreen(
             FavoritesStopList(
                 stops = uiState.favorites,
                 onClickItem = { stopId ->
-                    viewModel.handleIntent(FavoritesIntent.NavigateToDetail(stopId))
+                    viewModel.onIntent(FavoritesIntent.NavigateToDetail(stopId))
                 },
                 onLongClickItem = { stop ->
-                    viewModel.handleIntent(FavoritesIntent.RequestDeleteFavorite(stop))
+                    viewModel.onIntent(FavoritesIntent.RequestDeleteFavorite(stop))
                 }
             )
         }
@@ -77,10 +77,10 @@ fun FavoritesScreen(
         DeletePopup(
             stopName = popup.stop.stopName,
             onDismiss = {
-                viewModel.handleIntent(FavoritesIntent.CancelDeleteFavorite)
+                viewModel.onIntent(FavoritesIntent.CancelDeleteFavorite)
             },
             onConfirm = {
-                viewModel.handleIntent(FavoritesIntent.ConfirmDeleteFavorite)
+                viewModel.onIntent(FavoritesIntent.ConfirmDeleteFavorite)
             }
         )
     }
@@ -94,7 +94,7 @@ private fun CollectEffect(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.effect.collect { effect ->
+        viewModel.sideEffect.collect { effect ->
             when (effect) {
                 is FavoritesEffect.NavigateToStopDetail -> {
                     navigateToStopDetail(effect.stopId)

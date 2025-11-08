@@ -1,30 +1,22 @@
 package com.chaeny.busoda.favorites
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chaeny.busoda.data.repository.FavoriteRepository
 import com.chaeny.busoda.model.BusStop
+import com.chaeny.busoda.mvi.BaseViewModel
 import com.chaeny.busoda.mvi.SideEffect
 import com.chaeny.busoda.mvi.UiIntent
 import com.chaeny.busoda.mvi.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 internal class FavoritesViewModel @Inject constructor(
     private val favoriteRepository: FavoriteRepository
-) : ViewModel() {
-
-    private val _uiState = MutableStateFlow(FavoritesUiState())
-    val uiState: StateFlow<FavoritesUiState> = _uiState
-
-    private val _effect = MutableSharedFlow<FavoritesEffect>()
-    val effect: SharedFlow<FavoritesEffect> = _effect
+) : BaseViewModel<FavoritesIntent, FavoritesUiState, FavoritesEffect>(
+    initialState = FavoritesUiState()
+) {
 
     init {
         collectFavorites()
@@ -33,31 +25,29 @@ internal class FavoritesViewModel @Inject constructor(
     private fun collectFavorites() {
         viewModelScope.launch {
             favoriteRepository.getFavorites().collect { favorites ->
-                _uiState.value = _uiState.value.copy(favorites = favorites)
+                setState { copy(favorites = favorites) }
             }
         }
     }
 
-    fun handleIntent(intent: FavoritesIntent) {
+    override fun onIntent(intent: FavoritesIntent) {
         when (intent) {
             is FavoritesIntent.NavigateToDetail -> {
-                viewModelScope.launch {
-                    _effect.emit(FavoritesEffect.NavigateToStopDetail(intent.stopId))
-                }
+                postSideEffect(FavoritesEffect.NavigateToStopDetail(intent.stopId))
             }
             is FavoritesIntent.RequestDeleteFavorite -> {
-                _uiState.value = _uiState.value.copy(popup = Popup.Delete(intent.stop))
+                setState { copy(popup = Popup.Delete(intent.stop)) }
             }
             is FavoritesIntent.CancelDeleteFavorite -> {
-                _uiState.value = _uiState.value.copy(popup = null)
+                setState { copy(popup = null) }
             }
             is FavoritesIntent.ConfirmDeleteFavorite -> {
-                val popup = _uiState.value.popup
+                val popup = currentState.popup
                 if (popup is Popup.Delete) {
                     viewModelScope.launch {
                         favoriteRepository.deleteFavorite(popup.stop.stopId)
-                        _uiState.value = _uiState.value.copy(popup = null)
-                        _effect.emit(FavoritesEffect.ShowDeleteSuccess)
+                        setState { copy(popup = null) }
+                        postSideEffect(FavoritesEffect.ShowDeleteSuccess)
                     }
                 }
             }

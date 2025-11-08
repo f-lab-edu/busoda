@@ -24,7 +24,7 @@ abstract class BaseViewModel<UI_INTENT : UiIntent, UI_STATE : UiState, SIDE_EFFE
 
     abstract fun onIntent(intent: UI_INTENT)
 
-    protected fun intent(reduce: UI_STATE.() -> UI_STATE) {
+    protected fun setState(reduce: UI_STATE.() -> UI_STATE) {
         _uiState.update { currentState.reduce() }
     }
 
