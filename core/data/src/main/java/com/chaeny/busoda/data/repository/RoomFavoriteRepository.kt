@@ -15,6 +15,10 @@ class RoomFavoriteRepository @Inject constructor(
         favoriteStopDao.insertFavorite(stop.toFavoriteStop())
     }
 
+    override suspend fun deleteFavorite(stopId: String) {
+        favoriteStopDao.deleteFavorite(stopId)
+    }
+
     override fun getFavorites(): Flow<List<BusStop>> {
         return favoriteStopDao.getFavorites().map { entities ->
             entities.map { entity -> entity.toBusStop() }

@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface FavoriteRepository {
     suspend fun addFavorite(stop: BusStop)
+    suspend fun deleteFavorite(stopId: String)
     fun getFavorites(): Flow<List<BusStop>>
     fun isFavorite(stopId: String): Flow<Boolean>
 }

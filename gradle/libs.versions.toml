@@ -46,6 +46,7 @@ tikxml-core = { group = "com.tickaroo.tikxml", name = "core", version.ref = "tik
 tikxml-retrofit = { group = "com.tickaroo.tikxml", name = "retrofit-converter", version.ref = "tikxml" }
 tikxml-processor = { group = "com.tickaroo.tikxml", name = "processor", version.ref = "tikxml" }
 androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycle" }
+androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }

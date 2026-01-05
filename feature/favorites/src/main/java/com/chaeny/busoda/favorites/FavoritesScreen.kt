@@ -1,19 +1,25 @@
 package com.chaeny.busoda.favorites
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -22,7 +28,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -32,34 +40,72 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.chaeny.busoda.model.BusStop
 import com.chaeny.busoda.ui.theme.Gray60
+import com.chaeny.busoda.ui.theme.MainGreen
 
 @Composable
 fun FavoritesScreen(
     navigateToStopList: () -> Unit,
-    navigateToStopDetail: (String) -> Unit = {}
+    navigateToStopDetail: (String) -> Unit
 ) {
     val viewModel: FavoritesViewModel = hiltViewModel()
-    val favorites by viewModel.favorites.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
 
-    Column {
+    CollectEffect(viewModel, navigateToStopDetail)
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .systemBarsPadding()
+    ) {
         SearchBar(navigateToStopList = navigateToStopList)
-        //FavoritesGuide()
-        FavoritesStopList(
-            stops = favorites,
-            onClickItem = viewModel::handleFavoriteStopClick
+        if (uiState.favorites.isEmpty()) {
+            FavoritesGuide()
+        } else {
+            FavoritesStopList(
+                stops = uiState.favorites,
+                onClickItem = { stopId ->
+                    viewModel.onIntent(FavoritesIntent.NavigateToDetail(stopId))
+                },
+                onLongClickItem = { stop ->
+                    viewModel.onIntent(FavoritesIntent.RequestDeleteFavorite(stop))
+                }
+            )
+        }
+    }
+
+    val popup = uiState.popup
+    if (popup is Popup.Delete) {
+        DeletePopup(
+            stopName = popup.stop.stopName,
+            onDismiss = {
+                viewModel.onIntent(FavoritesIntent.CancelDeleteFavorite)
+            },
+            onConfirm = {
+                viewModel.onIntent(FavoritesIntent.ConfirmDeleteFavorite)
+            }
         )
     }
-    CollectFavoriteStopClickEvent(navigateToStopDetail, viewModel)
 }
 
 @Composable
-private fun CollectFavoriteStopClickEvent(
-    navigateToStopDetail: (String) -> Unit,
-    viewModel: FavoritesViewModel
+private fun CollectEffect(
+    viewModel: FavoritesViewModel,
+    navigateToStopDetail: (String) -> Unit
 ) {
+    val context = LocalContext.current
+
     LaunchedEffect(Unit) {
-        viewModel.favoritesStopNavigationEvent.collect { stopId ->
-            navigateToStopDetail(stopId)
+        viewModel.sideEffect.collect { effect ->
+            when (effect) {
+                is FavoritesEffect.NavigateToStopDetail -> {
+                    navigateToStopDetail(effect.stopId)
+                }
+                is FavoritesEffect.ShowDeleteSuccess -> {
+                    Toast.makeText(
+                        context, context.getString(R.string.delete_success), Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
         }
     }
 }
@@ -100,6 +146,7 @@ private fun FavoritesGuide(
     ) {
         Text(
             text = stringResource(R.string.guide),
+            color = Color.Gray,
             style = MaterialTheme.typography.bodyLarge
         )
     }
@@ -109,6 +156,7 @@ private fun FavoritesGuide(
 private fun FavoritesStopList(
     stops: List<BusStop>,
     onClickItem: (String) -> Unit,
+    onLongClickItem: (BusStop) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier
@@ -120,7 +168,11 @@ private fun FavoritesStopList(
                 items = stops,
                 key = { stop -> stop.stopId }
             ) { stop ->
-                StopItem(stop, onClickItem)
+                StopItem(
+                    stop = stop,
+                    onClick = onClickItem,
+                    onLongClick = { onLongClickItem(stop) }
+                )
             }
         }
     }
@@ -130,13 +182,18 @@ private fun FavoritesStopList(
 private fun StopItem(
     stop: BusStop,
     onClick: (String) -> Unit,
+    onLongClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier
             .padding(horizontal = 30.dp)
-            .padding(bottom = 15.dp),
-        onClick = { onClick(stop.stopId) },
+            .padding(bottom = 15.dp)
+            .clip(RoundedCornerShape(15.dp))
+            .combinedClickable(
+                onClick = { onClick(stop.stopId) },
+                onLongClick = { onLongClick() }
+            ),
         shape = RoundedCornerShape(15.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
@@ -175,6 +232,41 @@ private fun StopItem(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DeletePopup(
+    stopName: String,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = MainGreen
+    ) {
+        Column(modifier = Modifier.padding(bottom = 10.dp)) {
+            Text(
+                text = stringResource(R.string.delete_confirmation, stopName),
+                modifier = Modifier
+                    .padding(horizontal = 25.dp, vertical = 15.dp)
+            )
+            Row {
+                TextButton(
+                    onClick = onDismiss,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(stringResource(R.string.cancel))
+                }
+                TextButton(
+                    onClick = onConfirm,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(stringResource(R.string.delete))
+                }
+            }
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun SearchBarPreview() {
@@ -190,13 +282,18 @@ private fun FavoritesGuidePreview() {
 @Preview(showBackground = true)
 @Composable
 private fun FavoritesScreenPreview() {
-    FavoritesScreen(navigateToStopList = {})
+    FavoritesScreen(
+        navigateToStopList = {},
+        navigateToStopDetail = {}
+    )
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun FavoritesStopListPreview() {
-    FavoritesStopList(stops = dummyData, onClickItem = {})
+    FavoritesStopList(
+        stops = dummyData, onClickItem = {}, onLongClickItem = {}
+    )
 }
 
 private val dummyData = listOf(
