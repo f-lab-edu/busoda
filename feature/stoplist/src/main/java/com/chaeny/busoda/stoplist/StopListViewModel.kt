@@ -31,12 +31,12 @@ internal class StopListViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _isLoading = MutableStateFlow(false)
+    private val _uiState = MutableStateFlow(StopListUiState())
     private val _searchEvent = MutableSharedFlow<SearchEvent>()
     private val _busStopClicked = MutableSharedFlow<String>()
     private val keyWord: MutableStateFlow<String> =
         MutableStateFlow(savedStateHandle.get(KEYWORD_SAVED_STATE_KEY) ?: EMPTY_KEYWORD)
-    val isLoading: StateFlow<Boolean> = _isLoading
+    val uiState: StateFlow<StopListUiState> = _uiState
     val searchEvent : SharedFlow<SearchEvent> = _searchEvent
     val busStopClicked: SharedFlow<String> = _busStopClicked
 
@@ -64,7 +64,7 @@ internal class StopListViewModel @Inject constructor(
     }
 
     private suspend fun loadBusStops(stopName: String): List<BusStop> {
-        _isLoading.value = true
+        _uiState.value = _uiState.value.copy(isLoading = true)
         val result = busStopRepository.getBusStops(stopName)
         val updatedStops = when (result) {
             is GetBusStopResult.Success -> getUpdatedStops(result.data)
@@ -81,7 +81,7 @@ internal class StopListViewModel @Inject constructor(
                 emptyList()
             }
         }
-        _isLoading.value = false
+        _uiState.value = _uiState.value.copy(isLoading = false)
         return updatedStops
     }
 
@@ -117,3 +117,7 @@ internal class StopListViewModel @Inject constructor(
         private const val KEYWORD_SAVED_STATE_KEY = "KEYWORD_SAVED_STATE_KEY"
     }
 }
+
+data class StopListUiState(
+    val isLoading: Boolean = false
+)
