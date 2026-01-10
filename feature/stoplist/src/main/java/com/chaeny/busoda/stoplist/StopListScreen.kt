@@ -58,13 +58,12 @@ fun StopListScreen(
     navigateBack: () -> Unit
 ) {
     val viewModel: StopListViewModel = hiltViewModel()
-    val stops by viewModel.busStops.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
 
     CollectStopSpecificEvent(viewModel)
     CollectStopClickEvent(navigateToStopDetail, viewModel)
     StopListContent(
-        stops = stops,
+        stops = uiState.busStops,
         isLoading = uiState.isLoading,
         onKeywordChange = viewModel::setKeyWord,
         onStopClick = viewModel::handleBusStopClick,

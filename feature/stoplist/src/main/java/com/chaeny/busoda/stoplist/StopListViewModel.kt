@@ -41,7 +41,7 @@ internal class StopListViewModel @Inject constructor(
     val busStopClicked: SharedFlow<String> = _busStopClicked
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    val busStops: StateFlow<List<BusStop>> = keyWord
+    private val busStops: StateFlow<List<BusStop>> = keyWord
         .debounce(1000)
         .mapLatest { word ->
             when {
@@ -56,9 +56,22 @@ internal class StopListViewModel @Inject constructor(
         )
 
     init {
+        collectKeyWord()
+        collectBusStops()
+    }
+
+    private fun collectKeyWord() {
         viewModelScope.launch {
             keyWord.collect { newKeyWord ->
                 savedStateHandle.set(KEYWORD_SAVED_STATE_KEY, newKeyWord)
+            }
+        }
+    }
+
+    private fun collectBusStops() {
+        viewModelScope.launch {
+            busStops.collect { stops ->
+                _uiState.value = _uiState.value.copy(busStops = stops)
             }
         }
     }
@@ -119,5 +132,6 @@ internal class StopListViewModel @Inject constructor(
 }
 
 data class StopListUiState(
+    val busStops: List<BusStop> = emptyList(),
     val isLoading: Boolean = false
 )
