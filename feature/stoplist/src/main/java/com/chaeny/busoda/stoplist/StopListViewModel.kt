@@ -32,12 +32,10 @@ internal class StopListViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(StopListUiState())
-    private val _searchEvent = MutableSharedFlow<SearchEvent>()
     private val _effect = MutableSharedFlow<StopListEffect>()
     private val keyWord: MutableStateFlow<String> =
         MutableStateFlow(savedStateHandle.get(KEYWORD_SAVED_STATE_KEY) ?: EMPTY_KEYWORD)
     val uiState: StateFlow<StopListUiState> = _uiState
-    val searchEvent : SharedFlow<SearchEvent> = _searchEvent
     val effect: SharedFlow<StopListEffect> = _effect
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
@@ -82,15 +80,15 @@ internal class StopListViewModel @Inject constructor(
         val updatedStops = when (result) {
             is GetBusStopResult.Success -> getUpdatedStops(result.data)
             is GetBusStopResult.NoResult -> {
-                _searchEvent.emit(SearchEvent.NoResult)
+                _effect.emit(StopListEffect.ShowNoResult)
                 emptyList()
             }
             is GetBusStopResult.NoInternet -> {
-                _searchEvent.emit(SearchEvent.NoInternet)
+                _effect.emit(StopListEffect.ShowNoInternet)
                 emptyList()
             }
             is GetBusStopResult.NetworkError -> {
-                _searchEvent.emit(SearchEvent.NetworkError)
+                _effect.emit(StopListEffect.ShowNetworkError)
                 emptyList()
             }
         }
@@ -110,7 +108,7 @@ internal class StopListViewModel @Inject constructor(
 
     private fun handleShortKeyword(): List<BusStop> {
         viewModelScope.launch {
-            _searchEvent.emit(SearchEvent.ShortKeyword)
+            _effect.emit(StopListEffect.ShowShortKeyword)
         }
         return emptyList()
     }
@@ -146,4 +144,8 @@ sealed class StopListIntent {
 
 sealed class StopListEffect {
     data class NavigateToStopDetail(val stopId: String) : StopListEffect()
+    data object ShowNoResult : StopListEffect()
+    data object ShowNoInternet : StopListEffect()
+    data object ShowNetworkError : StopListEffect()
+    data object ShowShortKeyword : StopListEffect()
 }

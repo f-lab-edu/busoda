@@ -1,5 +1,6 @@
 package com.chaeny.busoda.stoplist
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -60,8 +61,7 @@ fun StopListScreen(
     val viewModel: StopListViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
 
-    CollectStopSpecificEvent(viewModel)
-    CollectStopClickEvent(navigateToStopDetail, viewModel)
+    CollectEffects(navigateToStopDetail, viewModel)
     StopListContent(
         stops = uiState.busStops,
         isLoading = uiState.isLoading,
@@ -72,34 +72,21 @@ fun StopListScreen(
 }
 
 @Composable
-private fun CollectStopClickEvent(
+private fun CollectEffects(
     navigateToStopDetail: (String) -> Unit,
     viewModel: StopListViewModel
 ) {
-    LaunchedEffect(Unit) {
-        viewModel.effect.collect { effect ->
-            when (effect) {
-                is StopListEffect.NavigateToStopDetail -> {
-                    navigateToStopDetail(effect.stopId)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun CollectStopSpecificEvent(viewModel: StopListViewModel) {
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.searchEvent.collect { event ->
-            val messageResId = when (event) {
-                SearchEvent.NoResult -> R.string.no_result
-                SearchEvent.NoInternet -> R.string.no_internet
-                SearchEvent.NetworkError -> R.string.network_error
-                SearchEvent.ShortKeyword -> R.string.short_keyword
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is StopListEffect.NavigateToStopDetail -> navigateToStopDetail(effect.stopId)
+                is StopListEffect.ShowNoResult -> showToast(context, R.string.no_result)
+                is StopListEffect.ShowNoInternet -> showToast(context, R.string.no_internet)
+                is StopListEffect.ShowNetworkError -> showToast(context, R.string.network_error)
+                is StopListEffect.ShowShortKeyword -> showToast(context, R.string.short_keyword)
             }
-            Toast.makeText(context, context.getString(messageResId), Toast.LENGTH_SHORT).show()
         }
     }
 }
@@ -308,3 +295,7 @@ private val dummyData = listOf(
     BusStop("16146", "화곡본동시장", "한국폴리텍1.서울강서대학교"),
     BusStop("16146", "화곡본동시장", "한국폴리텍1.서울강서대학교")
 )
+
+private fun showToast(context: Context, messageResId: Int) {
+    Toast.makeText(context, context.getString(messageResId), Toast.LENGTH_SHORT).show()
+}
