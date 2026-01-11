@@ -77,8 +77,12 @@ private fun CollectStopClickEvent(
     viewModel: StopListViewModel
 ) {
     LaunchedEffect(Unit) {
-        viewModel.busStopClicked.collect { stopId ->
-            navigateToStopDetail(stopId)
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is StopListEffect.NavigateToStopDetail -> {
+                    navigateToStopDetail(effect.stopId)
+                }
+            }
         }
     }
 }

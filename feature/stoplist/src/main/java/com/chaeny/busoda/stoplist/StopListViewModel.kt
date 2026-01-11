@@ -33,12 +33,12 @@ internal class StopListViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(StopListUiState())
     private val _searchEvent = MutableSharedFlow<SearchEvent>()
-    private val _busStopClicked = MutableSharedFlow<String>()
+    private val _effect = MutableSharedFlow<StopListEffect>()
     private val keyWord: MutableStateFlow<String> =
         MutableStateFlow(savedStateHandle.get(KEYWORD_SAVED_STATE_KEY) ?: EMPTY_KEYWORD)
     val uiState: StateFlow<StopListUiState> = _uiState
     val searchEvent : SharedFlow<SearchEvent> = _searchEvent
-    val busStopClicked: SharedFlow<String> = _busStopClicked
+    val effect: SharedFlow<StopListEffect> = _effect
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     private val busStops: StateFlow<List<BusStop>> = keyWord
@@ -122,7 +122,7 @@ internal class StopListViewModel @Inject constructor(
             }
             is StopListIntent.ClickBusStop -> {
                 viewModelScope.launch {
-                    _busStopClicked.emit(intent.stopId)
+                    _effect.emit(StopListEffect.NavigateToStopDetail(intent.stopId))
                 }
             }
         }
@@ -142,4 +142,8 @@ data class StopListUiState(
 sealed class StopListIntent {
     data class SetKeyWord(val word: String) : StopListIntent()
     data class ClickBusStop(val stopId: String) : StopListIntent()
+}
+
+sealed class StopListEffect {
+    data class NavigateToStopDetail(val stopId: String) : StopListEffect()
 }
