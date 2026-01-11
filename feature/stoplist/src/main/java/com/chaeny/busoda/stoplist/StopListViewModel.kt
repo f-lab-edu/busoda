@@ -121,8 +121,12 @@ internal class StopListViewModel @Inject constructor(
         }
     }
 
-    fun setKeyWord(word: String) {
-        keyWord.value = word.replace(" ", "")
+    fun handleIntent(intent: StopListIntent) {
+        when (intent) {
+            is StopListIntent.SetKeyWord -> {
+                keyWord.value = intent.word.replace(" ", "")
+            }
+        }
     }
 
     companion object {
@@ -135,3 +139,7 @@ data class StopListUiState(
     val busStops: List<BusStop> = emptyList(),
     val isLoading: Boolean = false
 )
+
+sealed class StopListIntent {
+    data class SetKeyWord(val word: String) : StopListIntent()
+}

@@ -65,7 +65,7 @@ fun StopListScreen(
     StopListContent(
         stops = uiState.busStops,
         isLoading = uiState.isLoading,
-        onKeywordChange = viewModel::setKeyWord,
+        onKeywordChange = { word -> viewModel.handleIntent(StopListIntent.SetKeyWord(word)) },
         onStopClick = viewModel::handleBusStopClick,
         navigateBack = navigateBack
     )
