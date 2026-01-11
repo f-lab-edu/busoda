@@ -115,16 +115,15 @@ internal class StopListViewModel @Inject constructor(
         return emptyList()
     }
 
-    fun handleBusStopClick(stopId: String) {
-        viewModelScope.launch {
-            _busStopClicked.emit(stopId)
-        }
-    }
-
     fun handleIntent(intent: StopListIntent) {
         when (intent) {
             is StopListIntent.SetKeyWord -> {
                 keyWord.value = intent.word.replace(" ", "")
+            }
+            is StopListIntent.ClickBusStop -> {
+                viewModelScope.launch {
+                    _busStopClicked.emit(intent.stopId)
+                }
             }
         }
     }
@@ -142,4 +141,5 @@ data class StopListUiState(
 
 sealed class StopListIntent {
     data class SetKeyWord(val word: String) : StopListIntent()
+    data class ClickBusStop(val stopId: String) : StopListIntent()
 }
