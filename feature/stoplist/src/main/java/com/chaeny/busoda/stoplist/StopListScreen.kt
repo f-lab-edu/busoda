@@ -65,8 +65,8 @@ fun StopListScreen(
     StopListContent(
         stops = uiState.busStops,
         isLoading = uiState.isLoading,
-        onKeywordChange = { word -> viewModel.handleIntent(StopListIntent.SetKeyWord(word)) },
-        onStopClick = { stopId -> viewModel.handleIntent(StopListIntent.ClickBusStop(stopId)) },
+        onKeywordChange = { word -> viewModel.onIntent(StopListIntent.SetKeyWord(word)) },
+        onStopClick = { stopId -> viewModel.onIntent(StopListIntent.ClickBusStop(stopId)) },
         navigateBack = navigateBack
     )
 }
@@ -79,7 +79,7 @@ private fun CollectEffects(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.effect.collect { effect ->
+        viewModel.sideEffect.collect { effect ->
             when (effect) {
                 is StopListEffect.NavigateToStopDetail -> navigateToStopDetail(effect.stopId)
                 is StopListEffect.ShowNoResult -> showToast(context, R.string.no_result)
