@@ -7,6 +7,9 @@ import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.data.repository.BusStopRepository
 import com.chaeny.busoda.data.repository.GetBusStopResult
 import com.chaeny.busoda.model.BusStop
+import com.chaeny.busoda.mvi.UiIntent
+import com.chaeny.busoda.mvi.UiState
+import com.chaeny.busoda.mvi.SideEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -135,14 +138,14 @@ internal class StopListViewModel @Inject constructor(
 data class StopListUiState(
     val busStops: List<BusStop> = emptyList(),
     val isLoading: Boolean = false
-)
+) : UiState
 
-sealed class StopListIntent {
+sealed class StopListIntent : UiIntent {
     data class SetKeyWord(val word: String) : StopListIntent()
     data class ClickBusStop(val stopId: String) : StopListIntent()
 }
 
-sealed class StopListEffect {
+sealed class StopListEffect : SideEffect {
     data class NavigateToStopDetail(val stopId: String) : StopListEffect()
     data object ShowNoResult : StopListEffect()
     data object ShowNoInternet : StopListEffect()
