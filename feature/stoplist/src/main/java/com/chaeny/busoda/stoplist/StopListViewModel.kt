@@ -1,6 +1,5 @@
 package com.chaeny.busoda.stoplist
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.chaeny.busoda.data.repository.BusStopDetailRepository
@@ -69,7 +68,6 @@ internal class StopListViewModel @Inject constructor(
     private fun collectBusStops() {
         viewModelScope.launch {
             busStops.collect { stops ->
-                Log.d("StopListViewModel", "Flow emit: ${stops.size}개")
                 setState { copy(busStops = stops) }
             }
         }
