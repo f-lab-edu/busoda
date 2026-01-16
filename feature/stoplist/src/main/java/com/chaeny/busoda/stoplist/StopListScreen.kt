@@ -25,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -33,6 +34,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -61,6 +63,15 @@ fun StopListScreen(
 ) {
     val viewModel: StopListViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
+    val uiStateWithLifecycle by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(uiState.busStops.size) {
+        Log.d("StopListScreen", "collectAsState: ${uiState.busStops.size}개")
+    }
+
+    LaunchedEffect(uiStateWithLifecycle.busStops.size) {
+        Log.d("StopListScreen", "collectAsStateWithLifecycle: ${uiStateWithLifecycle.busStops.size}개")
+    }
 
     CollectEffects(navigateToStopDetail, viewModel)
     StopListContent(
