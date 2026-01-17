@@ -1,6 +1,5 @@
 package com.chaeny.busoda.mvi
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.channels.Channel
@@ -30,12 +29,9 @@ abstract class BaseViewModel<UI_INTENT : UiIntent, UI_STATE : UiState, SIDE_EFFE
     }
 
     protected fun postSideEffect(vararg effects: SIDE_EFFECT) {
-        Log.d("BaseViewModel", "postSideEffect - ${effects.size}개")
         viewModelScope.launch {
             effects.forEach { effect ->
-                Log.d("BaseViewModel", "SharedFlow.emit start - $effect")
                 _sideEffect.send(effect)
-                Log.d("BaseViewModel", "SharedFlow.emit finish - $effect")
             }
         }
     }

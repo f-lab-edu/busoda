@@ -37,8 +37,6 @@ internal class StopListViewModel @Inject constructor(
     init {
         saveKeyWordChanges()
         searchBusStops()
-
-        postSideEffect(StopListEffect.ShowNoResult)
     }
 
     private fun saveKeyWordChanges() {
