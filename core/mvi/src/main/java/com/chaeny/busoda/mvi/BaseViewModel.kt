@@ -3,10 +3,10 @@ package com.chaeny.busoda.mvi
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -17,8 +17,8 @@ abstract class BaseViewModel<UI_INTENT : UiIntent, UI_STATE : UiState, SIDE_EFFE
     private val _uiState = MutableStateFlow(initialState)
     val uiState = _uiState.asStateFlow()
 
-    private val _sideEffect = MutableSharedFlow<SIDE_EFFECT>()
-    val sideEffect = _sideEffect.asSharedFlow()
+    private val _sideEffect: Channel<SIDE_EFFECT> = Channel(Channel.BUFFERED)
+    val sideEffect = _sideEffect.receiveAsFlow()
 
     protected val currentState: UI_STATE
         get() = _uiState.value
@@ -34,7 +34,7 @@ abstract class BaseViewModel<UI_INTENT : UiIntent, UI_STATE : UiState, SIDE_EFFE
         viewModelScope.launch {
             effects.forEach { effect ->
                 Log.d("BaseViewModel", "SharedFlow.emit start - $effect")
-                _sideEffect.emit(effect)
+                _sideEffect.send(effect)
                 Log.d("BaseViewModel", "SharedFlow.emit finish - $effect")
             }
         }
