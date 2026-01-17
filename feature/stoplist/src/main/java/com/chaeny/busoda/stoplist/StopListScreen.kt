@@ -1,6 +1,7 @@
 package com.chaeny.busoda.stoplist
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -80,7 +81,9 @@ private fun CollectEffects(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
+        Log.d("StopListScreen", "sideEffect collect start")
         viewModel.sideEffect.collect { effect ->
+            Log.d("StopListScreen", "sideEffect - $effect")
             when (effect) {
                 is StopListEffect.NavigateToStopDetail -> navigateToStopDetail(effect.stopId)
                 is StopListEffect.ShowNoResult -> showToast(context, R.string.no_result)
