@@ -17,11 +17,8 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -37,27 +34,12 @@ internal class StopListViewModel @Inject constructor(
     private val keyWord: MutableStateFlow<String> =
         MutableStateFlow(savedStateHandle.get(KEYWORD_SAVED_STATE_KEY) ?: EMPTY_KEYWORD)
 
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    private val busStops: StateFlow<List<BusStop>> = keyWord
-        .debounce(1000)
-        .mapLatest { word ->
-            when {
-                word.length > 2 -> loadBusStops(word)
-                word.isEmpty() -> emptyList()
-                else -> handleShortKeyword()
-            }
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
-
     init {
-        collectKeyWord()
-        collectBusStops()
+        saveKeyWordChanges()
+        searchBusStops()
     }
 
-    private fun collectKeyWord() {
+    private fun saveKeyWordChanges() {
         viewModelScope.launch {
             keyWord.collect { newKeyWord ->
                 savedStateHandle.set(KEYWORD_SAVED_STATE_KEY, newKeyWord)
@@ -65,11 +47,20 @@ internal class StopListViewModel @Inject constructor(
         }
     }
 
-    private fun collectBusStops() {
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    private fun searchBusStops() {
         viewModelScope.launch {
-            busStops.collect { stops ->
-                setState { copy(busStops = stops) }
-            }
+            keyWord
+                .debounce(1000)
+                .mapLatest { word ->
+                    when {
+                        word.length > 2 -> loadBusStops(word)
+                        word.isEmpty() -> emptyList()
+                        else -> handleShortKeyword()
+                    }
+                }.collect { stops ->
+                    setState { copy(busStops = stops) }
+                }
         }
     }
 
