@@ -1,5 +1,6 @@
 package com.chaeny.busoda.stoplist
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,12 +27,12 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -58,45 +60,34 @@ fun StopListScreen(
     navigateBack: () -> Unit
 ) {
     val viewModel: StopListViewModel = hiltViewModel()
-    val stops by viewModel.busStops.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    CollectStopSpecificEvent(viewModel)
-    CollectStopClickEvent(navigateToStopDetail, viewModel)
+    CollectEffects(navigateToStopDetail, viewModel)
     StopListContent(
-        stops = stops,
-        isLoading = isLoading,
-        onKeywordChange = viewModel::setKeyWord,
-        onStopClick = viewModel::handleBusStopClick,
+        stops = uiState.busStops,
+        isLoading = uiState.isLoading,
+        onKeywordChange = { word -> viewModel.onIntent(StopListIntent.SetKeyWord(word)) },
+        onStopClick = { stopId -> viewModel.onIntent(StopListIntent.ClickBusStop(stopId)) },
         navigateBack = navigateBack
     )
 }
 
 @Composable
-private fun CollectStopClickEvent(
+private fun CollectEffects(
     navigateToStopDetail: (String) -> Unit,
     viewModel: StopListViewModel
 ) {
-    LaunchedEffect(Unit) {
-        viewModel.busStopClicked.collect { stopId ->
-            navigateToStopDetail(stopId)
-        }
-    }
-}
-
-@Composable
-private fun CollectStopSpecificEvent(viewModel: StopListViewModel) {
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.searchEvent.collect { event ->
-            val messageResId = when (event) {
-                SearchEvent.NoResult -> R.string.no_result
-                SearchEvent.NoInternet -> R.string.no_internet
-                SearchEvent.NetworkError -> R.string.network_error
-                SearchEvent.ShortKeyword -> R.string.short_keyword
+        viewModel.sideEffect.collect { effect ->
+            when (effect) {
+                is StopListEffect.NavigateToStopDetail -> navigateToStopDetail(effect.stopId)
+                is StopListEffect.ShowNoResult -> showToast(context, R.string.no_result)
+                is StopListEffect.ShowNoInternet -> showToast(context, R.string.no_internet)
+                is StopListEffect.ShowNetworkError -> showToast(context, R.string.network_error)
+                is StopListEffect.ShowShortKeyword -> showToast(context, R.string.short_keyword)
             }
-            Toast.makeText(context, context.getString(messageResId), Toast.LENGTH_SHORT).show()
         }
     }
 }
@@ -109,7 +100,11 @@ private fun StopListContent(
     onStopClick: (String) -> Unit,
     navigateBack: () -> Unit
 ) {
-    Column {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .systemBarsPadding()
+    ) {
         SearchBarContent(
             setKeyWord = onKeywordChange,
             navigateBack = navigateBack
@@ -305,3 +300,7 @@ private val dummyData = listOf(
     BusStop("16146", "화곡본동시장", "한국폴리텍1.서울강서대학교"),
     BusStop("16146", "화곡본동시장", "한국폴리텍1.서울강서대학교")
 )
+
+private fun showToast(context: Context, messageResId: Int) {
+    Toast.makeText(context, context.getString(messageResId), Toast.LENGTH_SHORT).show()
+}

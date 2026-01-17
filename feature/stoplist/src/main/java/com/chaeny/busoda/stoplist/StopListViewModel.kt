@@ -1,26 +1,24 @@
 package com.chaeny.busoda.stoplist
 
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.data.repository.BusStopRepository
 import com.chaeny.busoda.data.repository.GetBusStopResult
 import com.chaeny.busoda.model.BusStop
+import com.chaeny.busoda.mvi.BaseViewModel
+import com.chaeny.busoda.mvi.SideEffect
+import com.chaeny.busoda.mvi.UiIntent
+import com.chaeny.busoda.mvi.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -29,33 +27,19 @@ internal class StopListViewModel @Inject constructor(
     private val busStopRepository: BusStopRepository,
     private val busStopDetailRepository: BusStopDetailRepository,
     private val savedStateHandle: SavedStateHandle
-) : ViewModel() {
+) : BaseViewModel<StopListIntent, StopListUiState, StopListEffect>(
+    initialState = StopListUiState()
+) {
 
-    private val _isLoading = MutableStateFlow(false)
-    private val _searchEvent = MutableSharedFlow<SearchEvent>()
-    private val _busStopClicked = MutableSharedFlow<String>()
     private val keyWord: MutableStateFlow<String> =
         MutableStateFlow(savedStateHandle.get(KEYWORD_SAVED_STATE_KEY) ?: EMPTY_KEYWORD)
-    val isLoading: StateFlow<Boolean> = _isLoading
-    val searchEvent : SharedFlow<SearchEvent> = _searchEvent
-    val busStopClicked: SharedFlow<String> = _busStopClicked
-
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    val busStops: StateFlow<List<BusStop>> = keyWord
-        .debounce(1000)
-        .mapLatest { word ->
-            when {
-                word.length > 2 -> loadBusStops(word)
-                word.isEmpty() -> emptyList()
-                else -> handleShortKeyword()
-            }
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
 
     init {
+        saveKeyWordChanges()
+        searchBusStops()
+    }
+
+    private fun saveKeyWordChanges() {
         viewModelScope.launch {
             keyWord.collect { newKeyWord ->
                 savedStateHandle.set(KEYWORD_SAVED_STATE_KEY, newKeyWord)
@@ -63,25 +47,42 @@ internal class StopListViewModel @Inject constructor(
         }
     }
 
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    private fun searchBusStops() {
+        viewModelScope.launch {
+            keyWord
+                .debounce(1000)
+                .mapLatest { word ->
+                    when {
+                        word.length > 2 -> loadBusStops(word)
+                        word.isEmpty() -> emptyList()
+                        else -> handleShortKeyword()
+                    }
+                }.collect { stops ->
+                    setState { copy(busStops = stops) }
+                }
+        }
+    }
+
     private suspend fun loadBusStops(stopName: String): List<BusStop> {
-        _isLoading.value = true
+        setState { copy(isLoading = true) }
         val result = busStopRepository.getBusStops(stopName)
         val updatedStops = when (result) {
             is GetBusStopResult.Success -> getUpdatedStops(result.data)
             is GetBusStopResult.NoResult -> {
-                _searchEvent.emit(SearchEvent.NoResult)
+                postSideEffect(StopListEffect.ShowNoResult)
                 emptyList()
             }
             is GetBusStopResult.NoInternet -> {
-                _searchEvent.emit(SearchEvent.NoInternet)
+                postSideEffect(StopListEffect.ShowNoInternet)
                 emptyList()
             }
             is GetBusStopResult.NetworkError -> {
-                _searchEvent.emit(SearchEvent.NetworkError)
+                postSideEffect(StopListEffect.ShowNetworkError)
                 emptyList()
             }
         }
-        _isLoading.value = false
+        setState { copy(isLoading = false) }
         return updatedStops
     }
 
@@ -96,24 +97,41 @@ internal class StopListViewModel @Inject constructor(
     }
 
     private fun handleShortKeyword(): List<BusStop> {
-        viewModelScope.launch {
-            _searchEvent.emit(SearchEvent.ShortKeyword)
-        }
+        postSideEffect(StopListEffect.ShowShortKeyword)
         return emptyList()
     }
 
-    fun handleBusStopClick(stopId: String) {
-        viewModelScope.launch {
-            _busStopClicked.emit(stopId)
+    override fun onIntent(intent: StopListIntent) {
+        when (intent) {
+            is StopListIntent.SetKeyWord -> {
+                keyWord.value = intent.word.replace(" ", "")
+            }
+            is StopListIntent.ClickBusStop -> {
+                postSideEffect(StopListEffect.NavigateToStopDetail(intent.stopId))
+            }
         }
-    }
-
-    fun setKeyWord(word: String) {
-        keyWord.value = word.replace(" ", "")
     }
 
     companion object {
         private const val EMPTY_KEYWORD = ""
         private const val KEYWORD_SAVED_STATE_KEY = "KEYWORD_SAVED_STATE_KEY"
     }
+}
+
+data class StopListUiState(
+    val busStops: List<BusStop> = emptyList(),
+    val isLoading: Boolean = false
+) : UiState
+
+sealed class StopListIntent : UiIntent {
+    data class SetKeyWord(val word: String) : StopListIntent()
+    data class ClickBusStop(val stopId: String) : StopListIntent()
+}
+
+sealed class StopListEffect : SideEffect {
+    data class NavigateToStopDetail(val stopId: String) : StopListEffect()
+    data object ShowNoResult : StopListEffect()
+    data object ShowNoInternet : StopListEffect()
+    data object ShowNetworkError : StopListEffect()
+    data object ShowShortKeyword : StopListEffect()
 }
