@@ -29,10 +29,8 @@ internal class StopDetailViewModel @Inject constructor(
 ) {
 
     private var currentCount = 15
-    private val _timer = MutableStateFlow(currentCount)
     private val _currentTime = MutableStateFlow(System.currentTimeMillis())
     private val _refreshEvent = MutableSharedFlow<Unit>()
-    val timer: StateFlow<Int> = _timer
     val currentTime: StateFlow<Long> = _currentTime
     val refreshEvent: SharedFlow<Unit> = _refreshEvent
 
@@ -55,7 +53,7 @@ internal class StopDetailViewModel @Inject constructor(
     private fun startTimer() {
         viewModelScope.launch {
             while (true) {
-                _timer.value = currentCount
+                setState { copy(timer = currentCount) }
                 _currentTime.value = System.currentTimeMillis() / 1000
                 delay(1000)
                 currentCount--
@@ -95,7 +93,8 @@ internal class StopDetailViewModel @Inject constructor(
 data class StopDetailUiState(
     val stopId: String = "",
     val stopDetail: BusStopDetail = BusStopDetail("", emptyList()),
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+    val timer: Int = 15
 ) : UiState
 
 sealed class StopDetailIntent : UiIntent

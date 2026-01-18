@@ -65,7 +65,6 @@ fun StopDetailScreen(
 ) {
     val viewModel: StopDetailViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val timerValue by viewModel.timer.collectAsState(initial = 15)
     val currentTime by viewModel.currentTime.collectAsState()
 
     CompositionLocalProvider(LocalCurrentTime provides currentTime) {
@@ -73,7 +72,7 @@ fun StopDetailScreen(
             stopId = uiState.stopId,
             stopDetail = uiState.stopDetail,
             isLoading = uiState.isLoading,
-            timer = timerValue,
+            timer = uiState.timer,
             refreshEvent = viewModel.refreshEvent,
             onRefresh = viewModel::refreshData,
             onAddToFavorites = viewModel::addToFavorites,
