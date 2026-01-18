@@ -1,12 +1,15 @@
 package com.chaeny.busoda.stopdetail
 
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.data.repository.FavoriteRepository
 import com.chaeny.busoda.model.BusStop
 import com.chaeny.busoda.model.BusStopDetail
+import com.chaeny.busoda.mvi.BaseViewModel
+import com.chaeny.busoda.mvi.SideEffect
+import com.chaeny.busoda.mvi.UiIntent
+import com.chaeny.busoda.mvi.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -21,7 +24,9 @@ internal class StopDetailViewModel @Inject constructor(
     private val busStopDetailRepository: BusStopDetailRepository,
     private val favoriteRepository: FavoriteRepository,
     savedStateHandle: SavedStateHandle
-) : ViewModel() {
+) : BaseViewModel<StopDetailIntent, StopDetailUiState, StopDetailEffect>(
+    initialState = StopDetailUiState()
+) {
 
     private var currentCount = 15
     private val _stopDetail = MutableStateFlow<BusStopDetail>(BusStopDetail("", emptyList()))
@@ -41,6 +46,9 @@ internal class StopDetailViewModel @Inject constructor(
     init {
         asyncDataLoad()
         startTimer()
+    }
+
+    override fun onIntent(intent: StopDetailIntent) {
     }
 
     private fun asyncDataLoad() {
@@ -90,3 +98,11 @@ internal class StopDetailViewModel @Inject constructor(
         private const val BUS_STOP_ID = "stopId"
     }
 }
+
+data class StopDetailUiState(
+    val isLoading: Boolean = false
+) : UiState
+
+sealed class StopDetailIntent : UiIntent
+
+sealed class StopDetailEffect : SideEffect
