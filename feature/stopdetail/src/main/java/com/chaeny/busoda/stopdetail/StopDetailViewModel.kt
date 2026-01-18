@@ -29,13 +29,11 @@ internal class StopDetailViewModel @Inject constructor(
 ) {
 
     private var currentCount = 15
-    private val _stopDetail = MutableStateFlow<BusStopDetail>(BusStopDetail("", emptyList()))
     private val _stopId: MutableStateFlow<String> =
         MutableStateFlow(savedStateHandle.get(BUS_STOP_ID) ?: "")
     private val _timer = MutableStateFlow(currentCount)
     private val _currentTime = MutableStateFlow(System.currentTimeMillis())
     private val _refreshEvent = MutableSharedFlow<Unit>()
-    val stopDetail: StateFlow<BusStopDetail> = _stopDetail
     val stopId: StateFlow<String> = _stopId
     val timer: StateFlow<Int> = _timer
     val currentTime: StateFlow<Long> = _currentTime
@@ -52,8 +50,8 @@ internal class StopDetailViewModel @Inject constructor(
     private fun asyncDataLoad() {
         setState { copy(isLoading = true) }
         viewModelScope.launch {
-            _stopDetail.value = busStopDetailRepository.getBusStopDetail(_stopId.value)
-            setState { copy(isLoading = false) }
+            val busStopDetail = busStopDetailRepository.getBusStopDetail(_stopId.value)
+            setState { copy(stopDetail = busStopDetail, isLoading = false) }
         }
     }
 
@@ -85,8 +83,8 @@ internal class StopDetailViewModel @Inject constructor(
             favoriteRepository.addFavorite(
                 BusStop(
                     _stopId.value,
-                    _stopDetail.value.stopName,
-                    _stopDetail.value.busInfos.firstOrNull()?.nextStopName ?: ""
+                    currentState.stopDetail.stopName,
+                    currentState.stopDetail.busInfos.firstOrNull()?.nextStopName ?: ""
                 )
             )
         }
@@ -98,6 +96,7 @@ internal class StopDetailViewModel @Inject constructor(
 }
 
 data class StopDetailUiState(
+    val stopDetail: BusStopDetail = BusStopDetail("", emptyList()),
     val isLoading: Boolean = false
 ) : UiState
 
