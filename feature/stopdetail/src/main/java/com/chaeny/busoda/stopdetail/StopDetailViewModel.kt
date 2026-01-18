@@ -25,16 +25,13 @@ internal class StopDetailViewModel @Inject constructor(
     private val favoriteRepository: FavoriteRepository,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel<StopDetailIntent, StopDetailUiState, StopDetailEffect>(
-    initialState = StopDetailUiState()
+    initialState = StopDetailUiState(stopId = savedStateHandle.get(BUS_STOP_ID) ?: "")
 ) {
 
     private var currentCount = 15
-    private val _stopId: MutableStateFlow<String> =
-        MutableStateFlow(savedStateHandle.get(BUS_STOP_ID) ?: "")
     private val _timer = MutableStateFlow(currentCount)
     private val _currentTime = MutableStateFlow(System.currentTimeMillis())
     private val _refreshEvent = MutableSharedFlow<Unit>()
-    val stopId: StateFlow<String> = _stopId
     val timer: StateFlow<Int> = _timer
     val currentTime: StateFlow<Long> = _currentTime
     val refreshEvent: SharedFlow<Unit> = _refreshEvent
@@ -50,7 +47,7 @@ internal class StopDetailViewModel @Inject constructor(
     private fun asyncDataLoad() {
         setState { copy(isLoading = true) }
         viewModelScope.launch {
-            val busStopDetail = busStopDetailRepository.getBusStopDetail(_stopId.value)
+            val busStopDetail = busStopDetailRepository.getBusStopDetail(currentState.stopId)
             setState { copy(stopDetail = busStopDetail, isLoading = false) }
         }
     }
@@ -82,7 +79,7 @@ internal class StopDetailViewModel @Inject constructor(
         viewModelScope.launch {
             favoriteRepository.addFavorite(
                 BusStop(
-                    _stopId.value,
+                    currentState.stopId,
                     currentState.stopDetail.stopName,
                     currentState.stopDetail.busInfos.firstOrNull()?.nextStopName ?: ""
                 )
@@ -96,6 +93,7 @@ internal class StopDetailViewModel @Inject constructor(
 }
 
 data class StopDetailUiState(
+    val stopId: String = "",
     val stopDetail: BusStopDetail = BusStopDetail("", emptyList()),
     val isLoading: Boolean = false
 ) : UiState
