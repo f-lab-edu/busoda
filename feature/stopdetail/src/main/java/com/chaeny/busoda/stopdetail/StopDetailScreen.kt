@@ -50,6 +50,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.chaeny.busoda.model.BusArrivalInfo
 import com.chaeny.busoda.model.BusInfo
 import com.chaeny.busoda.model.BusStopDetail
@@ -63,9 +64,9 @@ fun StopDetailScreen(
     modifier: Modifier = Modifier
 ) {
     val viewModel: StopDetailViewModel = hiltViewModel()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val stopId by viewModel.stopId.collectAsState()
     val stopDetail by viewModel.stopDetail.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
     val timerValue by viewModel.timer.collectAsState(initial = 15)
     val currentTime by viewModel.currentTime.collectAsState()
 
@@ -73,7 +74,7 @@ fun StopDetailScreen(
         StopDetailContent(
             stopId = stopId,
             stopDetail = stopDetail,
-            isLoading = isLoading,
+            isLoading = uiState.isLoading,
             timer = timerValue,
             refreshEvent = viewModel.refreshEvent,
             onRefresh = viewModel::refreshData,
