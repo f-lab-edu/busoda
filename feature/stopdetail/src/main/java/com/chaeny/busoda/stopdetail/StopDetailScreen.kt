@@ -30,7 +30,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -65,9 +64,8 @@ fun StopDetailScreen(
 ) {
     val viewModel: StopDetailViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val currentTime by viewModel.currentTime.collectAsState()
 
-    CompositionLocalProvider(LocalCurrentTime provides currentTime) {
+    CompositionLocalProvider(LocalCurrentTime provides uiState.currentTime) {
         StopDetailContent(
             stopId = uiState.stopId,
             stopDetail = uiState.stopDetail,

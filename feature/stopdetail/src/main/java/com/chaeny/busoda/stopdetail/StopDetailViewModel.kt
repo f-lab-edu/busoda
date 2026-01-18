@@ -13,9 +13,7 @@ import com.chaeny.busoda.mvi.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -29,9 +27,7 @@ internal class StopDetailViewModel @Inject constructor(
 ) {
 
     private var currentCount = 15
-    private val _currentTime = MutableStateFlow(System.currentTimeMillis())
     private val _refreshEvent = MutableSharedFlow<Unit>()
-    val currentTime: StateFlow<Long> = _currentTime
     val refreshEvent: SharedFlow<Unit> = _refreshEvent
 
     init {
@@ -53,8 +49,12 @@ internal class StopDetailViewModel @Inject constructor(
     private fun startTimer() {
         viewModelScope.launch {
             while (true) {
-                setState { copy(timer = currentCount) }
-                _currentTime.value = System.currentTimeMillis() / 1000
+                setState {
+                    copy(
+                        timer = currentCount,
+                        currentTime = System.currentTimeMillis() / 1000
+                    )
+                }
                 delay(1000)
                 currentCount--
 
@@ -94,7 +94,8 @@ data class StopDetailUiState(
     val stopId: String = "",
     val stopDetail: BusStopDetail = BusStopDetail("", emptyList()),
     val isLoading: Boolean = false,
-    val timer: Int = 15
+    val timer: Int = 15,
+    val currentTime: Long = 0L
 ) : UiState
 
 sealed class StopDetailIntent : UiIntent
