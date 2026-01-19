@@ -54,7 +54,6 @@ import com.chaeny.busoda.model.BusArrivalInfo
 import com.chaeny.busoda.model.BusInfo
 import com.chaeny.busoda.model.BusStopDetail
 import com.chaeny.busoda.ui.theme.DarkGreen
-import kotlinx.coroutines.flow.Flow
 
 private val LocalCurrentTime = compositionLocalOf<Long> { 0L }
 
@@ -64,6 +63,12 @@ fun StopDetailScreen(
 ) {
     val viewModel: StopDetailViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var rotation by remember { mutableFloatStateOf(0f) }
+
+    CollectEffects(
+        viewModel = viewModel,
+        onRotate = { rotation += 180f }
+    )
 
     CompositionLocalProvider(LocalCurrentTime provides uiState.currentTime) {
         StopDetailContent(
@@ -71,11 +76,25 @@ fun StopDetailScreen(
             stopDetail = uiState.stopDetail,
             isLoading = uiState.isLoading,
             timer = uiState.timer,
-            refreshEvent = viewModel.sideEffect,
+            rotation = rotation,
             onRefresh = { viewModel.onIntent(StopDetailIntent.RefreshData) },
             onAddToFavorites = { viewModel.onIntent(StopDetailIntent.AddToFavorites) },
             modifier = modifier
         )
+    }
+}
+
+@Composable
+private fun CollectEffects(
+    viewModel: StopDetailViewModel,
+    onRotate: () -> Unit
+) {
+    LaunchedEffect(Unit) {
+        viewModel.sideEffect.collect { effect ->
+            when (effect) {
+                is StopDetailEffect.RefreshEvent -> onRotate()
+            }
+        }
     }
 }
 
@@ -85,7 +104,7 @@ private fun StopDetailContent(
     stopDetail: BusStopDetail,
     isLoading: Boolean,
     timer: Int,
-    refreshEvent: Flow<StopDetailEffect>,
+    rotation: Float,
     onRefresh: () -> Unit,
     onAddToFavorites: () -> Unit,
     modifier: Modifier = Modifier
@@ -123,7 +142,7 @@ private fun StopDetailContent(
             )
         }
         RefreshButton(
-            refreshEvent = refreshEvent,
+            rotation = rotation,
             onClick = onRefresh,
             modifier = Modifier.align(Alignment.BottomEnd)
         )
@@ -210,12 +229,10 @@ private fun StopEmoji(
 
 @Composable
 private fun RefreshButton(
-    refreshEvent: Flow<StopDetailEffect>,
+    rotation: Float,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var rotation by remember { mutableFloatStateOf(0f) }
-
     val animRotation by animateFloatAsState(
         targetValue = rotation,
         animationSpec = tween(
@@ -223,14 +240,6 @@ private fun RefreshButton(
             easing = LinearEasing
         )
     )
-
-    LaunchedEffect(Unit) {
-        refreshEvent.collect { effect ->
-            when (effect) {
-                is StopDetailEffect.RefreshEvent -> rotation += 180f
-            }
-        }
-    }
 
     FloatingActionButton(
         onClick = onClick,
