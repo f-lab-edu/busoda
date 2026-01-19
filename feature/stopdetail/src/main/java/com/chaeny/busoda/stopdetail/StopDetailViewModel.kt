@@ -80,6 +80,7 @@ internal class StopDetailViewModel @Inject constructor(
                     currentState.stopDetail.busInfos.firstOrNull()?.nextStopName ?: ""
                 )
             )
+            postSideEffect(StopDetailEffect.ShowFavoriteAdded)
         }
     }
 
@@ -103,4 +104,5 @@ sealed class StopDetailIntent : UiIntent {
 
 sealed class StopDetailEffect : SideEffect {
     data object RotateRefreshBtn : StopDetailEffect()
+    data object ShowFavoriteAdded : StopDetailEffect()
 }

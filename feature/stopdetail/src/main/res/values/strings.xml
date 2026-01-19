@@ -14,4 +14,5 @@
     <string name="minutes_seconds">%1$d분 %2$d초</string>
     <string name="minutes">%1$d분</string>
     <string name="seconds">%1$d초</string>
+    <string name="favorite_added">즐겨찾기에 추가되었습니다</string>
 </resources>

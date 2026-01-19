@@ -1,5 +1,6 @@
 package com.chaeny.busoda.stopdetail
 
+import android.widget.Toast
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -41,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -89,10 +91,17 @@ private fun CollectEffects(
     viewModel: StopDetailViewModel,
     onRotate: () -> Unit
 ) {
+    val context = LocalContext.current
+
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collect { effect ->
             when (effect) {
                 is StopDetailEffect.RotateRefreshBtn -> onRotate()
+                is StopDetailEffect.ShowFavoriteAdded -> {
+                    Toast.makeText(
+                        context, context.getString(R.string.favorite_added), Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
     }
