@@ -67,7 +67,7 @@ internal class StopDetailViewModel @Inject constructor(
 
     private fun refreshData() {
         currentCount = 15
-        postSideEffect(StopDetailEffect.RefreshEvent)
+        postSideEffect(StopDetailEffect.RotateRefreshBtn)
         asyncDataLoad()
     }
 
@@ -102,5 +102,5 @@ sealed class StopDetailIntent : UiIntent {
 }
 
 sealed class StopDetailEffect : SideEffect {
-    data object RefreshEvent : StopDetailEffect()
+    data object RotateRefreshBtn : StopDetailEffect()
 }

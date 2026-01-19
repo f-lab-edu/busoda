@@ -92,7 +92,7 @@ private fun CollectEffects(
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collect { effect ->
             when (effect) {
-                is StopDetailEffect.RefreshEvent -> onRotate()
+                is StopDetailEffect.RotateRefreshBtn -> onRotate()
             }
         }
     }
