@@ -38,6 +38,7 @@ internal class StopDetailViewModel @Inject constructor(
     override fun onIntent(intent: StopDetailIntent) {
         when (intent) {
             is StopDetailIntent.RefreshData -> refreshData()
+            is StopDetailIntent.AddToFavorites -> addToFavorites()
         }
     }
 
@@ -76,7 +77,7 @@ internal class StopDetailViewModel @Inject constructor(
         asyncDataLoad()
     }
 
-    fun addToFavorites() {
+    private fun addToFavorites() {
         viewModelScope.launch {
             favoriteRepository.addFavorite(
                 BusStop(
@@ -103,6 +104,7 @@ data class StopDetailUiState(
 
 sealed class StopDetailIntent : UiIntent {
     data object RefreshData : StopDetailIntent()
+    data object AddToFavorites : StopDetailIntent()
 }
 
 sealed class StopDetailEffect : SideEffect
