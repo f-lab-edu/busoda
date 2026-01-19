@@ -72,7 +72,7 @@ fun StopDetailScreen(
             isLoading = uiState.isLoading,
             timer = uiState.timer,
             refreshEvent = viewModel.refreshEvent,
-            onRefresh = viewModel::refreshData,
+            onRefresh = { viewModel.onIntent(StopDetailIntent.RefreshData) },
             onAddToFavorites = viewModel::addToFavorites,
             modifier = modifier
         )

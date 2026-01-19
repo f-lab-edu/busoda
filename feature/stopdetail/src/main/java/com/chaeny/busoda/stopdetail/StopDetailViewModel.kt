@@ -36,6 +36,9 @@ internal class StopDetailViewModel @Inject constructor(
     }
 
     override fun onIntent(intent: StopDetailIntent) {
+        when (intent) {
+            is StopDetailIntent.RefreshData -> refreshData()
+        }
     }
 
     private fun asyncDataLoad() {
@@ -65,7 +68,7 @@ internal class StopDetailViewModel @Inject constructor(
         }
     }
 
-    fun refreshData() {
+    private fun refreshData() {
         currentCount = 15
         viewModelScope.launch {
             _refreshEvent.emit(Unit)
@@ -98,6 +101,8 @@ data class StopDetailUiState(
     val currentTime: Long = 0L
 ) : UiState
 
-sealed class StopDetailIntent : UiIntent
+sealed class StopDetailIntent : UiIntent {
+    data object RefreshData : StopDetailIntent()
+}
 
 sealed class StopDetailEffect : SideEffect
