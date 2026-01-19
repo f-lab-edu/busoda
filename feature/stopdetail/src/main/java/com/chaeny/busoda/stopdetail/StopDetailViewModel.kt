@@ -12,8 +12,6 @@ import com.chaeny.busoda.mvi.UiIntent
 import com.chaeny.busoda.mvi.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,8 +25,6 @@ internal class StopDetailViewModel @Inject constructor(
 ) {
 
     private var currentCount = 15
-    private val _refreshEvent = MutableSharedFlow<Unit>()
-    val refreshEvent: SharedFlow<Unit> = _refreshEvent
 
     init {
         asyncDataLoad()
@@ -71,9 +67,7 @@ internal class StopDetailViewModel @Inject constructor(
 
     private fun refreshData() {
         currentCount = 15
-        viewModelScope.launch {
-            _refreshEvent.emit(Unit)
-        }
+        postSideEffect(StopDetailEffect.RefreshEvent)
         asyncDataLoad()
     }
 
@@ -107,4 +101,6 @@ sealed class StopDetailIntent : UiIntent {
     data object AddToFavorites : StopDetailIntent()
 }
 
-sealed class StopDetailEffect : SideEffect
+sealed class StopDetailEffect : SideEffect {
+    data object RefreshEvent : StopDetailEffect()
+}

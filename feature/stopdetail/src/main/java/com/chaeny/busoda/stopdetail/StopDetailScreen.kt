@@ -54,7 +54,7 @@ import com.chaeny.busoda.model.BusArrivalInfo
 import com.chaeny.busoda.model.BusInfo
 import com.chaeny.busoda.model.BusStopDetail
 import com.chaeny.busoda.ui.theme.DarkGreen
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.Flow
 
 private val LocalCurrentTime = compositionLocalOf<Long> { 0L }
 
@@ -71,7 +71,7 @@ fun StopDetailScreen(
             stopDetail = uiState.stopDetail,
             isLoading = uiState.isLoading,
             timer = uiState.timer,
-            refreshEvent = viewModel.refreshEvent,
+            refreshEvent = viewModel.sideEffect,
             onRefresh = { viewModel.onIntent(StopDetailIntent.RefreshData) },
             onAddToFavorites = { viewModel.onIntent(StopDetailIntent.AddToFavorites) },
             modifier = modifier
@@ -85,7 +85,7 @@ private fun StopDetailContent(
     stopDetail: BusStopDetail,
     isLoading: Boolean,
     timer: Int,
-    refreshEvent: SharedFlow<Unit>,
+    refreshEvent: Flow<StopDetailEffect>,
     onRefresh: () -> Unit,
     onAddToFavorites: () -> Unit,
     modifier: Modifier = Modifier
@@ -210,7 +210,7 @@ private fun StopEmoji(
 
 @Composable
 private fun RefreshButton(
-    refreshEvent: SharedFlow<Unit>,
+    refreshEvent: Flow<StopDetailEffect>,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -225,8 +225,10 @@ private fun RefreshButton(
     )
 
     LaunchedEffect(Unit) {
-        refreshEvent.collect {
-            rotation += 180f
+        refreshEvent.collect { effect ->
+            when (effect) {
+                is StopDetailEffect.RefreshEvent -> rotation += 180f
+            }
         }
     }
 
