@@ -20,7 +20,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Autorenew
-import androidx.compose.material.icons.filled.BookmarkAdd
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.outlined.BookmarkAdd
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -80,6 +81,7 @@ fun StopDetailScreen(
             isLoading = uiState.isLoading,
             timer = uiState.timer,
             rotation = rotation,
+            isFavorite = uiState.isFavorite,
             onRefresh = { viewModel.onIntent(StopDetailIntent.RefreshData) },
             onAddToFavorites = { viewModel.onIntent(StopDetailIntent.AddToFavorites) },
             modifier = modifier
@@ -115,6 +117,7 @@ private fun StopDetailContent(
     isLoading: Boolean,
     timer: Int,
     rotation: Float,
+    isFavorite: Boolean,
     onRefresh: () -> Unit,
     onAddToFavorites: () -> Unit,
     modifier: Modifier = Modifier
@@ -132,7 +135,7 @@ private fun StopDetailContent(
                 .padding(start = 30.dp)
         ) {
             Icon(
-                imageVector = Icons.Filled.BookmarkAdd,
+                imageVector = if (isFavorite) Icons.Filled.Bookmark else Icons.Outlined.BookmarkAdd,
                 contentDescription = stringResource(R.string.bookmark),
                 tint = MaterialTheme.colorScheme.onBackground
             )

@@ -29,6 +29,7 @@ internal class StopDetailViewModel @Inject constructor(
     init {
         asyncDataLoad()
         startTimer()
+        collectIsFavorite()
     }
 
     override fun onIntent(intent: StopDetailIntent) {
@@ -65,6 +66,14 @@ internal class StopDetailViewModel @Inject constructor(
         }
     }
 
+    private fun collectIsFavorite() {
+        viewModelScope.launch {
+            favoriteRepository.isFavorite(currentState.stopId).collect { isFavorite ->
+                setState { copy(isFavorite = isFavorite) }
+            }
+        }
+    }
+
     private fun refreshData() {
         currentCount = 15
         postSideEffect(StopDetailEffect.RotateRefreshBtn)
@@ -94,7 +103,8 @@ data class StopDetailUiState(
     val stopDetail: BusStopDetail = BusStopDetail("", emptyList()),
     val isLoading: Boolean = false,
     val timer: Int = 15,
-    val currentTime: Long = 0L
+    val currentTime: Long = 0L,
+    val isFavorite: Boolean = false
 ) : UiState
 
 sealed class StopDetailIntent : UiIntent {
