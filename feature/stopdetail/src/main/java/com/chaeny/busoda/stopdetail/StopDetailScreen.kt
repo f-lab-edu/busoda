@@ -83,7 +83,13 @@ fun StopDetailScreen(
             rotation = rotation,
             isFavorite = uiState.isFavorite,
             onRefresh = { viewModel.onIntent(StopDetailIntent.RefreshData) },
-            onAddToFavorites = { viewModel.onIntent(StopDetailIntent.AddToFavorites) },
+            onToggleFavorite = {
+                if (uiState.isFavorite) {
+                    viewModel.onIntent(StopDetailIntent.RemoveFromFavorites)
+                } else {
+                    viewModel.onIntent(StopDetailIntent.AddToFavorites)
+                }
+            },
             modifier = modifier
         )
     }
@@ -119,7 +125,7 @@ private fun StopDetailContent(
     rotation: Float,
     isFavorite: Boolean,
     onRefresh: () -> Unit,
-    onAddToFavorites: () -> Unit,
+    onToggleFavorite: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -129,7 +135,7 @@ private fun StopDetailContent(
             .padding(top = 20.dp)
     ) {
         IconButton(
-            onClick = onAddToFavorites,
+            onClick = onToggleFavorite,
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .padding(start = 30.dp)

@@ -36,6 +36,7 @@ internal class StopDetailViewModel @Inject constructor(
         when (intent) {
             is StopDetailIntent.RefreshData -> refreshData()
             is StopDetailIntent.AddToFavorites -> addToFavorites()
+            is StopDetailIntent.RemoveFromFavorites -> removeFromFavorites()
         }
     }
 
@@ -93,6 +94,12 @@ internal class StopDetailViewModel @Inject constructor(
         }
     }
 
+    private fun removeFromFavorites() {
+        viewModelScope.launch {
+            favoriteRepository.deleteFavorite(currentState.stopId)
+        }
+    }
+
     companion object {
         private const val BUS_STOP_ID = "stopId"
     }
@@ -110,6 +117,7 @@ data class StopDetailUiState(
 sealed class StopDetailIntent : UiIntent {
     data object RefreshData : StopDetailIntent()
     data object AddToFavorites : StopDetailIntent()
+    data object RemoveFromFavorites : StopDetailIntent()
 }
 
 sealed class StopDetailEffect : SideEffect {
