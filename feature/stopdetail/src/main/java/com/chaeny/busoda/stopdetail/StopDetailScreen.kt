@@ -1,5 +1,6 @@
 package com.chaeny.busoda.stopdetail
 
+import android.widget.Toast
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -12,13 +13,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Autorenew
-import androidx.compose.material.icons.filled.BookmarkAdd
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.outlined.BookmarkAdd
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -30,7 +33,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -42,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -50,11 +53,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.chaeny.busoda.model.BusArrivalInfo
 import com.chaeny.busoda.model.BusInfo
 import com.chaeny.busoda.model.BusStopDetail
 import com.chaeny.busoda.ui.theme.DarkGreen
-import kotlinx.coroutines.flow.SharedFlow
 
 private val LocalCurrentTime = compositionLocalOf<Long> { 0L }
 
@@ -63,23 +66,58 @@ fun StopDetailScreen(
     modifier: Modifier = Modifier
 ) {
     val viewModel: StopDetailViewModel = hiltViewModel()
-    val stopId by viewModel.stopId.collectAsState()
-    val stopDetail by viewModel.stopDetail.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-    val timerValue by viewModel.timer.collectAsState(initial = 15)
-    val currentTime by viewModel.currentTime.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var rotation by remember { mutableFloatStateOf(0f) }
 
-    CompositionLocalProvider(LocalCurrentTime provides currentTime) {
+    CollectEffects(
+        viewModel = viewModel,
+        onRotate = { rotation += 180f }
+    )
+
+    CompositionLocalProvider(LocalCurrentTime provides uiState.currentTime) {
         StopDetailContent(
-            stopId = stopId,
-            stopDetail = stopDetail,
-            isLoading = isLoading,
-            timer = timerValue,
-            refreshEvent = viewModel.refreshEvent,
-            onRefresh = viewModel::refreshData,
-            onAddToFavorites = viewModel::addToFavorites,
+            stopId = uiState.stopId,
+            stopDetail = uiState.stopDetail,
+            isLoading = uiState.isLoading,
+            timer = uiState.timer,
+            rotation = rotation,
+            isFavorite = uiState.isFavorite,
+            onRefresh = { viewModel.onIntent(StopDetailIntent.RefreshData) },
+            onToggleFavorite = {
+                if (uiState.isFavorite) {
+                    viewModel.onIntent(StopDetailIntent.RemoveFromFavorites)
+                } else {
+                    viewModel.onIntent(StopDetailIntent.AddToFavorites)
+                }
+            },
             modifier = modifier
         )
+    }
+}
+
+@Composable
+private fun CollectEffects(
+    viewModel: StopDetailViewModel,
+    onRotate: () -> Unit
+) {
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.sideEffect.collect { effect ->
+            when (effect) {
+                is StopDetailEffect.RotateRefreshBtn -> onRotate()
+                is StopDetailEffect.ShowFavoriteAdded -> {
+                    Toast.makeText(
+                        context, context.getString(R.string.favorite_added), Toast.LENGTH_SHORT
+                    ).show()
+                }
+                is StopDetailEffect.ShowFavoriteRemoved -> {
+                    Toast.makeText(
+                        context, context.getString(R.string.favorite_removed), Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
     }
 }
 
@@ -89,24 +127,26 @@ private fun StopDetailContent(
     stopDetail: BusStopDetail,
     isLoading: Boolean,
     timer: Int,
-    refreshEvent: SharedFlow<Unit>,
+    rotation: Float,
+    isFavorite: Boolean,
     onRefresh: () -> Unit,
-    onAddToFavorites: () -> Unit,
+    onToggleFavorite: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
         modifier = modifier
             .fillMaxSize()
+            .systemBarsPadding()
             .padding(top = 20.dp)
     ) {
         IconButton(
-            onClick = onAddToFavorites,
+            onClick = onToggleFavorite,
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .padding(start = 30.dp)
         ) {
             Icon(
-                imageVector = Icons.Filled.BookmarkAdd,
+                imageVector = if (isFavorite) Icons.Filled.Bookmark else Icons.Outlined.BookmarkAdd,
                 contentDescription = stringResource(R.string.bookmark),
                 tint = MaterialTheme.colorScheme.onBackground
             )
@@ -127,7 +167,7 @@ private fun StopDetailContent(
             )
         }
         RefreshButton(
-            refreshEvent = refreshEvent,
+            rotation = rotation,
             onClick = onRefresh,
             modifier = Modifier.align(Alignment.BottomEnd)
         )
@@ -214,12 +254,10 @@ private fun StopEmoji(
 
 @Composable
 private fun RefreshButton(
-    refreshEvent: SharedFlow<Unit>,
+    rotation: Float,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var rotation by remember { mutableFloatStateOf(0f) }
-
     val animRotation by animateFloatAsState(
         targetValue = rotation,
         animationSpec = tween(
@@ -227,12 +265,6 @@ private fun RefreshButton(
             easing = LinearEasing
         )
     )
-
-    LaunchedEffect(Unit) {
-        refreshEvent.collect {
-            rotation += 180f
-        }
-    }
 
     FloatingActionButton(
         onClick = onClick,

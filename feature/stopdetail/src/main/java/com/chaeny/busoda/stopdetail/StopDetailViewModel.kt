@@ -1,18 +1,17 @@
 package com.chaeny.busoda.stopdetail
 
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.data.repository.FavoriteRepository
 import com.chaeny.busoda.model.BusStop
 import com.chaeny.busoda.model.BusStopDetail
+import com.chaeny.busoda.mvi.BaseViewModel
+import com.chaeny.busoda.mvi.SideEffect
+import com.chaeny.busoda.mvi.UiIntent
+import com.chaeny.busoda.mvi.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,41 +20,43 @@ internal class StopDetailViewModel @Inject constructor(
     private val busStopDetailRepository: BusStopDetailRepository,
     private val favoriteRepository: FavoriteRepository,
     savedStateHandle: SavedStateHandle
-) : ViewModel() {
+) : BaseViewModel<StopDetailIntent, StopDetailUiState, StopDetailEffect>(
+    initialState = StopDetailUiState(stopId = savedStateHandle.get(BUS_STOP_ID) ?: "")
+) {
 
     private var currentCount = 15
-    private val _stopDetail = MutableStateFlow<BusStopDetail>(BusStopDetail("", emptyList()))
-    private val _isLoading = MutableStateFlow(false)
-    private val _stopId: MutableStateFlow<String> =
-        MutableStateFlow(savedStateHandle.get(BUS_STOP_ID) ?: "")
-    private val _timer = MutableStateFlow(currentCount)
-    private val _currentTime = MutableStateFlow(System.currentTimeMillis())
-    private val _refreshEvent = MutableSharedFlow<Unit>()
-    val stopDetail: StateFlow<BusStopDetail> = _stopDetail
-    val isLoading: StateFlow<Boolean> = _isLoading
-    val stopId: StateFlow<String> = _stopId
-    val timer: StateFlow<Int> = _timer
-    val currentTime: StateFlow<Long> = _currentTime
-    val refreshEvent: SharedFlow<Unit> = _refreshEvent
 
     init {
         asyncDataLoad()
         startTimer()
+        collectIsFavorite()
+    }
+
+    override fun onIntent(intent: StopDetailIntent) {
+        when (intent) {
+            is StopDetailIntent.RefreshData -> refreshData()
+            is StopDetailIntent.AddToFavorites -> addToFavorites()
+            is StopDetailIntent.RemoveFromFavorites -> removeFromFavorites()
+        }
     }
 
     private fun asyncDataLoad() {
-        _isLoading.value = true
+        setState { copy(isLoading = true) }
         viewModelScope.launch {
-            _stopDetail.value = busStopDetailRepository.getBusStopDetail(_stopId.value)
-            _isLoading.value = false
+            val busStopDetail = busStopDetailRepository.getBusStopDetail(currentState.stopId)
+            setState { copy(stopDetail = busStopDetail, isLoading = false) }
         }
     }
 
     private fun startTimer() {
         viewModelScope.launch {
             while (true) {
-                _timer.value = currentCount
-                _currentTime.value = System.currentTimeMillis() / 1000
+                setState {
+                    copy(
+                        timer = currentCount,
+                        currentTime = System.currentTimeMillis() / 1000
+                    )
+                }
                 delay(1000)
                 currentCount--
 
@@ -66,27 +67,62 @@ internal class StopDetailViewModel @Inject constructor(
         }
     }
 
-    fun refreshData() {
-        currentCount = 15
+    private fun collectIsFavorite() {
         viewModelScope.launch {
-            _refreshEvent.emit(Unit)
+            favoriteRepository.isFavorite(currentState.stopId).collect { isFavorite ->
+                setState { copy(isFavorite = isFavorite) }
+            }
         }
+    }
+
+    private fun refreshData() {
+        currentCount = 15
+        postSideEffect(StopDetailEffect.RotateRefreshBtn)
         asyncDataLoad()
     }
 
-    fun addToFavorites() {
+    private fun addToFavorites() {
         viewModelScope.launch {
             favoriteRepository.addFavorite(
                 BusStop(
-                    _stopId.value,
-                    _stopDetail.value.stopName,
-                    _stopDetail.value.busInfos.firstOrNull()?.nextStopName ?: ""
+                    currentState.stopId,
+                    currentState.stopDetail.stopName,
+                    currentState.stopDetail.busInfos.firstOrNull()?.nextStopName ?: ""
                 )
             )
+            postSideEffect(StopDetailEffect.ShowFavoriteAdded)
+        }
+    }
+
+    private fun removeFromFavorites() {
+        viewModelScope.launch {
+            favoriteRepository.deleteFavorite(currentState.stopId)
+            postSideEffect(StopDetailEffect.ShowFavoriteRemoved)
         }
     }
 
     companion object {
         private const val BUS_STOP_ID = "stopId"
     }
+}
+
+data class StopDetailUiState(
+    val stopId: String = "",
+    val stopDetail: BusStopDetail = BusStopDetail("", emptyList()),
+    val isLoading: Boolean = false,
+    val timer: Int = 15,
+    val currentTime: Long = 0L,
+    val isFavorite: Boolean = false
+) : UiState
+
+sealed class StopDetailIntent : UiIntent {
+    data object RefreshData : StopDetailIntent()
+    data object AddToFavorites : StopDetailIntent()
+    data object RemoveFromFavorites : StopDetailIntent()
+}
+
+sealed class StopDetailEffect : SideEffect {
+    data object RotateRefreshBtn : StopDetailEffect()
+    data object ShowFavoriteAdded : StopDetailEffect()
+    data object ShowFavoriteRemoved : StopDetailEffect()
 }
