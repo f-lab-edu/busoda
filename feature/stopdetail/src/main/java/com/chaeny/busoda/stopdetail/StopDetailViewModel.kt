@@ -97,6 +97,7 @@ internal class StopDetailViewModel @Inject constructor(
     private fun removeFromFavorites() {
         viewModelScope.launch {
             favoriteRepository.deleteFavorite(currentState.stopId)
+            postSideEffect(StopDetailEffect.ShowFavoriteRemoved)
         }
     }
 
@@ -123,4 +124,5 @@ sealed class StopDetailIntent : UiIntent {
 sealed class StopDetailEffect : SideEffect {
     data object RotateRefreshBtn : StopDetailEffect()
     data object ShowFavoriteAdded : StopDetailEffect()
+    data object ShowFavoriteRemoved : StopDetailEffect()
 }

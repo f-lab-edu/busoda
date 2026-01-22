@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="favorite_added">Added to favorites</string>
+    <string name="favorite_removed">Removed from favorites</string>
 </resources>

@@ -111,6 +111,11 @@ private fun CollectEffects(
                         context, context.getString(R.string.favorite_added), Toast.LENGTH_SHORT
                     ).show()
                 }
+                is StopDetailEffect.ShowFavoriteRemoved -> {
+                    Toast.makeText(
+                        context, context.getString(R.string.favorite_removed), Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
     }
