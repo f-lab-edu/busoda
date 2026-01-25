@@ -35,8 +35,7 @@ internal class StopDetailViewModel @Inject constructor(
     override fun onIntent(intent: StopDetailIntent) {
         when (intent) {
             is StopDetailIntent.RefreshData -> refreshData()
-            is StopDetailIntent.AddToFavorites -> addToFavorites()
-            is StopDetailIntent.RemoveFromFavorites -> removeFromFavorites()
+            is StopDetailIntent.ToggleFavorite -> toggleFavorite()
         }
     }
 
@@ -81,6 +80,14 @@ internal class StopDetailViewModel @Inject constructor(
         asyncDataLoad()
     }
 
+    private fun toggleFavorite() {
+        if (currentState.isFavorite) {
+            removeFromFavorites()
+        } else {
+            addToFavorites()
+        }
+    }
+
     private fun addToFavorites() {
         viewModelScope.launch {
             favoriteRepository.addFavorite(
@@ -117,8 +124,7 @@ data class StopDetailUiState(
 
 sealed class StopDetailIntent : UiIntent {
     data object RefreshData : StopDetailIntent()
-    data object AddToFavorites : StopDetailIntent()
-    data object RemoveFromFavorites : StopDetailIntent()
+    data object ToggleFavorite : StopDetailIntent()
 }
 
 sealed class StopDetailEffect : SideEffect {

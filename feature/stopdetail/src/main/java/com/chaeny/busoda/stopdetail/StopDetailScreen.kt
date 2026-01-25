@@ -83,13 +83,7 @@ fun StopDetailScreen(
             rotation = rotation,
             isFavorite = uiState.isFavorite,
             onRefresh = { viewModel.onIntent(StopDetailIntent.RefreshData) },
-            onToggleFavorite = {
-                if (uiState.isFavorite) {
-                    viewModel.onIntent(StopDetailIntent.RemoveFromFavorites)
-                } else {
-                    viewModel.onIntent(StopDetailIntent.AddToFavorites)
-                }
-            },
+            onToggleFavorite = { viewModel.onIntent(StopDetailIntent.ToggleFavorite) },
             modifier = modifier
         )
     }
