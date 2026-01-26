@@ -70,6 +70,7 @@ dependencies {
     androidTestImplementation libs.androidx.junit
     androidTestImplementation libs.androidx.espresso.core
 
+    implementation project(":feature:nearbystops")
     implementation project(":feature:favorites")
     implementation project(":feature:stoplist")
     implementation project(":feature:stopdetail")

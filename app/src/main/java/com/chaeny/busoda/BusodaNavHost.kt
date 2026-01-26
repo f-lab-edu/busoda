@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.chaeny.busoda.favorites.FavoritesScreen
+import com.chaeny.busoda.nearbystops.NearbystopsScreen
 import com.chaeny.busoda.stopdetail.StopDetailScreen
 import com.chaeny.busoda.stoplist.StopListScreen
 
@@ -17,19 +18,12 @@ fun BusodaNavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = "favorites"
+        startDestination = "nearbystops"
     ) {
         composable(
-            route = "favorites"
+            route = "nearbystops"
         ) {
-            FavoritesScreen(
-                navigateToStopList = {
-                    navController.navigate("stop_list")
-                },
-                navigateToStopDetail = { stopId ->
-                    navController.navigate("stop_detail/$stopId")
-                }
-            )
+            NearbystopsScreen()
         }
         composable(
             route = "stop_list"
