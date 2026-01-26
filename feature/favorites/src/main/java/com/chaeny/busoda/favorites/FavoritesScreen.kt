@@ -27,6 +27,9 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -274,20 +277,23 @@ private fun DeletePopup(
 private fun TabBar(
     modifier: Modifier = Modifier
 ) {
+    var selectedTab by rememberSaveable { mutableIntStateOf(0) }
+
     TabRow(
-        selectedTabIndex = 0,
+        selectedTabIndex = selectedTab,
         modifier = modifier
             .padding(top = 12.dp)
-            .padding(horizontal = 36.dp)
+            .padding(horizontal = 36.dp),
+        divider = { }
     ) {
         Tab(
-            selected = true,
-            onClick = { },
+            selected = selectedTab == 0,
+            onClick = { selectedTab = 0 },
             text = { Text(text = stringResource(R.string.tab_home)) }
         )
         Tab(
-            selected = false,
-            onClick = { },
+            selected = selectedTab == 1,
+            onClick = { selectedTab = 1 },
             text = { Text(text = stringResource(R.string.tab_nearby_stops)) }
         )
     }
