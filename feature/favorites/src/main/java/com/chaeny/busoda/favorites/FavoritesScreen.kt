@@ -280,7 +280,10 @@ private fun TabBar(
     var selectedTab by rememberSaveable { mutableStateOf(FavoritesTab.HOME) }
 
     TabRow(
-        selectedTabIndex = selectedTab.ordinal,
+        selectedTabIndex = when (selectedTab) {
+            FavoritesTab.HOME -> 0
+            FavoritesTab.NEARBY_STOPS -> 1
+        },
         modifier = modifier
             .padding(top = 12.dp)
             .padding(horizontal = 36.dp),
