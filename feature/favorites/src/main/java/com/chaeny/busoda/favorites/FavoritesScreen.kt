@@ -18,6 +18,8 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -58,6 +60,7 @@ fun FavoritesScreen(
             .systemBarsPadding()
     ) {
         SearchBar(navigateToStopList = navigateToStopList)
+        TabBar()
         if (uiState.favorites.isEmpty()) {
             FavoritesGuide()
         } else {
@@ -264,6 +267,29 @@ private fun DeletePopup(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun TabBar(
+    modifier: Modifier = Modifier
+) {
+    TabRow(
+        selectedTabIndex = 0,
+        modifier = modifier
+            .padding(top = 12.dp)
+            .padding(horizontal = 36.dp)
+    ) {
+        Tab(
+            selected = true,
+            onClick = { },
+            text = { Text(text = stringResource(R.string.tab_home)) }
+        )
+        Tab(
+            selected = false,
+            onClick = { },
+            text = { Text(text = stringResource(R.string.tab_nearby_stops)) }
+        )
     }
 }
 
