@@ -38,7 +38,11 @@ fun BusodaNavGraph(
         composable(
             route = "nearbystops"
         ) {
-            NearbystopsScreen()
+            NearbystopsScreen(
+                navigateToStopList = {
+                    navController.navigate("stop_list")
+                }
+            )
         }
         composable(
             route = "stop_list"
