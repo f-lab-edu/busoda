@@ -1,13 +1,11 @@
 package com.chaeny.busoda.favorites
 
 import android.widget.Toast
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,8 +20,6 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -36,7 +32,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -44,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.chaeny.busoda.model.BusStop
+import com.chaeny.busoda.ui.component.MainSearchBar
 import com.chaeny.busoda.ui.theme.Gray60
 import com.chaeny.busoda.ui.theme.MainGreen
 
@@ -63,7 +59,7 @@ fun FavoritesScreen(
             .fillMaxSize()
             .systemBarsPadding()
     ) {
-        SearchBar(navigateToStopList)
+        MainSearchBar(onSearchClick = navigateToStopList)
         TabBar(navigateToNearbyStops)
         if (uiState.favorites.isEmpty()) {
             FavoritesGuide()
@@ -115,32 +111,6 @@ private fun CollectEffect(
             }
         }
     }
-}
-
-@Composable
-private fun SearchBar(
-    navigateToStopList: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    TextField(
-        value = TextFieldValue(""),
-        onValueChange = {},
-        enabled = false,
-        colors = TextFieldDefaults.colors(
-            disabledContainerColor = Color.Transparent
-        ),
-        placeholder = {
-            Text(
-                text = stringResource(R.string.stop_search),
-                color = Color.Gray
-            )
-        },
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 36.dp)
-            .padding(top = 20.dp)
-            .clickable { navigateToStopList() }
-    )
 }
 
 @Composable
@@ -302,12 +272,6 @@ private fun TabBar(
             text = { Text(text = stringResource(R.string.tab_nearby_stops)) }
         )
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun SearchBarPreview() {
-    SearchBar(navigateToStopList = {})
 }
 
 @Preview(showBackground = true)
