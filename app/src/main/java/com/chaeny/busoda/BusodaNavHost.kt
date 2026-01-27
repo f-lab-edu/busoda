@@ -18,8 +18,23 @@ fun BusodaNavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = "nearbystops"
+        startDestination = "favorites"
     ) {
+        composable(
+            route = "favorites"
+        ) {
+            FavoritesScreen(
+                navigateToStopList = {
+                    navController.navigate("stop_list")
+                },
+                navigateToStopDetail = { stopId ->
+                    navController.navigate("stop_detail/$stopId")
+                },
+                navigateToNearbyStops = {
+                    navController.navigate("nearbystops")
+                }
+            )
+        }
         composable(
             route = "nearbystops"
         ) {

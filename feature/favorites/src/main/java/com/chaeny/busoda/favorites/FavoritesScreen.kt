@@ -50,7 +50,8 @@ import com.chaeny.busoda.ui.theme.MainGreen
 @Composable
 fun FavoritesScreen(
     navigateToStopList: () -> Unit,
-    navigateToStopDetail: (String) -> Unit
+    navigateToStopDetail: (String) -> Unit,
+    navigateToNearbyStops: () -> Unit
 ) {
     val viewModel: FavoritesViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -62,8 +63,8 @@ fun FavoritesScreen(
             .fillMaxSize()
             .systemBarsPadding()
     ) {
-        SearchBar(navigateToStopList = navigateToStopList)
-        TabBar()
+        SearchBar(navigateToStopList)
+        TabBar(navigateToNearbyStops)
         if (uiState.favorites.isEmpty()) {
             FavoritesGuide()
         } else {
@@ -275,6 +276,7 @@ private fun DeletePopup(
 
 @Composable
 private fun TabBar(
+    navigateToNearbyStops: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var selectedTab by rememberSaveable { mutableStateOf(FavoritesTab.HOME) }
@@ -293,7 +295,10 @@ private fun TabBar(
         )
         Tab(
             selected = selectedTab == FavoritesTab.NEARBY_STOPS,
-            onClick = { selectedTab = FavoritesTab.NEARBY_STOPS },
+            onClick = {
+                selectedTab = FavoritesTab.NEARBY_STOPS
+                navigateToNearbyStops()
+            },
             text = { Text(text = stringResource(R.string.tab_nearby_stops)) }
         )
     }
@@ -316,7 +321,8 @@ private fun FavoritesGuidePreview() {
 private fun FavoritesScreenPreview() {
     FavoritesScreen(
         navigateToStopList = {},
-        navigateToStopDetail = {}
+        navigateToStopDetail = {},
+        navigateToNearbyStops = {}
     )
 }
 
