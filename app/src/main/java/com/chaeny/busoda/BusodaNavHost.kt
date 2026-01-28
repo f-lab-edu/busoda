@@ -41,6 +41,9 @@ fun BusodaNavGraph(
             NearbystopsScreen(
                 navigateToStopList = {
                     navController.navigate("stop_list")
+                },
+                navigateToHome = {
+                    navController.popBackStack()
                 }
             )
         }
