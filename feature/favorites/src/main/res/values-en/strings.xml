@@ -6,4 +6,6 @@
     <string name="delete">Delete</string>
     <string name="delete_confirmation">Delete %s bus stop?</string>
     <string name="delete_success">Removed from favorites</string>
+    <string name="tab_home">Home</string>
+    <string name="tab_nearby_stops">Nearby Stops</string>
 </resources>
