@@ -16,16 +16,11 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,6 +35,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.chaeny.busoda.model.BusStop
 import com.chaeny.busoda.ui.component.MainSearchBar
+import com.chaeny.busoda.ui.component.MainTab
+import com.chaeny.busoda.ui.component.MainTabRow
 import com.chaeny.busoda.ui.theme.Gray60
 import com.chaeny.busoda.ui.theme.MainGreen
 
@@ -60,7 +57,11 @@ fun FavoritesScreen(
             .systemBarsPadding()
     ) {
         MainSearchBar(onSearchClick = navigateToStopList)
-        TabBar(navigateToNearbyStops)
+        MainTabRow(
+            selectedTab = MainTab.HOME,
+            onHomeClick = { },
+            onNearbyStopsClick = navigateToNearbyStops
+        )
         if (uiState.favorites.isEmpty()) {
             FavoritesGuide()
         } else {
@@ -241,36 +242,6 @@ private fun DeletePopup(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun TabBar(
-    navigateToNearbyStops: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var selectedTab by rememberSaveable { mutableStateOf(FavoritesTab.HOME) }
-
-    TabRow(
-        selectedTabIndex = selectedTab.index,
-        modifier = modifier
-            .padding(top = 12.dp)
-            .padding(horizontal = 36.dp),
-        divider = { }
-    ) {
-        Tab(
-            selected = selectedTab == FavoritesTab.HOME,
-            onClick = { selectedTab = FavoritesTab.HOME },
-            text = { Text(text = stringResource(R.string.tab_home)) }
-        )
-        Tab(
-            selected = selectedTab == FavoritesTab.NEARBY_STOPS,
-            onClick = {
-                selectedTab = FavoritesTab.NEARBY_STOPS
-                navigateToNearbyStops()
-            },
-            text = { Text(text = stringResource(R.string.tab_nearby_stops)) }
-        )
     }
 }
 
