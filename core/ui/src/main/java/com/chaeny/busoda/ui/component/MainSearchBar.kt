@@ -35,7 +35,7 @@ fun MainSearchBar(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 36.dp)
-            .padding(top = 20.dp)
+            .padding(top = 10.dp)
             .clickable { onSearchClick() }
     )
 }

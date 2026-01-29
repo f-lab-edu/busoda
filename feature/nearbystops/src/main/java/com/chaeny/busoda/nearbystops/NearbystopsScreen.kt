@@ -1,9 +1,17 @@
 package com.chaeny.busoda.nearbystops
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.dp
+import com.chaeny.busoda.ui.component.MainSearchBar
+import com.chaeny.busoda.ui.component.MainTab
+import com.chaeny.busoda.ui.component.MainTabRow
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -21,8 +29,25 @@ fun NearbystopsScreen(
         position = CameraPosition.fromLatLngZoom(seoul, 15f)
     }
 
-    GoogleMap(
-        modifier = modifier.fillMaxSize(),
-        cameraPositionState = cameraPositionState
-    )
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .systemBarsPadding()
+    ) {
+        MainSearchBar(onSearchClick = navigateToStopList)
+        MainTabRow(
+            selectedTab = MainTab.NEARBY_STOPS,
+            onHomeClick = navigateToHome,
+            onNearbyStopsClick = { }
+        )
+
+        GoogleMap(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(vertical = 5.dp)
+                .padding(horizontal = 5.dp)
+                .clip(RoundedCornerShape(15.dp)),
+            cameraPositionState = cameraPositionState
+        )
+    }
 }
