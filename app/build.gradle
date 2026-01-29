@@ -21,6 +21,10 @@ android {
         versionName "1.6"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        if (properties['MAPS_API_KEY'] != null) {
+            manifestPlaceholders = [MAPS_API_KEY: properties['MAPS_API_KEY']]
+        }
     }
 
     signingConfigs {

@@ -1,16 +1,13 @@
 package com.chaeny.busoda.nearbystops
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import com.chaeny.busoda.ui.component.MainSearchBar
-import com.chaeny.busoda.ui.component.MainTab
-import com.chaeny.busoda.ui.component.MainTabRow
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
 fun NearbystopsScreen(
@@ -18,23 +15,14 @@ fun NearbystopsScreen(
     navigateToHome: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .systemBarsPadding()
-    ) {
-        MainSearchBar(onSearchClick = navigateToStopList)
-        MainTabRow(
-            selectedTab = MainTab.NEARBY_STOPS,
-            onHomeClick = navigateToHome,
-            onNearbyStopsClick = { }
-        )
+    val seoul = LatLng(37.5665, 126.9780)
 
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(text = "nearbystops screen")
-        }
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(seoul, 15f)
     }
+
+    GoogleMap(
+        modifier = modifier.fillMaxSize(),
+        cameraPositionState = cameraPositionState
+    )
 }
