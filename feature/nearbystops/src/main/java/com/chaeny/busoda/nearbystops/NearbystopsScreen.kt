@@ -1,6 +1,7 @@
 package com.chaeny.busoda.nearbystops
 
 import android.Manifest
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
@@ -16,10 +17,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.chaeny.busoda.ui.component.MainSearchBar
 import com.chaeny.busoda.ui.component.MainTab
 import com.chaeny.busoda.ui.component.MainTabRow
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -32,8 +35,10 @@ fun NearbystopsScreen(
     navigateToHome: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     val seoul = LatLng(37.5665, 126.9780)
     var hasLocationPermission by remember { mutableStateOf(false) }
+    var currentLocation by remember { mutableStateOf<LatLng?>(null) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
@@ -48,6 +53,28 @@ fun NearbystopsScreen(
                 Manifest.permission.ACCESS_COARSE_LOCATION
             )
         )
+    }
+
+    LaunchedEffect(hasLocationPermission) {
+        if (hasLocationPermission) {
+            val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+            try {
+                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                    location?.let {
+                        currentLocation = LatLng(it.latitude, it.longitude)
+                        Log.d("Location", "Current location fetched: ${it.latitude}, ${it.longitude}")
+                    } ?: run {
+                        Log.d("Location", "Location is null")
+                    }
+                }
+            } catch (e: SecurityException) {
+                Log.d("Location", "SecurityException: ${e.message}")
+            }
+        }
+    }
+
+    LaunchedEffect(currentLocation) {
+        Log.d("Location", "currentLocation changed: $currentLocation")
     }
 
     val cameraPositionState = rememberCameraPositionState {
