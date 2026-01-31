@@ -78,7 +78,14 @@ fun NearbystopsScreen(
     }
 
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(seoul, 15f)
+            position = CameraPosition.fromLatLngZoom(currentLocation ?: seoul, 15f)
+    }
+
+    LaunchedEffect(currentLocation) {
+        currentLocation?.let {
+            cameraPositionState.position = CameraPosition.fromLatLngZoom(it, 15f)
+            Log.d("Location", "Camera moved to: $it")
+        }
     }
 
     Column(
