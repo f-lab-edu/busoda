@@ -1,7 +1,6 @@
 package com.chaeny.busoda.nearbystops
 
 import android.Manifest
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
@@ -62,19 +61,12 @@ fun NearbystopsScreen(
                 fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                     location?.let {
                         currentLocation = LatLng(it.latitude, it.longitude)
-                        Log.d("Location", "Current location fetched: ${it.latitude}, ${it.longitude}")
-                    } ?: run {
-                        Log.d("Location", "Location is null")
                     }
                 }
             } catch (e: SecurityException) {
-                Log.d("Location", "SecurityException: ${e.message}")
+
             }
         }
-    }
-
-    LaunchedEffect(currentLocation) {
-        Log.d("Location", "currentLocation changed: $currentLocation")
     }
 
     val cameraPositionState = rememberCameraPositionState {
@@ -84,7 +76,6 @@ fun NearbystopsScreen(
     LaunchedEffect(currentLocation) {
         currentLocation?.let {
             cameraPositionState.position = CameraPosition.fromLatLngZoom(it, 15f)
-            Log.d("Location", "Camera moved to: $it")
         }
     }
 
