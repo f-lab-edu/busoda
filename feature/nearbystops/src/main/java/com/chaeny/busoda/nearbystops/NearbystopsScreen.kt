@@ -1,7 +1,6 @@
 package com.chaeny.busoda.nearbystops
 
 import android.Manifest
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
@@ -39,10 +38,7 @@ fun NearbystopsScreen(
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
-        hasLocationPermission = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
-                permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
-        Log.d("Location", "Permission granted: $hasLocationPermission")
-        Log.d("Location", "Permissions: $permissions")
+        hasLocationPermission = permissions.values.any { it }
     }
 
     LaunchedEffect(Unit) {
@@ -77,9 +73,7 @@ fun NearbystopsScreen(
                 .padding(horizontal = 5.dp)
                 .clip(RoundedCornerShape(15.dp)),
             cameraPositionState = cameraPositionState,
-            properties = MapProperties(isMyLocationEnabled = hasLocationPermission).also {
-                Log.d("Location", "Map isMyLocationEnabled: $hasLocationPermission")
-            }
+            properties = MapProperties(isMyLocationEnabled = hasLocationPermission)
         )
     }
 }
