@@ -144,7 +144,7 @@ private fun SearchBar(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(top = 20.dp, start = 20.dp, end = 36.dp),
+            .padding(top = 10.dp, start = 20.dp, end = 36.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = navigateBack) {
