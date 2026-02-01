@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -18,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.chaeny.busoda.ui.component.MainSearchBar
 import com.chaeny.busoda.ui.component.MainTab
@@ -27,7 +27,9 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.rememberMarkerState
 
 @Composable
 fun NearbystopsScreen(
@@ -98,7 +100,15 @@ fun NearbystopsScreen(
                 .clip(RoundedCornerShape(15.dp)),
             cameraPositionState = cameraPositionState,
             properties = MapProperties(isMyLocationEnabled = uiState.hasLocationPermission)
-        )
+        ) {
+            DUMMY_BUS_STOPS.forEach { stop ->
+                Marker(
+                    state = rememberMarkerState(position = stop.position),
+                    title = stop.stopName,
+                    snippet = stop.stopId
+                )
+            }
+        }
     }
 }
 
@@ -107,4 +117,16 @@ private val DEFAULT_LOCATION = LatLng(37.5665, 126.9780)
 private val LOCATION_PERMISSIONS = arrayOf(
     Manifest.permission.ACCESS_FINE_LOCATION,
     Manifest.permission.ACCESS_COARSE_LOCATION
+)
+
+private data class BusStopMarker(
+    val stopId: String,
+    val stopName: String,
+    val position: LatLng
+)
+
+private val DUMMY_BUS_STOPS = listOf(
+    BusStopMarker("16001", "서울시청", LatLng(37.5663, 126.9779)),
+    BusStopMarker("16002", "을지로입구역", LatLng(37.5657, 126.9824)),
+    BusStopMarker("16003", "명동역", LatLng(37.5607, 126.9856))
 )
