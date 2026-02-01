@@ -38,7 +38,6 @@ fun NearbystopsScreen(
     val viewModel: NearbystopsViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
-    val seoul = LatLng(37.5665, 126.9780)
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
@@ -47,20 +46,14 @@ fun NearbystopsScreen(
     }
 
     LaunchedEffect(Unit) {
-        val hasPermission = ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
+        val hasPermission = LOCATION_PERMISSIONS.any { permission ->
+            ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+        }
 
         if (hasPermission) {
             viewModel.onIntent(NearbystopsIntent.UpdatePermission(true))
         } else {
-            permissionLauncher.launch(
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                )
-            )
+            permissionLauncher.launch(LOCATION_PERMISSIONS)
         }
     }
 
@@ -76,12 +69,12 @@ fun NearbystopsScreen(
     }
 
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(uiState.currentLocation ?: seoul, 15f)
+        position = CameraPosition.fromLatLngZoom(uiState.currentLocation ?: DEFAULT_LOCATION, DEFAULT_ZOOM_LEVEL)
     }
 
     LaunchedEffect(uiState.currentLocation) {
         uiState.currentLocation?.let {
-            cameraPositionState.position = CameraPosition.fromLatLngZoom(it, 15f)
+            cameraPositionState.position = CameraPosition.fromLatLngZoom(it, DEFAULT_ZOOM_LEVEL)
         }
     }
 
@@ -108,3 +101,10 @@ fun NearbystopsScreen(
         )
     }
 }
+
+private const val DEFAULT_ZOOM_LEVEL = 15f
+private val DEFAULT_LOCATION = LatLng(37.5665, 126.9780)
+private val LOCATION_PERMISSIONS = arrayOf(
+    Manifest.permission.ACCESS_FINE_LOCATION,
+    Manifest.permission.ACCESS_COARSE_LOCATION
+)
