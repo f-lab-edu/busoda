@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -18,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.chaeny.busoda.ui.component.MainSearchBar
 import com.chaeny.busoda.ui.component.MainTab
 import com.chaeny.busoda.ui.component.MainTabRow
@@ -34,10 +36,11 @@ fun NearbystopsScreen(
     navigateToHome: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val viewModel: NearbystopsViewModel = hiltViewModel()
+    val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
     val seoul = LatLng(37.5665, 126.9780)
     var hasLocationPermission by remember { mutableStateOf(false) }
-    var currentLocation by remember { mutableStateOf<LatLng?>(null) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
@@ -57,24 +60,20 @@ fun NearbystopsScreen(
     LaunchedEffect(hasLocationPermission) {
         if (hasLocationPermission) {
             val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-            try {
-                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                    location?.let {
-                        currentLocation = LatLng(it.latitude, it.longitude)
-                    }
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                location?.let {
+                    viewModel.onIntent(NearbystopsIntent.UpdateLocation(LatLng(it.latitude, it.longitude)))
                 }
-            } catch (e: SecurityException) {
-
             }
         }
     }
 
     val cameraPositionState = rememberCameraPositionState {
-            position = CameraPosition.fromLatLngZoom(currentLocation ?: seoul, 15f)
+        position = CameraPosition.fromLatLngZoom(uiState.currentLocation ?: seoul, 15f)
     }
 
-    LaunchedEffect(currentLocation) {
-        currentLocation?.let {
+    LaunchedEffect(uiState.currentLocation) {
+        uiState.currentLocation?.let {
             cameraPositionState.position = CameraPosition.fromLatLngZoom(it, 15f)
         }
     }
