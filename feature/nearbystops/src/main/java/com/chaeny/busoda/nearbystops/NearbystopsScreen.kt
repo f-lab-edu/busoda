@@ -12,9 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
@@ -40,12 +37,11 @@ fun NearbystopsScreen(
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
     val seoul = LatLng(37.5665, 126.9780)
-    var hasLocationPermission by remember { mutableStateOf(false) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
-        hasLocationPermission = permissions.values.any { it }
+        viewModel.onIntent(NearbystopsIntent.UpdatePermission(permissions.values.any { it }))
     }
 
     LaunchedEffect(Unit) {
@@ -57,8 +53,8 @@ fun NearbystopsScreen(
         )
     }
 
-    LaunchedEffect(hasLocationPermission) {
-        if (hasLocationPermission) {
+    LaunchedEffect(uiState.hasLocationPermission) {
+        if (uiState.hasLocationPermission) {
             val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
             fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                 location?.let {
@@ -97,7 +93,7 @@ fun NearbystopsScreen(
                 .padding(horizontal = 5.dp)
                 .clip(RoundedCornerShape(15.dp)),
             cameraPositionState = cameraPositionState,
-            properties = MapProperties(isMyLocationEnabled = hasLocationPermission)
+            properties = MapProperties(isMyLocationEnabled = uiState.hasLocationPermission)
         )
     }
 }

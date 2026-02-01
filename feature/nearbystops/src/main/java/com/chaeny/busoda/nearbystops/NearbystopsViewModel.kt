@@ -16,6 +16,9 @@ internal class NearbystopsViewModel @Inject constructor() :
 
     override fun onIntent(intent: NearbystopsIntent) {
         when (intent) {
+            is NearbystopsIntent.UpdatePermission -> {
+                setState { copy(hasLocationPermission = intent.granted) }
+            }
             is NearbystopsIntent.UpdateLocation -> {
                 setState { copy(currentLocation = intent.location) }
             }
@@ -24,10 +27,12 @@ internal class NearbystopsViewModel @Inject constructor() :
 }
 
 data class NearbystopsUiState(
+    val hasLocationPermission: Boolean = false,
     val currentLocation: LatLng? = null
 ) : UiState
 
 sealed class NearbystopsIntent : UiIntent {
+    data class UpdatePermission(val granted: Boolean) : NearbystopsIntent()
     data class UpdateLocation(val location: LatLng) : NearbystopsIntent()
 }
 
