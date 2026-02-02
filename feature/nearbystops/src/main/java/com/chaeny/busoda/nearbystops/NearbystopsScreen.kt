@@ -126,7 +126,8 @@ private data class BusStopMarker(
 )
 
 private val DUMMY_BUS_STOPS = listOf(
-    BusStopMarker("16001", "서울시청", LatLng(37.5663, 126.9779)),
-    BusStopMarker("16002", "을지로입구역", LatLng(37.5657, 126.9824)),
-    BusStopMarker("16003", "명동역", LatLng(37.5607, 126.9856))
+    BusStopMarker("02503", "시청역", LatLng(37.566031, 126.97701)),
+    BusStopMarker("02662", "시청.덕수궁", LatLng(37.566254, 126.976921)),
+    BusStopMarker("02902", "덕수궁", LatLng(37.566106, 126.976925)),
+    BusStopMarker("02286", "시청앞.덕수궁", LatLng(37.5662122834, 126.9768355729))
 )
