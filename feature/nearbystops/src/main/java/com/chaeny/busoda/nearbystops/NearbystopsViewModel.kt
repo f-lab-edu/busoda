@@ -1,5 +1,7 @@
 package com.chaeny.busoda.nearbystops
 
+import androidx.lifecycle.viewModelScope
+import com.chaeny.busoda.data.repository.NearbyBusStopsRepository
 import com.chaeny.busoda.model.BusStopMarker
 import com.chaeny.busoda.mvi.BaseViewModel
 import com.chaeny.busoda.mvi.SideEffect
@@ -7,11 +9,13 @@ import com.chaeny.busoda.mvi.UiIntent
 import com.chaeny.busoda.mvi.UiState
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-internal class NearbystopsViewModel @Inject constructor() :
-    BaseViewModel<NearbystopsIntent, NearbystopsUiState, NearbystopsEffect>(
+internal class NearbystopsViewModel @Inject constructor(
+    private val nearbyBusStopsRepository: NearbyBusStopsRepository
+) : BaseViewModel<NearbystopsIntent, NearbystopsUiState, NearbystopsEffect>(
         initialState = NearbystopsUiState()
     ) {
 
@@ -22,20 +26,27 @@ internal class NearbystopsViewModel @Inject constructor() :
             }
             is NearbystopsIntent.UpdateLocation -> {
                 setState { copy(currentLocation = intent.location) }
+                loadNearbyBusStops(intent.location.latitude, intent.location.longitude)
             }
         }
+    }
+
+    private fun loadNearbyBusStops(latitude: Double, longitude: Double) {
+        viewModelScope.launch {
+            val busStops = nearbyBusStopsRepository.getNearbyBusStops(latitude, longitude, DEFAULT_RADIUS)
+            setState { copy(busStops = busStops) }
+        }
+    }
+
+    companion object {
+        private const val DEFAULT_RADIUS = 500
     }
 }
 
 data class NearbystopsUiState(
     val hasLocationPermission: Boolean = false,
     val currentLocation: LatLng? = null,
-    val busStops: List<BusStopMarker> = listOf(
-        BusStopMarker("02503", "시청역", 37.566031, 126.97701),
-        BusStopMarker("02662", "시청.덕수궁", 37.566254, 126.976921),
-        BusStopMarker("02902", "덕수궁", 37.566106, 126.976925),
-        BusStopMarker("02286", "시청앞.덕수궁", 37.5662122834, 126.9768355729)
-    )
+    val busStops: List<BusStopMarker> = emptyList()
 ) : UiState
 
 sealed class NearbystopsIntent : UiIntent {
