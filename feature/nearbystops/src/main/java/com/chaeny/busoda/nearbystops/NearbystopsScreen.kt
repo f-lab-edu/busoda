@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.chaeny.busoda.model.BusStopMarker
 import com.chaeny.busoda.ui.component.MainSearchBar
 import com.chaeny.busoda.ui.component.MainTab
 import com.chaeny.busoda.ui.component.MainTabRow
@@ -103,7 +104,7 @@ fun NearbystopsScreen(
         ) {
             DUMMY_BUS_STOPS.forEach { stop ->
                 Marker(
-                    state = rememberMarkerState(position = stop.position),
+                    state = rememberMarkerState(position = LatLng(stop.latitude, stop.longitude)),
                     title = stop.stopName,
                     snippet = stop.stopId
                 )
@@ -119,15 +120,9 @@ private val LOCATION_PERMISSIONS = arrayOf(
     Manifest.permission.ACCESS_COARSE_LOCATION
 )
 
-private data class BusStopMarker(
-    val stopId: String,
-    val stopName: String,
-    val position: LatLng
-)
-
 private val DUMMY_BUS_STOPS = listOf(
-    BusStopMarker("02503", "시청역", LatLng(37.566031, 126.97701)),
-    BusStopMarker("02662", "시청.덕수궁", LatLng(37.566254, 126.976921)),
-    BusStopMarker("02902", "덕수궁", LatLng(37.566106, 126.976925)),
-    BusStopMarker("02286", "시청앞.덕수궁", LatLng(37.5662122834, 126.9768355729))
+    BusStopMarker("02503", "시청역", 37.566031, 126.97701),
+    BusStopMarker("02662", "시청.덕수궁", 37.566254, 126.976921),
+    BusStopMarker("02902", "덕수궁", 37.566106, 126.976925),
+    BusStopMarker("02286", "시청앞.덕수궁", 37.5662122834, 126.9768355729)
 )
