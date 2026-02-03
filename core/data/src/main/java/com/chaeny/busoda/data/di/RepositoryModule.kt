@@ -2,9 +2,9 @@ package com.chaeny.busoda.data.di
 
 import com.chaeny.busoda.data.repository.ApiBusStopDetailRepository
 import com.chaeny.busoda.data.repository.ApiBusStopRepository
+import com.chaeny.busoda.data.repository.ApiNearbyBusStopsRepository
 import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.data.repository.BusStopRepository
-import com.chaeny.busoda.data.repository.DummyNearbyBusStopsRepository
 import com.chaeny.busoda.data.repository.FavoriteRepository
 import com.chaeny.busoda.data.repository.NearbyBusStopsRepository
 import com.chaeny.busoda.data.repository.RoomFavoriteRepository
@@ -32,5 +32,5 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindNearbyBusStopsRepository(implementation: DummyNearbyBusStopsRepository): NearbyBusStopsRepository
+    abstract fun bindNearbyBusStopsRepository(implementation: ApiNearbyBusStopsRepository): NearbyBusStopsRepository
 }
