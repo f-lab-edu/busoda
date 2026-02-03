@@ -35,6 +35,7 @@ import com.google.maps.android.compose.rememberMarkerState
 fun NearbystopsScreen(
     navigateToStopList: () -> Unit,
     navigateToHome: () -> Unit,
+    navigateToStopDetail: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val viewModel: NearbystopsViewModel = hiltViewModel()
@@ -80,6 +81,14 @@ fun NearbystopsScreen(
         }
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.sideEffect.collect { effect ->
+            when (effect) {
+                is NearbystopsEffect.NavigateToStopDetail -> navigateToStopDetail(effect.stopId)
+            }
+        }
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -105,7 +114,11 @@ fun NearbystopsScreen(
                 Marker(
                     state = rememberMarkerState(position = LatLng(stop.latitude, stop.longitude)),
                     title = stop.stopName,
-                    snippet = stop.stopId
+                    snippet = stop.stopId,
+                    onClick = {
+                        viewModel.onIntent(NearbystopsIntent.ClickBusStop(stop.stopId))
+                        true
+                    }
                 )
             }
         }

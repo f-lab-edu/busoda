@@ -44,6 +44,9 @@ fun BusodaNavGraph(
                 },
                 navigateToHome = {
                     navController.popBackStack()
+                },
+                navigateToStopDetail = { stopId ->
+                    navController.navigate("stop_detail/$stopId")
                 }
             )
         }
