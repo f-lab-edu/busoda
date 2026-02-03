@@ -5,6 +5,7 @@ import com.chaeny.busoda.data.model.StopPositionResponse
 import com.chaeny.busoda.data.network.BusApiService
 import com.chaeny.busoda.data.util.replaceStopNameEntities
 import com.chaeny.busoda.model.BusStopPosition
+import java.io.IOException
 import javax.inject.Inject
 
 class ApiNearbyBusStopsRepository @Inject constructor(
@@ -12,12 +13,18 @@ class ApiNearbyBusStopsRepository @Inject constructor(
 ) : NearbyBusStopsRepository {
 
     override suspend fun getNearbyBusStops(latitude: Double, longitude: Double, radius: Int): List<BusStopPosition> {
-        val response = busApiService.getStationByPos(
-            longitude = longitude,
-            latitude = latitude,
-            radius = radius
-        )
-        return response.toBusStopPositionList()
+        return try {
+            val response = busApiService.getStationByPos(
+                longitude = longitude,
+                latitude = latitude,
+                radius = radius
+            )
+            response.toBusStopPositionList()
+        } catch (e: IOException) {
+            emptyList()
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
 
     private fun StopPositionResponse.toBusStopPositionList(): List<BusStopPosition> {
