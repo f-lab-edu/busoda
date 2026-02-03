@@ -2,7 +2,7 @@ package com.chaeny.busoda.nearbystops
 
 import androidx.lifecycle.viewModelScope
 import com.chaeny.busoda.data.repository.NearbyBusStopsRepository
-import com.chaeny.busoda.model.BusStopMarker
+import com.chaeny.busoda.model.BusStopPosition
 import com.chaeny.busoda.mvi.BaseViewModel
 import com.chaeny.busoda.mvi.SideEffect
 import com.chaeny.busoda.mvi.UiIntent
@@ -46,7 +46,7 @@ internal class NearbystopsViewModel @Inject constructor(
 data class NearbystopsUiState(
     val hasLocationPermission: Boolean = false,
     val currentLocation: LatLng? = null,
-    val busStops: List<BusStopMarker> = emptyList()
+    val busStops: List<BusStopPosition> = emptyList()
 ) : UiState
 
 sealed class NearbystopsIntent : UiIntent {
