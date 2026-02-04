@@ -17,13 +17,13 @@ android {
         applicationId "com.chaeny.busoda"
         minSdk libs.versions.minSdk.get().toInteger()
         targetSdk libs.versions.targetSdk.get().toInteger()
-        versionCode 7
-        versionName "1.6"
+        versionCode 8
+        versionName "1.7"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         if (properties['MAPS_API_KEY'] != null) {
-            manifestPlaceholders = [MAPS_API_KEY: properties['MAPS_API_KEY']]
+            manifestPlaceholders += [MAPS_API_KEY: properties['MAPS_API_KEY']]
         }
     }
 
