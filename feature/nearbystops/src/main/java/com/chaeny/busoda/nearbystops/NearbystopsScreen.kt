@@ -81,13 +81,7 @@ fun NearbystopsScreen(
         }
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.sideEffect.collect { effect ->
-            when (effect) {
-                is NearbystopsEffect.NavigateToStopDetail -> navigateToStopDetail(effect.stopId)
-            }
-        }
-    }
+    CollectEffects(navigateToStopDetail, viewModel)
 
     Column(
         modifier = modifier
@@ -120,6 +114,20 @@ fun NearbystopsScreen(
                         true
                     }
                 )
+            }
+        }
+    }
+}
+
+@Composable
+private fun CollectEffects(
+    navigateToStopDetail: (String) -> Unit,
+    viewModel: NearbystopsViewModel
+) {
+    LaunchedEffect(Unit) {
+        viewModel.sideEffect.collect { effect ->
+            when (effect) {
+                is NearbystopsEffect.NavigateToStopDetail -> navigateToStopDetail(effect.stopId)
             }
         }
     }
