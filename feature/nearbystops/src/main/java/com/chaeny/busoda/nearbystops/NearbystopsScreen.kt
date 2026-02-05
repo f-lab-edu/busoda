@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
@@ -25,11 +26,14 @@ import com.chaeny.busoda.ui.component.MainTabRow
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
 
 @Composable
 fun NearbystopsScreen(
@@ -75,12 +79,8 @@ fun NearbystopsScreen(
         position = CameraPosition.fromLatLngZoom(uiState.currentLocation ?: DEFAULT_LOCATION, DEFAULT_ZOOM_LEVEL)
     }
 
-    LaunchedEffect(uiState.currentLocation) {
-        uiState.currentLocation?.let {
-            cameraPositionState.position = CameraPosition.fromLatLngZoom(it, DEFAULT_ZOOM_LEVEL)
-        }
-    }
-
+    MoveCameraToCurrentLocation(uiState.currentLocation, cameraPositionState)
+    ReloadStopsOnCameraMove(cameraPositionState, viewModel)
     CollectEffects(navigateToStopDetail, viewModel)
 
     Column(
@@ -130,6 +130,33 @@ private fun CollectEffects(
                 is NearbystopsEffect.NavigateToStopDetail -> navigateToStopDetail(effect.stopId)
             }
         }
+    }
+}
+
+@Composable
+private fun MoveCameraToCurrentLocation(
+    currentLocation: LatLng?,
+    cameraPositionState: CameraPositionState
+) {
+    LaunchedEffect(currentLocation) {
+        currentLocation?.let {
+            cameraPositionState.position = CameraPosition.fromLatLngZoom(it, DEFAULT_ZOOM_LEVEL)
+        }
+    }
+}
+
+@OptIn(FlowPreview::class)
+@Composable
+private fun ReloadStopsOnCameraMove(
+    cameraPositionState: CameraPositionState,
+    viewModel: NearbystopsViewModel
+) {
+    LaunchedEffect(cameraPositionState) {
+        snapshotFlow { cameraPositionState.position.target }
+            .debounce(1000)
+            .collect { latLng ->
+                viewModel.onIntent(NearbystopsIntent.LoadNearbyStops(LatLng(latLng.latitude, latLng.longitude)))
+            }
     }
 }
 
