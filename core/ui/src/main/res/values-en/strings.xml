@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="stop_search">Search for bus stop</string>
+    <string name="tab_home">Home</string>
+    <string name="tab_nearby_stops">Nearby Stops</string>
+</resources>
