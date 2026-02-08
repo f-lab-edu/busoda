@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -110,21 +111,23 @@ fun NearbystopsScreen(
             Log.d(TAG, "[UI] 마커 렌더링 시작: ${uiState.busStops.size}개")
 
             uiState.busStops.forEachIndexed { index, stop ->
-                val markerState = MarkerState(position = LatLng(stop.latitude, stop.longitude))
+                key(stop.stopId) {
+                    val markerState = rememberMarkerState(position = LatLng(stop.latitude, stop.longitude))
 
-                if (index == 0) {
-                    Log.d(TAG, "[방식A - 직접생성] MarkerState 객체 생성: ${System.identityHashCode(markerState)}")
-                }
-
-                Marker(
-                    state = markerState,
-                    title = stop.stopName,
-                    snippet = stop.stopId,
-                    onClick = {
-                        viewModel.onIntent(NearbystopsIntent.ClickBusStop(stop.stopId))
-                        true
+                    if (index == 0) {
+                        Log.d(TAG, "[방식B - remember+key] MarkerState 객체: ${System.identityHashCode(markerState)}, position: ${markerState.position}")
                     }
-                )
+
+                    Marker(
+                        state = markerState,
+                        title = stop.stopName,
+                        snippet = stop.stopId,
+                        onClick = {
+                            viewModel.onIntent(NearbystopsIntent.ClickBusStop(stop.stopId))
+                            true
+                        }
+                    )
+                }
             }
 
             val elapsed = System.currentTimeMillis() - startTime
