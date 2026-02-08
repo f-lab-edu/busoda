@@ -2,6 +2,7 @@ package com.chaeny.busoda.nearbystops
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
@@ -104,9 +105,19 @@ fun NearbystopsScreen(
             cameraPositionState = cameraPositionState,
             properties = MapProperties(isMyLocationEnabled = uiState.hasLocationPermission)
         ) {
-            uiState.busStops.forEach { stop ->
+            Log.d(TAG, "[UI] 마커 렌더링 시작: ${uiState.busStops.size}개")
+            uiState.busStops.forEachIndexed { index, stop ->
+                val markerState = rememberMarkerState(position = LatLng(stop.latitude, stop.longitude))
+
+                if (index == 0) {
+                    Log.d(TAG, "[UI] 첫 번째 마커:")
+                    Log.d(TAG, "  State 정류소: ${stop.stopName}")
+                    Log.d(TAG, "  State 위치: (${stop.latitude}, ${stop.longitude})")
+                    Log.d(TAG, "  MarkerState 실제 위치: ${markerState.position}")
+                }
+
                 Marker(
-                    state = rememberMarkerState(position = LatLng(stop.latitude, stop.longitude)),
+                    state = markerState,
                     title = stop.stopName,
                     snippet = stop.stopId,
                     onClick = {
@@ -160,6 +171,7 @@ private fun ReloadStopsOnCameraMove(
     }
 }
 
+private const val TAG = "NearbystopsScreen"
 private const val DEFAULT_ZOOM_LEVEL = 15f
 private val DEFAULT_LOCATION = LatLng(37.5665, 126.9780)
 private val LOCATION_PERMISSIONS = arrayOf(
