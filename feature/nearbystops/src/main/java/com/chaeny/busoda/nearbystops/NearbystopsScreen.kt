@@ -2,7 +2,6 @@ package com.chaeny.busoda.nearbystops
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
@@ -14,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,7 +32,6 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 
@@ -107,31 +104,17 @@ fun NearbystopsScreen(
             cameraPositionState = cameraPositionState,
             properties = MapProperties(isMyLocationEnabled = uiState.hasLocationPermission)
         ) {
-            val startTime = System.currentTimeMillis()
-            Log.d(TAG, "[UI] 마커 렌더링 시작: ${uiState.busStops.size}개")
-
-            uiState.busStops.forEachIndexed { index, stop ->
-                key(stop.stopId) {
-                    val markerState = rememberMarkerState(position = LatLng(stop.latitude, stop.longitude))
-
-                    if (index == 0) {
-                        Log.d(TAG, "[방식B - remember+key] MarkerState 객체: ${System.identityHashCode(markerState)}, position: ${markerState.position}")
+            uiState.busStops.forEach { stop ->
+                Marker(
+                    state = MarkerState(position = LatLng(stop.latitude, stop.longitude)),
+                    title = stop.stopName,
+                    snippet = stop.stopId,
+                    onClick = {
+                        viewModel.onIntent(NearbystopsIntent.ClickBusStop(stop.stopId))
+                        true
                     }
-
-                    Marker(
-                        state = markerState,
-                        title = stop.stopName,
-                        snippet = stop.stopId,
-                        onClick = {
-                            viewModel.onIntent(NearbystopsIntent.ClickBusStop(stop.stopId))
-                            true
-                        }
-                    )
-                }
+                )
             }
-
-            val elapsed = System.currentTimeMillis() - startTime
-            Log.d(TAG, "[UI] 마커 렌더링 완료: ${elapsed}ms")
         }
     }
 }
@@ -177,7 +160,6 @@ private fun ReloadStopsOnCameraMove(
     }
 }
 
-private const val TAG = "NearbystopsScreen"
 private const val DEFAULT_ZOOM_LEVEL = 15f
 private val DEFAULT_LOCATION = LatLng(37.5665, 126.9780)
 private val LOCATION_PERMISSIONS = arrayOf(
