@@ -31,6 +31,7 @@ import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.FlowPreview
@@ -107,7 +108,7 @@ fun NearbystopsScreen(
         ) {
             Log.d(TAG, "[UI] 마커 렌더링 시작: ${uiState.busStops.size}개")
             uiState.busStops.forEachIndexed { index, stop ->
-                val markerState = rememberMarkerState(position = LatLng(stop.latitude, stop.longitude))
+                val markerState = MarkerState(position = LatLng(stop.latitude, stop.longitude))
 
                 if (index == 0) {
                     Log.d(TAG, "[UI] 첫 번째 마커:")
