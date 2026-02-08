@@ -106,15 +106,14 @@ fun NearbystopsScreen(
             cameraPositionState = cameraPositionState,
             properties = MapProperties(isMyLocationEnabled = uiState.hasLocationPermission)
         ) {
+            val startTime = System.currentTimeMillis()
             Log.d(TAG, "[UI] 마커 렌더링 시작: ${uiState.busStops.size}개")
+
             uiState.busStops.forEachIndexed { index, stop ->
                 val markerState = MarkerState(position = LatLng(stop.latitude, stop.longitude))
 
                 if (index == 0) {
-                    Log.d(TAG, "[UI] 첫 번째 마커:")
-                    Log.d(TAG, "  State 정류소: ${stop.stopName}")
-                    Log.d(TAG, "  State 위치: (${stop.latitude}, ${stop.longitude})")
-                    Log.d(TAG, "  MarkerState 실제 위치: ${markerState.position}")
+                    Log.d(TAG, "[방식A - 직접생성] MarkerState 객체 생성: ${System.identityHashCode(markerState)}")
                 }
 
                 Marker(
@@ -127,6 +126,9 @@ fun NearbystopsScreen(
                     }
                 )
             }
+
+            val elapsed = System.currentTimeMillis() - startTime
+            Log.d(TAG, "[UI] 마커 렌더링 완료: ${elapsed}ms")
         }
     }
 }
