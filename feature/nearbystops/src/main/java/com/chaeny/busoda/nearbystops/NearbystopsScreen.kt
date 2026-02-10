@@ -166,10 +166,16 @@ private fun ReloadStopsOnCameraMove(
     viewModel: NearbystopsViewModel
 ) {
     LaunchedEffect(cameraPositionState) {
-        snapshotFlow { cameraPositionState.position.target }
+        snapshotFlow { cameraPositionState.position }
             .debounce(1000)
-            .collect { latLng ->
-                viewModel.onIntent(NearbystopsIntent.LoadNearbyStops(LatLng(latLng.latitude, latLng.longitude)))
+            .collect { position ->
+                if (position.zoom >= MIN_ZOOM_LEVEL) {
+                    viewModel.onIntent(
+                        NearbystopsIntent.LoadNearbyStops(
+                            LatLng(position.target.latitude, position.target.longitude)
+                        )
+                    )
+                }
             }
     }
 }
@@ -200,6 +206,7 @@ fun Context.createCustomMarkerIcon(@DrawableRes id: Int): BitmapDescriptor {
 }
 
 private const val DEFAULT_ZOOM_LEVEL = 15f
+private const val MIN_ZOOM_LEVEL = 13f
 private val DEFAULT_LOCATION = LatLng(37.5665, 126.9780)
 private val LOCATION_PERMISSIONS = arrayOf(
     Manifest.permission.ACCESS_FINE_LOCATION,
