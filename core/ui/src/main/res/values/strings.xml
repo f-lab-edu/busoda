@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="stop_search">정류장 검색</string>
+    <string name="tab_home">홈</string>
+    <string name="tab_nearby_stops">주변정류소</string>
+</resources>
