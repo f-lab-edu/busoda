@@ -17,8 +17,8 @@ android {
         applicationId "com.chaeny.busoda"
         minSdk libs.versions.minSdk.get().toInteger()
         targetSdk libs.versions.targetSdk.get().toInteger()
-        versionCode 8
-        versionName "1.7"
+        versionCode 9
+        versionName "1.8"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
