@@ -175,6 +175,8 @@ private fun ReloadStopsOnCameraMove(
                             LatLng(position.target.latitude, position.target.longitude)
                         )
                     )
+                } else {
+                    viewModel.onIntent(NearbystopsIntent.ClearBusStops)
                 }
             }
     }

@@ -34,6 +34,9 @@ internal class NearbystopsViewModel @Inject constructor(
             is NearbystopsIntent.ClickBusStop -> {
                 postSideEffect(NearbystopsEffect.NavigateToStopDetail(intent.stopId))
             }
+            is NearbystopsIntent.ClearBusStops -> {
+                setState { copy(busStops = emptyList()) }
+            }
         }
     }
 
@@ -60,6 +63,7 @@ sealed class NearbystopsIntent : UiIntent {
     data class UpdateLocation(val location: LatLng) : NearbystopsIntent()
     data class LoadNearbyStops(val location: LatLng) : NearbystopsIntent()
     data class ClickBusStop(val stopId: String) : NearbystopsIntent()
+    data object ClearBusStops : NearbystopsIntent()
 }
 
 sealed class NearbystopsEffect : SideEffect {
