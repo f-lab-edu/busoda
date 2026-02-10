@@ -1,9 +1,17 @@
 package com.chaeny.busoda.nearbystops
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.RectF
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.ui.graphics.toArgb
+import com.chaeny.busoda.ui.theme.SkyBlue
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -19,11 +27,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.createBitmap
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.chaeny.busoda.ui.component.MainSearchBar
 import com.chaeny.busoda.ui.component.MainTab
 import com.chaeny.busoda.ui.component.MainTabRow
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
@@ -104,11 +115,14 @@ fun NearbystopsScreen(
             cameraPositionState = cameraPositionState,
             properties = MapProperties(isMyLocationEnabled = uiState.hasLocationPermission)
         ) {
+            val busIcon = context.createCustomMarkerIcon(R.drawable.ic_bus_marker)
+
             uiState.busStops.forEach { stop ->
                 Marker(
                     state = MarkerState(position = LatLng(stop.latitude, stop.longitude)),
                     title = stop.stopName,
                     snippet = stop.stopId,
+                    icon = busIcon,
                     onClick = {
                         viewModel.onIntent(NearbystopsIntent.ClickBusStop(stop.stopId))
                         true
@@ -158,6 +172,31 @@ private fun ReloadStopsOnCameraMove(
                 viewModel.onIntent(NearbystopsIntent.LoadNearbyStops(LatLng(latLng.latitude, latLng.longitude)))
             }
     }
+}
+
+fun Context.createCustomMarkerIcon(@DrawableRes id: Int): BitmapDescriptor {
+    val size = 100
+    val bitmap = createBitmap(size, size)
+    val canvas = Canvas(bitmap)
+
+    val paint = Paint().apply {
+        color = SkyBlue.toArgb()
+        isAntiAlias = true
+    }
+    val rect = RectF(10f, 10f, (size - 10).toFloat(), (size - 10).toFloat())
+    canvas.drawRoundRect(rect, 15f, 15f, paint)
+
+    val iconSize = (size * 0.6f).toInt()
+    val iconDrawable = ContextCompat.getDrawable(this, id)
+        ?: return BitmapDescriptorFactory.defaultMarker()
+
+    val left = (size - iconSize) / 2
+    val top = (size - iconSize) / 2
+    iconDrawable.setBounds(left, top, left + iconSize, top + iconSize)
+    iconDrawable.setTint(Color.WHITE)
+    iconDrawable.draw(canvas)
+
+    return BitmapDescriptorFactory.fromBitmap(bitmap)
 }
 
 private const val DEFAULT_ZOOM_LEVEL = 15f
