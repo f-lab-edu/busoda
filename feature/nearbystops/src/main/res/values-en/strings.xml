@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="stop_name_label">Stop Name : %s</string>
+    <string name="stop_id_label">ID : %s</string>
+</resources>

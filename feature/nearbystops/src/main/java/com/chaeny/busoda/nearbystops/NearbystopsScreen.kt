@@ -8,15 +8,19 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.compose.ui.graphics.toArgb
-import com.chaeny.busoda.ui.theme.SkyBlue
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -24,14 +28,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.createBitmap
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.chaeny.busoda.model.BusStopPosition
 import com.chaeny.busoda.ui.component.MainSearchBar
 import com.chaeny.busoda.ui.component.MainTab
 import com.chaeny.busoda.ui.component.MainTabRow
+import com.chaeny.busoda.ui.theme.MainGreen
+import com.chaeny.busoda.ui.theme.SkyBlue
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
@@ -93,6 +102,7 @@ fun NearbystopsScreen(
     MoveCameraToCurrentLocation(uiState.currentLocation, cameraPositionState)
     ReloadStopsOnCameraMove(cameraPositionState, viewModel)
     CollectEffects(navigateToStopDetail, viewModel)
+    ShowMarkerInfoSheet(uiState, viewModel)
 
     Column(
         modifier = modifier
@@ -124,12 +134,30 @@ fun NearbystopsScreen(
                     snippet = stop.stopId,
                     icon = busIcon,
                     onClick = {
-                        viewModel.onIntent(NearbystopsIntent.ClickBusStop(stop.stopId))
+                        viewModel.onIntent(NearbystopsIntent.ShowMarkerInfo(stop))
                         true
                     }
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun ShowMarkerInfoSheet(
+    uiState: NearbystopsUiState,
+    viewModel: NearbystopsViewModel
+) {
+    uiState.selectedMarkerInfo?.let { stop ->
+        MarkerInfoBottomSheet(
+            stop = stop,
+            onDismiss = {
+                viewModel.onIntent(NearbystopsIntent.HideMarkerInfo)
+            },
+            onNavigateToDetail = {
+                viewModel.onIntent(NearbystopsIntent.ClickBusStop(stop.stopId))
+            }
+        )
     }
 }
 
@@ -205,6 +233,37 @@ fun Context.createCustomMarkerIcon(@DrawableRes id: Int): BitmapDescriptor {
     iconDrawable.draw(canvas)
 
     return BitmapDescriptorFactory.fromBitmap(bitmap)
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun MarkerInfoBottomSheet(
+    stop: BusStopPosition,
+    onDismiss: () -> Unit,
+    onNavigateToDetail: () -> Unit
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = MainGreen
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onNavigateToDetail() }
+                .padding(bottom = 20.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.stop_name_label, stop.stopName),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(horizontal = 25.dp, vertical = 5.dp)
+            )
+            Text(
+                text = stringResource(R.string.stop_id_label, stop.stopId),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(horizontal = 25.dp, vertical = 5.dp)
+            )
+        }
+    }
 }
 
 private const val DEFAULT_ZOOM_LEVEL = 15f

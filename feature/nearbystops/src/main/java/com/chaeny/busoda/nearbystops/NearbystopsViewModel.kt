@@ -37,6 +37,12 @@ internal class NearbystopsViewModel @Inject constructor(
             is NearbystopsIntent.ClearBusStops -> {
                 setState { copy(busStops = emptyList()) }
             }
+            is NearbystopsIntent.ShowMarkerInfo -> {
+                setState { copy(selectedMarkerInfo = intent.stop) }
+            }
+            is NearbystopsIntent.HideMarkerInfo -> {
+                setState { copy(selectedMarkerInfo = null) }
+            }
         }
     }
 
@@ -55,7 +61,8 @@ internal class NearbystopsViewModel @Inject constructor(
 data class NearbystopsUiState(
     val hasLocationPermission: Boolean = false,
     val currentLocation: LatLng? = null,
-    val busStops: List<BusStopPosition> = emptyList()
+    val busStops: List<BusStopPosition> = emptyList(),
+    val selectedMarkerInfo: BusStopPosition? = null
 ) : UiState
 
 sealed class NearbystopsIntent : UiIntent {
@@ -64,6 +71,8 @@ sealed class NearbystopsIntent : UiIntent {
     data class LoadNearbyStops(val location: LatLng) : NearbystopsIntent()
     data class ClickBusStop(val stopId: String) : NearbystopsIntent()
     data object ClearBusStops : NearbystopsIntent()
+    data class ShowMarkerInfo(val stop: BusStopPosition) : NearbystopsIntent()
+    data object HideMarkerInfo : NearbystopsIntent()
 }
 
 sealed class NearbystopsEffect : SideEffect {
