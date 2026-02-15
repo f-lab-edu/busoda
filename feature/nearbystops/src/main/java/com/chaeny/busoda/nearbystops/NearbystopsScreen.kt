@@ -151,6 +151,7 @@ private fun ShowMarkerInfoSheet(
     uiState.selectedMarkerInfo?.let { stop ->
         MarkerInfoBottomSheet(
             stop = stop,
+            nextStopName = uiState.nextStopName,
             onDismiss = {
                 viewModel.onIntent(NearbystopsIntent.HideMarkerInfo)
             },
@@ -239,6 +240,7 @@ fun Context.createCustomMarkerIcon(@DrawableRes id: Int): BitmapDescriptor {
 @Composable
 private fun MarkerInfoBottomSheet(
     stop: BusStopPosition,
+    nextStopName: String,
     onDismiss: () -> Unit,
     onNavigateToDetail: () -> Unit
 ) {
@@ -258,7 +260,11 @@ private fun MarkerInfoBottomSheet(
                 modifier = Modifier.padding(horizontal = 25.dp, vertical = 5.dp)
             )
             Text(
-                text = stringResource(R.string.stop_id_label, stop.stopId),
+                text = if (nextStopName.isNotEmpty()) {
+                    stringResource(R.string.stop_info_label, stop.stopId, nextStopName)
+                } else {
+                    stop.stopId
+                },
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(horizontal = 25.dp, vertical = 5.dp)
             )
