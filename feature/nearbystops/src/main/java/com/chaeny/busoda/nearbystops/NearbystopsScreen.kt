@@ -40,8 +40,8 @@ import com.chaeny.busoda.model.BusStopPosition
 import com.chaeny.busoda.ui.component.MainSearchBar
 import com.chaeny.busoda.ui.component.MainTab
 import com.chaeny.busoda.ui.component.MainTabRow
-import com.chaeny.busoda.ui.theme.MainGreen
 import com.chaeny.busoda.ui.theme.SkyBlue
+import com.chaeny.busoda.ui.theme.White
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
@@ -249,7 +249,7 @@ private fun MarkerInfoBottomSheet(
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        containerColor = MainGreen
+        containerColor = White
     ) {
         Column(
             modifier = Modifier
