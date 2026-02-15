@@ -100,7 +100,7 @@ fun NearbystopsScreen(
         position = CameraPosition.fromLatLngZoom(uiState.currentLocation ?: DEFAULT_LOCATION, DEFAULT_ZOOM_LEVEL)
     }
 
-    MoveCameraToCurrentLocation(uiState.currentLocation, cameraPositionState)
+    MoveCameraToCurrentLocation(uiState.currentLocation, uiState.currentLocationLoaded, cameraPositionState, viewModel)
     ReloadStopsOnCameraMove(cameraPositionState, viewModel)
     CollectEffects(navigateToStopDetail, viewModel)
     ShowMarkerInfoSheet(uiState, viewModel)
@@ -181,11 +181,16 @@ private fun CollectEffects(
 @Composable
 private fun MoveCameraToCurrentLocation(
     currentLocation: LatLng?,
-    cameraPositionState: CameraPositionState
+    currentLocationLoaded: Boolean,
+    cameraPositionState: CameraPositionState,
+    viewModel: NearbystopsViewModel
 ) {
-    LaunchedEffect(currentLocation) {
-        currentLocation?.let {
-            cameraPositionState.position = CameraPosition.fromLatLngZoom(it, DEFAULT_ZOOM_LEVEL)
+    LaunchedEffect(currentLocation, currentLocationLoaded) {
+        if (!currentLocationLoaded) {
+            currentLocation?.let {
+                cameraPositionState.position = CameraPosition.fromLatLngZoom(it, DEFAULT_ZOOM_LEVEL)
+                viewModel.onIntent(NearbystopsIntent.CompleteLocationLoad)
+            }
         }
     }
 }
