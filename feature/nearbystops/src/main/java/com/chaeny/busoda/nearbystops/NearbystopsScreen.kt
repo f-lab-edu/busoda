@@ -31,6 +31,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.createBitmap
@@ -152,6 +153,7 @@ private fun ShowMarkerInfoSheet(
         MarkerInfoBottomSheet(
             stop = stop,
             nextStopName = uiState.nextStopName,
+            busNumbers = uiState.busNumbers,
             onDismiss = {
                 viewModel.onIntent(NearbystopsIntent.HideMarkerInfo)
             },
@@ -241,6 +243,7 @@ fun Context.createCustomMarkerIcon(@DrawableRes id: Int): BitmapDescriptor {
 private fun MarkerInfoBottomSheet(
     stop: BusStopPosition,
     nextStopName: String,
+    busNumbers: List<String>,
     onDismiss: () -> Unit,
     onNavigateToDetail: () -> Unit
 ) {
@@ -266,8 +269,17 @@ private fun MarkerInfoBottomSheet(
                     stop.stopId
                 },
                 style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(horizontal = 25.dp, vertical = 5.dp)
+                modifier = Modifier.padding(horizontal = 25.dp)
             )
+            if (busNumbers.isNotEmpty()) {
+                Text(
+                    text = stringResource(R.string.bus_numbers_label, busNumbers.joinToString(", ")),
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(horizontal = 25.dp, vertical = 5.dp)
+                )
+            }
         }
     }
 }

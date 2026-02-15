@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="stop_name_label">정류소 이름 : %s</string>
+    <string name="stop_name_label">%s</string>
     <string name="stop_info_label">%1$s | %2$s 방면</string>
+    <string name="bus_numbers_label">버스 정보 %s</string>
 </resources>

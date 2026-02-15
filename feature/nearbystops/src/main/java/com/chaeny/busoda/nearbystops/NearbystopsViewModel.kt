@@ -42,12 +42,14 @@ internal class NearbystopsViewModel @Inject constructor(
             is NearbystopsIntent.ShowMarkerInfo -> {
                 setState { copy(selectedMarkerInfo = intent.stop) }
                 viewModelScope.launch {
-                    val nextStop = busStopDetailRepository.getNextStopName(intent.stop.stopId)
-                    setState { copy(nextStopName = nextStop) }
+                    val stopDetail = busStopDetailRepository.getBusStopDetail(intent.stop.stopId)
+                    val nextStop = stopDetail.busInfos.firstOrNull()?.nextStopName ?: ""
+                    val buses = stopDetail.busInfos.map { it.busNumber }
+                    setState { copy(nextStopName = nextStop, busNumbers = buses) }
                 }
             }
             is NearbystopsIntent.HideMarkerInfo -> {
-                setState { copy(selectedMarkerInfo = null, nextStopName = "") }
+                setState { copy(selectedMarkerInfo = null, nextStopName = "", busNumbers = emptyList()) }
             }
         }
     }
@@ -69,7 +71,8 @@ data class NearbystopsUiState(
     val currentLocation: LatLng? = null,
     val busStops: List<BusStopPosition> = emptyList(),
     val selectedMarkerInfo: BusStopPosition? = null,
-    val nextStopName: String = ""
+    val nextStopName: String = "",
+    val busNumbers: List<String> = emptyList()
 ) : UiState
 
 sealed class NearbystopsIntent : UiIntent {
