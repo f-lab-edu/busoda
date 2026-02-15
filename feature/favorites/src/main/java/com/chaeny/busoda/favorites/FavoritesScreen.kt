@@ -38,7 +38,7 @@ import com.chaeny.busoda.ui.component.MainSearchBar
 import com.chaeny.busoda.ui.component.MainTab
 import com.chaeny.busoda.ui.component.MainTabRow
 import com.chaeny.busoda.ui.theme.Gray60
-import com.chaeny.busoda.ui.theme.MainGreen
+import com.chaeny.busoda.ui.theme.White
 
 @Composable
 fun FavoritesScreen(
@@ -219,7 +219,7 @@ private fun DeletePopup(
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        containerColor = MainGreen
+        containerColor = White
     ) {
         Column(modifier = Modifier.padding(bottom = 10.dp)) {
             Text(

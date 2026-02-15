@@ -1,6 +1,7 @@
 package com.chaeny.busoda.nearbystops
 
 import androidx.lifecycle.viewModelScope
+import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.data.repository.NearbyBusStopsRepository
 import com.chaeny.busoda.model.BusStopPosition
 import com.chaeny.busoda.mvi.BaseViewModel
@@ -14,7 +15,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class NearbystopsViewModel @Inject constructor(
-    private val nearbyBusStopsRepository: NearbyBusStopsRepository
+    private val nearbyBusStopsRepository: NearbyBusStopsRepository,
+    private val busStopDetailRepository: BusStopDetailRepository
 ) : BaseViewModel<NearbystopsIntent, NearbystopsUiState, NearbystopsEffect>(
         initialState = NearbystopsUiState()
     ) {
@@ -37,6 +39,21 @@ internal class NearbystopsViewModel @Inject constructor(
             is NearbystopsIntent.ClearBusStops -> {
                 setState { copy(busStops = emptyList()) }
             }
+            is NearbystopsIntent.ShowMarkerInfo -> {
+                setState { copy(selectedMarkerInfo = intent.stop) }
+                viewModelScope.launch {
+                    val stopDetail = busStopDetailRepository.getBusStopDetail(intent.stop.stopId)
+                    val nextStop = stopDetail.busInfos.firstOrNull()?.nextStopName ?: ""
+                    val buses = stopDetail.busInfos.map { it.busNumber }
+                    setState { copy(nextStopName = nextStop, busNumbers = buses) }
+                }
+            }
+            is NearbystopsIntent.HideMarkerInfo -> {
+                setState { copy(selectedMarkerInfo = null, nextStopName = "", busNumbers = emptyList()) }
+            }
+            is NearbystopsIntent.CompleteLocationLoad -> {
+                setState { copy(currentLocationLoaded = true) }
+            }
         }
     }
 
@@ -55,7 +72,11 @@ internal class NearbystopsViewModel @Inject constructor(
 data class NearbystopsUiState(
     val hasLocationPermission: Boolean = false,
     val currentLocation: LatLng? = null,
-    val busStops: List<BusStopPosition> = emptyList()
+    val busStops: List<BusStopPosition> = emptyList(),
+    val selectedMarkerInfo: BusStopPosition? = null,
+    val nextStopName: String = "",
+    val busNumbers: List<String> = emptyList(),
+    val currentLocationLoaded: Boolean = false
 ) : UiState
 
 sealed class NearbystopsIntent : UiIntent {
@@ -64,6 +85,9 @@ sealed class NearbystopsIntent : UiIntent {
     data class LoadNearbyStops(val location: LatLng) : NearbystopsIntent()
     data class ClickBusStop(val stopId: String) : NearbystopsIntent()
     data object ClearBusStops : NearbystopsIntent()
+    data class ShowMarkerInfo(val stop: BusStopPosition) : NearbystopsIntent()
+    data object HideMarkerInfo : NearbystopsIntent()
+    data object CompleteLocationLoad : NearbystopsIntent()
 }
 
 sealed class NearbystopsEffect : SideEffect {
