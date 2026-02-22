@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.BookmarkAdd
 import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.Card
@@ -84,6 +85,7 @@ fun StopDetailScreen(
             timer = uiState.timer,
             rotation = rotation,
             isFavorite = uiState.isFavorite,
+            favoriteBusNumbers = uiState.favoriteBusNumbers,
             onRefresh = { viewModel.onIntent(StopDetailIntent.RefreshData) },
             onToggleFavorite = { viewModel.onIntent(StopDetailIntent.ToggleFavorite) },
             onToggleBusFavorite = { busNumber ->
@@ -128,6 +130,7 @@ private fun StopDetailContent(
     timer: Int,
     rotation: Float,
     isFavorite: Boolean,
+    favoriteBusNumbers: Set<String>,
     onRefresh: () -> Unit,
     onToggleFavorite: () -> Unit,
     onToggleBusFavorite: (String) -> Unit,
@@ -164,6 +167,7 @@ private fun StopDetailContent(
             BusList(
                 busInfos = stopDetail.busInfos,
                 isLoading = isLoading,
+                favoriteBusNumbers = favoriteBusNumbers,
                 onToggleBusFavorite = onToggleBusFavorite
             )
         }
@@ -289,6 +293,7 @@ private fun RefreshButton(
 private fun BusInfoHeader(
     busNumber: String,
     nextStopName: String,
+    isBusFavorite: Boolean,
     onToggleBusFavorite: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -301,7 +306,7 @@ private fun BusInfoHeader(
             modifier = Modifier.size(32.dp)
         ) {
             Icon(
-                imageVector = Icons.Outlined.StarBorder,
+                imageVector = if (isBusFavorite) Icons.Filled.Star else Icons.Outlined.StarBorder,
                 contentDescription = stringResource(R.string.bus_favorite),
                 tint = Color.Gray,
                 modifier = Modifier.size(20.dp)
@@ -387,6 +392,7 @@ private fun ArrivalInfo(
 @Composable
 private fun BusItem(
     busInfo: BusInfo,
+    isBusFavorite: Boolean,
     onToggleBusFavorite: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -401,6 +407,7 @@ private fun BusItem(
         BusInfoHeader(
             busNumber = busInfo.busNumber,
             nextStopName = busInfo.nextStopName,
+            isBusFavorite = isBusFavorite,
             onToggleBusFavorite = { onToggleBusFavorite(busInfo.busNumber) },
             modifier = Modifier
                 .padding(start = 10.dp, end = 20.dp)
@@ -428,6 +435,7 @@ private fun BusItem(
 private fun BusList(
     busInfos: List<BusInfo>,
     isLoading: Boolean,
+    favoriteBusNumbers: Set<String>,
     onToggleBusFavorite: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -441,6 +449,7 @@ private fun BusList(
             ) { index, busInfo ->
                 BusItem(
                     busInfo = busInfo,
+                    isBusFavorite = favoriteBusNumbers.contains(busInfo.busNumber),
                     onToggleBusFavorite = onToggleBusFavorite
                 )
             }
