@@ -1,11 +1,14 @@
 package com.chaeny.busoda.favorites
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -27,6 +30,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,6 +53,12 @@ fun FavoritesScreen(
     val viewModel: FavoritesViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    LaunchedEffect(uiState.busFavorites) {
+        uiState.busFavorites.forEach { busItem ->
+            Log.d("FavoritesScreen", "Bus favorite: ${busItem.stopName} (${busItem.stopId}) - Bus ${busItem.busNumber}")
+        }
+    }
+
     CollectEffect(viewModel, navigateToStopDetail)
 
     Column(
@@ -62,18 +72,17 @@ fun FavoritesScreen(
             onHomeClick = { },
             onNearbyStopsClick = navigateToNearbyStops
         )
-        if (uiState.favorites.isEmpty()) {
-            FavoritesGuide()
-        } else {
-            FavoritesStopList(
-                stops = uiState.favorites,
-                onClickItem = { stopId ->
-                    viewModel.onIntent(FavoritesIntent.NavigateToDetail(stopId))
-                },
-                onLongClickItem = { stop ->
-                    viewModel.onIntent(FavoritesIntent.RequestDeleteFavorite(stop))
-                }
-            )
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 20.dp)
+        ) {
+            item {
+                HardcodedCardWithBuses()
+            }
+            item {
+                HardcodedCardStopOnly()
+            }
         }
     }
 
@@ -110,6 +119,305 @@ private fun CollectEffect(
                     ).show()
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun HardcodedCardWithBuses(
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .padding(horizontal = 30.dp)
+            .padding(bottom = 15.dp),
+        shape = RoundedCornerShape(15.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Text(
+            text = "남대문경찰서",
+            color = Color.Black,
+            style = MaterialTheme.typography.titleMedium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier
+                .padding(horizontal = 15.dp)
+                .padding(top = 15.dp, bottom = 5.dp)
+        )
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 15.dp)
+                .padding(bottom = 15.dp)
+        ) {
+            Text(
+                text = "16206",
+                color = Gray60,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.weight(0.3f)
+            )
+            Text(
+                text = "강남역",
+                color = Gray60,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Right,
+                modifier = Modifier.weight(0.7f)
+            )
+        }
+
+        // Divider
+        androidx.compose.material3.HorizontalDivider(
+            color = Gray60.copy(alpha = 0.3f)
+        )
+
+        // 버스 1 (StopDetail BusItem 양식)
+        // BusInfoHeader (별 제외)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+                .padding(top = 15.dp),
+            verticalAlignment = Alignment.Bottom
+        ) {
+            Text(
+                text = "120",
+                modifier = Modifier.weight(0.3f),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "강남역",
+                modifier = Modifier
+                    .weight(0.45f)
+                    .padding(end = 5.dp),
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.End,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = "방면",
+                style = MaterialTheme.typography.bodyLarge
+            )
+        }
+
+        androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(8.dp))
+
+        // ArrivalInfo 1
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 20.dp)
+                .fillMaxWidth()
+        ) {
+            Text(
+                text = "1번째 버스:",
+                modifier = Modifier.weight(2f),
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = "3분 30초",
+                modifier = Modifier.weight(2.5f),
+                textAlign = TextAlign.End,
+                style = MaterialTheme.typography.titleSmall
+            )
+            Text(
+                text = "3번째 전",
+                modifier = Modifier.weight(2f),
+                textAlign = TextAlign.End,
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = "여유",
+                color = Color(0xFF008000),
+                modifier = Modifier.weight(1.5f),
+                textAlign = TextAlign.End,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+
+        androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(8.dp))
+
+        // ArrivalInfo 2
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 20.dp)
+                .fillMaxWidth()
+                .padding(bottom = 15.dp)
+        ) {
+            Text(
+                text = "2번째 버스:",
+                modifier = Modifier.weight(2f),
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = "7분 20초",
+                modifier = Modifier.weight(2.5f),
+                textAlign = TextAlign.End,
+                style = MaterialTheme.typography.titleSmall
+            )
+            Text(
+                text = "7번째 전",
+                modifier = Modifier.weight(2f),
+                textAlign = TextAlign.End,
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = "혼잡",
+                color = Color(0xFFFF0000),
+                modifier = Modifier.weight(1.5f),
+                textAlign = TextAlign.End,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+
+        // Divider
+        androidx.compose.material3.HorizontalDivider(
+            color = Gray60.copy(alpha = 0.3f)
+        )
+
+        // 버스 2
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+                .padding(top = 15.dp),
+            verticalAlignment = Alignment.Bottom
+        ) {
+            Text(
+                text = "146",
+                modifier = Modifier.weight(0.3f),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "신촌역",
+                modifier = Modifier
+                    .weight(0.45f)
+                    .padding(end = 5.dp),
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.End,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = "방면",
+                style = MaterialTheme.typography.bodyLarge
+            )
+        }
+
+        androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(8.dp))
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+        ) {
+            Text(
+                text = "1번째 버스:",
+                modifier = Modifier.weight(2f),
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = "25분 10초",
+                modifier = Modifier.weight(2.5f),
+                textAlign = TextAlign.End,
+                style = MaterialTheme.typography.titleSmall
+            )
+            Text(
+                text = "11번째 전",
+                modifier = Modifier.weight(2f),
+                textAlign = TextAlign.End,
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = "보통",
+                color = Color(0xFFFFAB40),
+                modifier = Modifier.weight(1.5f),
+                textAlign = TextAlign.End,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+
+        androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(8.dp))
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+                .padding(bottom = 15.dp)
+        ) {
+            Text(
+                text = "2번째 버스:",
+                modifier = Modifier.weight(2f),
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = "10분 30초",
+                modifier = Modifier.weight(2.5f),
+                textAlign = TextAlign.End,
+                style = MaterialTheme.typography.titleSmall
+            )
+            Text(
+                text = "15번째 전",
+                modifier = Modifier.weight(2f),
+                textAlign = TextAlign.End,
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = "여유",
+                color = Color(0xFF008000),
+                modifier = Modifier.weight(1.5f),
+                textAlign = TextAlign.End,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
+}
+
+@Composable
+private fun HardcodedCardStopOnly(
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .padding(horizontal = 30.dp)
+            .padding(bottom = 15.dp),
+        shape = RoundedCornerShape(15.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Text(
+            text = "남대문경찰서",
+            color = Color.Black,
+            style = MaterialTheme.typography.titleMedium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier
+                .padding(horizontal = 15.dp)
+                .padding(top = 15.dp, bottom = 5.dp)
+        )
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 15.dp)
+                .padding(bottom = 15.dp)
+        ) {
+            Text(
+                text = "02218",
+                color = Gray60,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.weight(0.3f)
+            )
+            Text(
+                text = "논현역",
+                color = Gray60,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Right,
+                modifier = Modifier.weight(0.7f)
+            )
         }
     }
 }

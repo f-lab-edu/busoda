@@ -21,5 +21,5 @@ internal object DatabaseModule {
         context,
         AppDatabase::class.java,
         "busoda-database"
-    ).build()
+    ).fallbackToDestructiveMigration(dropAllTables = false).build()
 }
