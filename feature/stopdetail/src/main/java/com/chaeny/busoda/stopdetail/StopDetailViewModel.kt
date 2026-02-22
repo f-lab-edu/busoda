@@ -1,5 +1,6 @@
 package com.chaeny.busoda.stopdetail
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.chaeny.busoda.data.repository.BusStopDetailRepository
@@ -36,6 +37,9 @@ internal class StopDetailViewModel @Inject constructor(
         when (intent) {
             is StopDetailIntent.RefreshData -> refreshData()
             is StopDetailIntent.ToggleFavorite -> toggleFavorite()
+            is StopDetailIntent.ToggleBusFavorite -> {
+                Log.d("StopDetailViewModel", "ToggleBusFavorite clicked: ${intent.busNumber}")
+            }
         }
     }
 
@@ -125,6 +129,7 @@ data class StopDetailUiState(
 sealed class StopDetailIntent : UiIntent {
     data object RefreshData : StopDetailIntent()
     data object ToggleFavorite : StopDetailIntent()
+    data class ToggleBusFavorite(val busNumber: String) : StopDetailIntent()
 }
 
 sealed class StopDetailEffect : SideEffect {

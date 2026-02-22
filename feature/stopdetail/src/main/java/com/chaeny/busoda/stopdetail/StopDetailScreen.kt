@@ -86,6 +86,9 @@ fun StopDetailScreen(
             isFavorite = uiState.isFavorite,
             onRefresh = { viewModel.onIntent(StopDetailIntent.RefreshData) },
             onToggleFavorite = { viewModel.onIntent(StopDetailIntent.ToggleFavorite) },
+            onToggleBusFavorite = { busNumber ->
+                viewModel.onIntent(StopDetailIntent.ToggleBusFavorite(busNumber))
+            },
             modifier = modifier
         )
     }
@@ -127,6 +130,7 @@ private fun StopDetailContent(
     isFavorite: Boolean,
     onRefresh: () -> Unit,
     onToggleFavorite: () -> Unit,
+    onToggleBusFavorite: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -159,7 +163,8 @@ private fun StopDetailContent(
             }
             BusList(
                 busInfos = stopDetail.busInfos,
-                isLoading = isLoading
+                isLoading = isLoading,
+                onToggleBusFavorite = onToggleBusFavorite
             )
         }
         RefreshButton(
@@ -284,6 +289,7 @@ private fun RefreshButton(
 private fun BusInfoHeader(
     busNumber: String,
     nextStopName: String,
+    onToggleBusFavorite: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -291,7 +297,7 @@ private fun BusInfoHeader(
         verticalAlignment = Alignment.Bottom
     ) {
         IconButton(
-            onClick = { },
+            onClick = onToggleBusFavorite,
             modifier = Modifier.size(32.dp)
         ) {
             Icon(
@@ -381,6 +387,7 @@ private fun ArrivalInfo(
 @Composable
 private fun BusItem(
     busInfo: BusInfo,
+    onToggleBusFavorite: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -394,6 +401,7 @@ private fun BusItem(
         BusInfoHeader(
             busNumber = busInfo.busNumber,
             nextStopName = busInfo.nextStopName,
+            onToggleBusFavorite = { onToggleBusFavorite(busInfo.busNumber) },
             modifier = Modifier
                 .padding(start = 10.dp, end = 20.dp)
                 .padding(top = 15.dp)
@@ -420,6 +428,7 @@ private fun BusItem(
 private fun BusList(
     busInfos: List<BusInfo>,
     isLoading: Boolean,
+    onToggleBusFavorite: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -430,7 +439,10 @@ private fun BusList(
                 items = busInfos,
                 key = { index, busInfo -> "$index-${busInfo.busNumber}" }
             ) { index, busInfo ->
-                BusItem(busInfo)
+                BusItem(
+                    busInfo = busInfo,
+                    onToggleBusFavorite = onToggleBusFavorite
+                )
             }
         }
 
