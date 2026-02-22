@@ -1,5 +1,6 @@
 package com.chaeny.busoda.favorites
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
@@ -48,6 +49,12 @@ fun FavoritesScreen(
 ) {
     val viewModel: FavoritesViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(uiState.busFavorites) {
+        uiState.busFavorites.forEach { busItem ->
+            Log.d("FavoritesScreen", "Bus favorite: ${busItem.stopName} (${busItem.stopId}) - Bus ${busItem.busNumber}")
+        }
+    }
 
     CollectEffect(viewModel, navigateToStopDetail)
 

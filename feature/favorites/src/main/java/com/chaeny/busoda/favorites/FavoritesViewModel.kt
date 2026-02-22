@@ -1,8 +1,10 @@
 package com.chaeny.busoda.favorites
 
 import androidx.lifecycle.viewModelScope
+import com.chaeny.busoda.data.repository.FavoriteBusRepository
 import com.chaeny.busoda.data.repository.FavoriteRepository
 import com.chaeny.busoda.model.BusStop
+import com.chaeny.busoda.model.FavoriteBusItem
 import com.chaeny.busoda.mvi.BaseViewModel
 import com.chaeny.busoda.mvi.SideEffect
 import com.chaeny.busoda.mvi.UiIntent
@@ -13,19 +15,29 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class FavoritesViewModel @Inject constructor(
-    private val favoriteRepository: FavoriteRepository
+    private val favoriteRepository: FavoriteRepository,
+    private val favoriteBusRepository: FavoriteBusRepository
 ) : BaseViewModel<FavoritesIntent, FavoritesUiState, FavoritesEffect>(
     initialState = FavoritesUiState()
 ) {
 
     init {
         collectFavorites()
+        collectBusFavorites()
     }
 
     private fun collectFavorites() {
         viewModelScope.launch {
             favoriteRepository.getFavorites().collect { favorites ->
                 setState { copy(favorites = favorites) }
+            }
+        }
+    }
+
+    private fun collectBusFavorites() {
+        viewModelScope.launch {
+            favoriteBusRepository.getFavoriteBuses().collect { busFavorites ->
+                setState { copy(busFavorites = busFavorites) }
             }
         }
     }
@@ -61,6 +73,7 @@ sealed class Popup {
 
 data class FavoritesUiState(
     val favorites: List<BusStop> = emptyList(),
+    val busFavorites: List<FavoriteBusItem> = emptyList(),
     val popup: Popup? = null
 ) : UiState
 
