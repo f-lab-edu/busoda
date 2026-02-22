@@ -9,6 +9,7 @@
     <string name="congestion_low">여유</string>
     <string name="refresh">새로고침</string>
     <string name="bookmark">즐겨찾기</string>
+    <string name="bus_favorite">버스 즐겨찾기</string>
     <string name="bus_emoji">🚌</string>
     <string name="stop_emoji">🚏</string>
     <string name="minutes_seconds">%1$d분 %2$d초</string>

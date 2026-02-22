@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -22,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.outlined.BookmarkAdd
+import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -288,6 +290,17 @@ private fun BusInfoHeader(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Bottom
     ) {
+        IconButton(
+            onClick = { },
+            modifier = Modifier.size(32.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.StarBorder,
+                contentDescription = stringResource(R.string.bus_favorite),
+                tint = Color.Gray,
+                modifier = Modifier.size(20.dp)
+            )
+        }
         Text(
             text = busNumber,
             modifier = Modifier.weight(0.3f),
@@ -297,7 +310,7 @@ private fun BusInfoHeader(
         Text(
             text = nextStopName,
             modifier = Modifier
-                .weight(0.55f)
+                .weight(0.45f)
                 .padding(end = 5.dp),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.End,
@@ -382,7 +395,7 @@ private fun BusItem(
             busNumber = busInfo.busNumber,
             nextStopName = busInfo.nextStopName,
             modifier = Modifier
-                .padding(horizontal = 20.dp)
+                .padding(start = 10.dp, end = 20.dp)
                 .padding(top = 15.dp)
         )
         Spacer(modifier = Modifier.height(8.dp))
