@@ -1,9 +1,9 @@
 package com.chaeny.busoda.stopdetail
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.chaeny.busoda.data.repository.BusStopDetailRepository
+import com.chaeny.busoda.data.repository.FavoriteBusRepository
 import com.chaeny.busoda.data.repository.FavoriteRepository
 import com.chaeny.busoda.model.BusStop
 import com.chaeny.busoda.model.BusStopDetail
@@ -20,6 +20,7 @@ import javax.inject.Inject
 internal class StopDetailViewModel @Inject constructor(
     private val busStopDetailRepository: BusStopDetailRepository,
     private val favoriteRepository: FavoriteRepository,
+    private val favoriteBusRepository: FavoriteBusRepository,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel<StopDetailIntent, StopDetailUiState, StopDetailEffect>(
     initialState = StopDetailUiState(stopId = savedStateHandle.get(BUS_STOP_ID) ?: "")
@@ -31,6 +32,7 @@ internal class StopDetailViewModel @Inject constructor(
         asyncDataLoad()
         startTimer()
         collectIsFavorite()
+        collectFavoriteBuses()
     }
 
     override fun onIntent(intent: StopDetailIntent) {
@@ -38,7 +40,7 @@ internal class StopDetailViewModel @Inject constructor(
             is StopDetailIntent.RefreshData -> refreshData()
             is StopDetailIntent.ToggleFavorite -> toggleFavorite()
             is StopDetailIntent.ToggleBusFavorite -> {
-                Log.d("StopDetailViewModel", "ToggleBusFavorite clicked: ${intent.busNumber}")
+                addToBusFavorites(intent.busNumber)
             }
         }
     }
@@ -78,6 +80,18 @@ internal class StopDetailViewModel @Inject constructor(
         }
     }
 
+    private fun collectFavoriteBuses() {
+        viewModelScope.launch {
+            favoriteBusRepository.getFavoriteBuses().collect { busList ->
+                val favoriteBusNumbers = busList
+                    .filter { it.stopId == currentState.stopId }
+                    .map { it.busNumber }
+                    .toSet()
+                setState { copy(favoriteBusNumbers = favoriteBusNumbers) }
+            }
+        }
+    }
+
     private fun refreshData() {
         currentCount = 15
         postSideEffect(StopDetailEffect.RotateRefreshBtn)
@@ -112,6 +126,19 @@ internal class StopDetailViewModel @Inject constructor(
         }
     }
 
+    private fun addToBusFavorites(busNumber: String) {
+        viewModelScope.launch {
+            favoriteBusRepository.addFavoriteBus(
+                stopId = currentState.stopId,
+                stopName = currentState.stopDetail.stopName,
+                busNumber = busNumber,
+                nextStopName = currentState.stopDetail.busInfos
+                    .find { it.busNumber == busNumber }
+                    ?.nextStopName ?: ""
+            )
+        }
+    }
+
     companion object {
         private const val BUS_STOP_ID = "stopId"
     }
@@ -123,7 +150,8 @@ data class StopDetailUiState(
     val isLoading: Boolean = false,
     val timer: Int = 15,
     val currentTime: Long = 0L,
-    val isFavorite: Boolean = false
+    val isFavorite: Boolean = false,
+    val favoriteBusNumbers: Set<String> = emptySet()
 ) : UiState
 
 sealed class StopDetailIntent : UiIntent {
