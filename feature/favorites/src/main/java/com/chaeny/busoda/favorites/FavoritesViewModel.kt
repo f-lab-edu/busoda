@@ -1,6 +1,8 @@
 package com.chaeny.busoda.favorites
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
+import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.data.repository.FavoriteBusRepository
 import com.chaeny.busoda.data.repository.FavoriteRepository
 import com.chaeny.busoda.model.BusStop
@@ -10,13 +12,17 @@ import com.chaeny.busoda.mvi.SideEffect
 import com.chaeny.busoda.mvi.UiIntent
 import com.chaeny.busoda.mvi.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 internal class FavoritesViewModel @Inject constructor(
     private val favoriteRepository: FavoriteRepository,
-    private val favoriteBusRepository: FavoriteBusRepository
+    private val favoriteBusRepository: FavoriteBusRepository,
+    private val busStopDetailRepository: BusStopDetailRepository
 ) : BaseViewModel<FavoritesIntent, FavoritesUiState, FavoritesEffect>(
     initialState = FavoritesUiState()
 ) {
@@ -38,8 +44,23 @@ internal class FavoritesViewModel @Inject constructor(
         viewModelScope.launch {
             favoriteBusRepository.getFavoriteBuses().collect { busFavorites ->
                 setState { copy(busFavorites = busFavorites) }
+                if (busFavorites.isNotEmpty()) {
+                    loadFavoriteBusInfo()
+                }
             }
         }
+    }
+
+    private suspend fun loadFavoriteBusInfo() {
+        val results = coroutineScope {
+            currentState.busFavorites.map { bus ->
+                async {
+                    val busStopDetail = busStopDetailRepository.getBusStopDetail(bus.stopId)
+                    Log.d("FavoritesViewModel", "정류소 ${bus.stopId} 데이터: ${busStopDetail.busInfos.size}개 버스")
+                }
+            }.awaitAll()
+        }
+        Log.d("FavoritesViewModel", "총 ${results.size}개 정류소 데이터 받음")
     }
 
     override fun onIntent(intent: FavoritesIntent) {
