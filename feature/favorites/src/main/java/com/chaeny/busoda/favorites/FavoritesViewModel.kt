@@ -52,15 +52,26 @@ internal class FavoritesViewModel @Inject constructor(
     }
 
     private suspend fun loadFavoriteBusInfo() {
-        val results = coroutineScope {
-            currentState.busFavorites.map { bus ->
+        val currentTime = System.currentTimeMillis() / 1000
+
+        coroutineScope {
+            currentState.busFavorites.map { favoriteBus ->
                 async {
-                    val busStopDetail = busStopDetailRepository.getBusStopDetail(bus.stopId)
-                    Log.d("FavoritesViewModel", "정류소 ${bus.stopId} 데이터: ${busStopDetail.busInfos.size}개 버스")
+                    val busStopDetail = busStopDetailRepository.getBusStopDetail(favoriteBus.stopId)
+                    val matchingBus = busStopDetail.busInfos.find { it.busNumber == favoriteBus.busNumber }
+
+                    if (matchingBus != null && matchingBus.arrivalInfos.isNotEmpty()) {
+                        val firstBus = matchingBus.arrivalInfos[0]
+                        val remainingSeconds = firstBus.arrivalTime - currentTime
+                        val minutes = (remainingSeconds / 60).toInt()
+                        val seconds = (remainingSeconds % 60).toInt()
+
+                        Log.d("FavoritesViewModel",
+                            "[${matchingBus.busNumber}] ${busStopDetail.stopName} → ${minutes}분 ${seconds}초 | ${firstBus.position}")
+                    }
                 }
             }.awaitAll()
         }
-        Log.d("FavoritesViewModel", "총 ${results.size}개 정류소 데이터 받음")
     }
 
     override fun onIntent(intent: FavoritesIntent) {
