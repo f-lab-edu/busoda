@@ -6,6 +6,7 @@ import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.data.repository.FavoriteBusRepository
 import com.chaeny.busoda.data.repository.FavoriteRepository
 import com.chaeny.busoda.model.BusStop
+import com.chaeny.busoda.model.BusStopDetail
 import com.chaeny.busoda.model.FavoriteBusItem
 import com.chaeny.busoda.mvi.BaseViewModel
 import com.chaeny.busoda.mvi.SideEffect
@@ -106,6 +107,7 @@ sealed class Popup {
 data class FavoritesUiState(
     val favorites: List<BusStop> = emptyList(),
     val busFavorites: List<FavoriteBusItem> = emptyList(),
+    val favoriteBusInfo: Map<String, BusStopDetail> = emptyMap(),
     val popup: Popup? = null
 ) : UiState
 
