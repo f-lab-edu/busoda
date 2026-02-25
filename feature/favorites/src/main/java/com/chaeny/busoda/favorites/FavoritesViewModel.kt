@@ -1,6 +1,5 @@
 package com.chaeny.busoda.favorites
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.data.repository.FavoriteBusRepository
@@ -53,27 +52,19 @@ internal class FavoritesViewModel @Inject constructor(
     }
 
     private suspend fun loadFavoriteBusInfo() {
-        val currentTime = System.currentTimeMillis() / 1000
+        val busInfoMap = getBusStopDetailsMap()
+        setState { copy(favoriteBusInfo = busInfoMap) }
+    }
 
-        val busInfoMap = coroutineScope {
+    private suspend fun getBusStopDetailsMap(): Map<String, BusStopDetail> {
+        return coroutineScope {
             currentState.busFavorites.map { favoriteBus ->
                 async {
                     val busStopDetail = busStopDetailRepository.getBusStopDetail(favoriteBus.stopId)
-                    val matchingBus = busStopDetail.busInfos.find { it.busNumber == favoriteBus.busNumber }
-
-                    if (matchingBus != null && matchingBus.arrivalInfos.isNotEmpty()) {
-                        val firstBus = matchingBus.arrivalInfos[0]
-                        val remainingSeconds = firstBus.arrivalTime - currentTime
-                        val minutes = (remainingSeconds / 60).toInt()
-                        val seconds = (remainingSeconds % 60).toInt()
-
-                        Log.d("FavoritesViewModel", "[${matchingBus.busNumber}] ${busStopDetail.stopName} → ${minutes}분 ${seconds}초 | ${firstBus.position}")
-                    }
                     favoriteBus.stopId to busStopDetail
                 }
             }.awaitAll().toMap()
         }
-        setState { copy(favoriteBusInfo = busInfoMap) }
     }
 
     override fun onIntent(intent: FavoritesIntent) {
