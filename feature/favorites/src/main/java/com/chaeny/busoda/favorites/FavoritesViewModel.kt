@@ -55,7 +55,7 @@ internal class FavoritesViewModel @Inject constructor(
     private suspend fun loadFavoriteBusInfo() {
         val currentTime = System.currentTimeMillis() / 1000
 
-        coroutineScope {
+        val busInfoMap = coroutineScope {
             currentState.busFavorites.map { favoriteBus ->
                 async {
                     val busStopDetail = busStopDetailRepository.getBusStopDetail(favoriteBus.stopId)
@@ -67,12 +67,13 @@ internal class FavoritesViewModel @Inject constructor(
                         val minutes = (remainingSeconds / 60).toInt()
                         val seconds = (remainingSeconds % 60).toInt()
 
-                        Log.d("FavoritesViewModel",
-                            "[${matchingBus.busNumber}] ${busStopDetail.stopName} → ${minutes}분 ${seconds}초 | ${firstBus.position}")
+                        Log.d("FavoritesViewModel", "[${matchingBus.busNumber}] ${busStopDetail.stopName} → ${minutes}분 ${seconds}초 | ${firstBus.position}")
                     }
+                    favoriteBus.stopId to busStopDetail
                 }
-            }.awaitAll()
+            }.awaitAll().toMap()
         }
+        setState { copy(favoriteBusInfo = busInfoMap) }
     }
 
     override fun onIntent(intent: FavoritesIntent) {
