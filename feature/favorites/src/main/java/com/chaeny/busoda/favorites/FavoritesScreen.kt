@@ -79,10 +79,7 @@ fun FavoritesScreen(
                     onLongClickItem = { viewModel.onIntent(FavoritesIntent.RequestDeleteFavorite(it)) })
 
                 if (uiState.busFavorites.isNotEmpty()) {
-                    val groupedByStop = uiState.busFavorites.groupBy { it.stopId }
-                    groupedByStop.values.forEach { busItems ->
-                        FavoriteBusCard(busItems)
-                    }
+                    FavoritesBusList(uiState.busFavorites)
                 }
             }
         }
@@ -486,6 +483,27 @@ private fun FavoritesGuide(
             color = Color.Gray,
             style = MaterialTheme.typography.bodyLarge
         )
+    }
+}
+
+@Composable
+private fun FavoritesBusList(
+    busFavorites: List<FavoriteBusItem>,
+    modifier: Modifier = Modifier
+) {
+    val groupedByStop = busFavorites.groupBy { it.stopId }
+
+    Box(
+        modifier = modifier.padding(top = 20.dp)
+    ) {
+        LazyColumn {
+            items(
+                items = groupedByStop.values.toList(),
+                key = { it.first().stopId }
+            ) { busItems ->
+                FavoriteBusCard(busItems)
+            }
+        }
     }
 }
 
