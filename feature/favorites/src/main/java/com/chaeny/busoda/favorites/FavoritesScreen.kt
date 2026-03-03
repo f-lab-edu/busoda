@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -78,7 +79,7 @@ fun FavoritesScreen(
                     onLongClickItem = { viewModel.onIntent(FavoritesIntent.RequestDeleteFavorite(it)) })
 
                 if (uiState.busFavorites.isNotEmpty()) {
-                    FavoriteBusItem(uiState.busFavorites.first())
+                    FavoriteBusCard(uiState.busFavorites.first())
                 }
             }
         }
@@ -375,7 +376,43 @@ private fun HardcodedCardWithBuses(
 }
 
 @Composable
-private fun FavoriteBusItem(
+private fun BusInfo(
+    busNumber: String,
+    nextStopName: String,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp)
+            .padding(vertical = 15.dp),
+        verticalAlignment = Alignment.Bottom
+    ) {
+        Text(
+            text = busNumber,
+            modifier = Modifier.weight(0.3f),
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = nextStopName,
+            modifier = Modifier
+                .weight(0.45f)
+                .padding(end = 5.dp),
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.End,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+        Text(
+            text = stringResource(R.string.way),
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
+}
+
+@Composable
+private fun FavoriteBusCard(
     busItem: FavoriteBusItem,
     modifier: Modifier = Modifier
 ) {
@@ -388,7 +425,7 @@ private fun FavoriteBusItem(
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Text(
-            text = "${busItem.stopName} - ${busItem.busNumber}번",
+            text = busItem.stopName,
             color = Color.Black,
             style = MaterialTheme.typography.titleMedium,
             maxLines = 1,
@@ -418,6 +455,13 @@ private fun FavoriteBusItem(
                 modifier = Modifier.weight(0.7f)
             )
         }
+        HorizontalDivider(
+            color = Gray60.copy(alpha = 0.3f)
+        )
+        BusInfo(
+            busNumber = busItem.busNumber,
+            nextStopName = busItem.nextStopName
+        )
     }
 }
 
