@@ -68,11 +68,15 @@ fun FavoritesScreen(
         if (uiState.favorites.isEmpty() && uiState.busFavorites.isEmpty()) {
             FavoritesGuide()
         } else {
-            FavoritesStopList(
-                stops = uiState.favorites,
-                onClickItem = { viewModel.onIntent(FavoritesIntent.NavigateToDetail(it)) },
-                onLongClickItem = { viewModel.onIntent(FavoritesIntent.RequestDeleteFavorite(it)) }
-            )
+            Column(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                FavoritesStopList(
+                    stops = uiState.favorites,
+                    onClickItem = { viewModel.onIntent(FavoritesIntent.NavigateToDetail(it)) },
+                    onLongClickItem = { viewModel.onIntent(FavoritesIntent.RequestDeleteFavorite(it)) })
+                HardcodedCardWithBuses()
+            }
         }
     }
 
@@ -367,52 +371,6 @@ private fun HardcodedCardWithBuses(
 }
 
 @Composable
-private fun HardcodedCardStopOnly(
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier
-            .padding(horizontal = 30.dp)
-            .padding(bottom = 15.dp),
-        shape = RoundedCornerShape(15.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-    ) {
-        Text(
-            text = "남대문경찰서",
-            color = Color.Black,
-            style = MaterialTheme.typography.titleMedium,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier
-                .padding(horizontal = 15.dp)
-                .padding(top = 15.dp, bottom = 5.dp)
-        )
-        Row(
-            modifier = Modifier
-                .padding(horizontal = 15.dp)
-                .padding(bottom = 15.dp)
-        ) {
-            Text(
-                text = "02218",
-                color = Gray60,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.weight(0.3f)
-            )
-            Text(
-                text = "논현역",
-                color = Gray60,
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.Right,
-                modifier = Modifier.weight(0.7f)
-            )
-        }
-    }
-}
-
-@Composable
 private fun FavoritesGuide(
     modifier: Modifier = Modifier
 ) {
@@ -436,7 +394,6 @@ private fun FavoritesStopList(
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier
-        .fillMaxSize()
         .padding(top = 20.dp)
     ) {
         LazyColumn {
