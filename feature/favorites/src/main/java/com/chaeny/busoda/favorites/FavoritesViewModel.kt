@@ -1,5 +1,6 @@
 package com.chaeny.busoda.favorites
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.data.repository.FavoriteBusRepository
@@ -57,11 +58,19 @@ internal class FavoritesViewModel @Inject constructor(
     }
 
     private suspend fun getBusStopDetailsMap(): Map<String, BusStopDetail> {
+        val stopIds = currentState.busFavorites
+            .map { it.stopId }
+            .distinct()
+
+        Log.d("FavoritesViewModel", "전체 즐겨찾기: ${currentState.busFavorites.size}개")
+        Log.d("FavoritesViewModel", "실제 API 호출: ${stopIds.size}개")
+
         return coroutineScope {
-            currentState.busFavorites.map { favoriteBus ->
+            stopIds.map { stopId ->
                 async {
-                    val busStopDetail = busStopDetailRepository.getBusStopDetail(favoriteBus.stopId)
-                    favoriteBus.stopId to busStopDetail
+                    Log.d("FavoritesViewModel", "API 호출 → $stopId")
+                    val busStopDetail = busStopDetailRepository.getBusStopDetail(stopId)
+                    stopId to busStopDetail
                 }
             }.awaitAll().toMap()
         }
