@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.chaeny.busoda.model.BusStop
+import com.chaeny.busoda.model.FavoriteBusItem
 import com.chaeny.busoda.ui.component.MainSearchBar
 import com.chaeny.busoda.ui.component.MainTab
 import com.chaeny.busoda.ui.component.MainTabRow
@@ -75,7 +76,10 @@ fun FavoritesScreen(
                     stops = uiState.favorites,
                     onClickItem = { viewModel.onIntent(FavoritesIntent.NavigateToDetail(it)) },
                     onLongClickItem = { viewModel.onIntent(FavoritesIntent.RequestDeleteFavorite(it)) })
-                HardcodedCardWithBuses()
+
+                if (uiState.busFavorites.isNotEmpty()) {
+                    FavoriteBusItem(uiState.busFavorites.first())
+                }
             }
         }
     }
@@ -365,6 +369,53 @@ private fun HardcodedCardWithBuses(
                 modifier = Modifier.weight(1.5f),
                 textAlign = TextAlign.End,
                 style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
+}
+
+@Composable
+private fun FavoriteBusItem(
+    busItem: FavoriteBusItem,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .padding(horizontal = 30.dp)
+            .padding(bottom = 15.dp),
+        shape = RoundedCornerShape(15.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Text(
+            text = "${busItem.stopName} - ${busItem.busNumber}번",
+            color = Color.Black,
+            style = MaterialTheme.typography.titleMedium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier
+                .padding(horizontal = 15.dp)
+                .padding(top = 15.dp, bottom = 5.dp)
+        )
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 15.dp)
+                .padding(bottom = 15.dp)
+        ) {
+            Text(
+                text = busItem.stopId,
+                color = Gray60,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.weight(0.3f)
+            )
+            Text(
+                text = busItem.nextStopName,
+                color = Gray60,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Right,
+                modifier = Modifier.weight(0.7f)
             )
         }
     }
