@@ -79,7 +79,10 @@ fun FavoritesScreen(
                     onLongClickItem = { viewModel.onIntent(FavoritesIntent.RequestDeleteFavorite(it)) })
 
                 if (uiState.busFavorites.isNotEmpty()) {
-                    FavoriteBusCard(uiState.busFavorites.first())
+                    val groupedByStop = uiState.busFavorites.groupBy { it.stopId }
+                    groupedByStop.values.forEach { busItems ->
+                        FavoriteBusCard(busItems)
+                    }
                 }
             }
         }
@@ -413,9 +416,11 @@ private fun BusInfo(
 
 @Composable
 private fun FavoriteBusCard(
-    busItem: FavoriteBusItem,
+    busItems: List<FavoriteBusItem>,
     modifier: Modifier = Modifier
 ) {
+    val stopInfo = busItems.first()
+
     Card(
         modifier = modifier
             .padding(horizontal = 30.dp)
@@ -425,7 +430,7 @@ private fun FavoriteBusCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Text(
-            text = busItem.stopName,
+            text = stopInfo.stopName,
             color = Color.Black,
             style = MaterialTheme.typography.titleMedium,
             maxLines = 1,
@@ -440,13 +445,13 @@ private fun FavoriteBusCard(
                 .padding(bottom = 15.dp)
         ) {
             Text(
-                text = busItem.stopId,
+                text = stopInfo.stopId,
                 color = Gray60,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.weight(0.3f)
             )
             Text(
-                text = busItem.nextStopName,
+                text = stopInfo.nextStopName,
                 color = Gray60,
                 style = MaterialTheme.typography.bodyMedium,
                 maxLines = 1,
@@ -455,13 +460,16 @@ private fun FavoriteBusCard(
                 modifier = Modifier.weight(0.7f)
             )
         }
-        HorizontalDivider(
-            color = Gray60.copy(alpha = 0.3f)
-        )
-        BusInfo(
-            busNumber = busItem.busNumber,
-            nextStopName = busItem.nextStopName
-        )
+
+        busItems.forEachIndexed { index, busItem ->
+            HorizontalDivider(
+                color = Gray60.copy(alpha = 0.3f)
+            )
+            BusInfo(
+                busNumber = busItem.busNumber,
+                nextStopName = busItem.nextStopName
+            )
+        }
     }
 }
 
