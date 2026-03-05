@@ -78,8 +78,8 @@ fun FavoritesScreen(
                     onClickItem = { viewModel.onIntent(FavoritesIntent.NavigateToDetail(it)) },
                     onLongClickItem = { viewModel.onIntent(FavoritesIntent.RequestDeleteFavorite(it)) })
 
-                if (uiState.groupedBusFavorites.isNotEmpty()) {
-                    FavoritesBusList(uiState.groupedBusFavorites)
+                if (uiState.busFavorites.isNotEmpty()) {
+                    FavoritesBusList(uiState.busFavorites)
                 }
             }
         }
@@ -488,7 +488,7 @@ private fun FavoritesGuide(
 
 @Composable
 private fun FavoritesBusList(
-    groupedBusFavorites: Map<String, List<FavoriteBusItem>>,
+    busFavorites: Map<String, List<FavoriteBusItem>>,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -496,7 +496,7 @@ private fun FavoritesBusList(
     ) {
         LazyColumn {
             items(
-                items = groupedBusFavorites.values.toList(),
+                items = busFavorites.values.toList(),
                 key = { it.first().stopId }
             ) { busItems ->
                 FavoriteBusCard(busItems)

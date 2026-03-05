@@ -43,14 +43,8 @@ internal class FavoritesViewModel @Inject constructor(
     private fun collectBusFavorites() {
         viewModelScope.launch {
             favoriteBusRepository.getFavoriteBuses().collect { busFavorites ->
-                val groupedByStop = busFavorites.groupBy { it.stopId }
-
-                setState {
-                    copy(
-                        busFavorites = busFavorites,
-                        groupedBusFavorites = groupedByStop
-                    )
-                }
+                val busFavoritesByStop = busFavorites.groupBy { it.stopId }
+                setState { copy(busFavorites = busFavoritesByStop) }
 
                 if (busFavorites.isNotEmpty()) {
                     loadFavoriteBusInfo()
@@ -65,7 +59,7 @@ internal class FavoritesViewModel @Inject constructor(
     }
 
     private suspend fun getBusStopDetailsMap(): Map<String, BusStopDetail> {
-        val stopIds = currentState.busFavorites.map { it.stopId }.distinct()
+        val stopIds = currentState.busFavorites.keys
 
         return coroutineScope {
             stopIds.map { stopId ->
@@ -108,8 +102,7 @@ sealed class Popup {
 
 data class FavoritesUiState(
     val favorites: List<BusStop> = emptyList(),
-    val busFavorites: List<FavoriteBusItem> = emptyList(),
-    val groupedBusFavorites: Map<String, List<FavoriteBusItem>> = emptyMap(),
+    val busFavorites: Map<String, List<FavoriteBusItem>> = emptyMap(),
     val favoriteBusInfo: Map<String, BusStopDetail> = emptyMap(),
     val popup: Popup? = null
 ) : UiState
