@@ -78,8 +78,8 @@ fun FavoritesScreen(
                     onClickItem = { viewModel.onIntent(FavoritesIntent.NavigateToDetail(it)) },
                     onLongClickItem = { viewModel.onIntent(FavoritesIntent.RequestDeleteFavorite(it)) })
 
-                if (uiState.busFavorites.isNotEmpty()) {
-                    FavoritesBusList(uiState.busFavorites)
+                if (uiState.groupedBusFavorites.isNotEmpty()) {
+                    FavoritesBusList(uiState.groupedBusFavorites)
                 }
             }
         }
@@ -458,7 +458,7 @@ private fun FavoriteBusCard(
             )
         }
 
-        busItems.forEachIndexed { index, busItem ->
+        busItems.forEach { busItem ->
             HorizontalDivider(
                 color = Gray60.copy(alpha = 0.3f)
             )
@@ -488,17 +488,15 @@ private fun FavoritesGuide(
 
 @Composable
 private fun FavoritesBusList(
-    busFavorites: List<FavoriteBusItem>,
+    groupedBusFavorites: Map<String, List<FavoriteBusItem>>,
     modifier: Modifier = Modifier
 ) {
-    val groupedByStop = busFavorites.groupBy { it.stopId }
-
     Box(
         modifier = modifier.padding(top = 20.dp)
     ) {
         LazyColumn {
             items(
-                items = groupedByStop.values.toList(),
+                items = groupedBusFavorites.values.toList(),
                 key = { it.first().stopId }
             ) { busItems ->
                 FavoriteBusCard(busItems)
