@@ -70,18 +70,12 @@ fun FavoritesScreen(
         if (uiState.favorites.isEmpty() && uiState.busFavorites.isEmpty()) {
             FavoritesGuide()
         } else {
-            Column(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                FavoritesStopList(
-                    stops = uiState.favorites,
-                    onClickItem = { viewModel.onIntent(FavoritesIntent.NavigateToDetail(it)) },
-                    onLongClickItem = { viewModel.onIntent(FavoritesIntent.RequestDeleteFavorite(it)) })
-
-                if (uiState.busFavorites.isNotEmpty()) {
-                    FavoritesBusList(uiState.busFavorites)
-                }
-            }
+            FavoritesList(
+                stops = uiState.favorites,
+                busFavorites = uiState.busFavorites,
+                onClickItem = { viewModel.onIntent(FavoritesIntent.NavigateToDetail(it)) },
+                onLongClickItem = { viewModel.onIntent(FavoritesIntent.RequestDeleteFavorite(it)) }
+            )
         }
     }
 
@@ -487,45 +481,34 @@ private fun FavoritesGuide(
 }
 
 @Composable
-private fun FavoritesBusList(
-    busFavorites: Map<String, List<FavoriteBusItem>>,
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier.padding(top = 20.dp)
-    ) {
-        LazyColumn {
-            items(
-                items = busFavorites.values.toList(),
-                key = { it.first().stopId }
-            ) { busItems ->
-                FavoriteBusCard(busItems)
-            }
-        }
-    }
-}
-
-@Composable
-private fun FavoritesStopList(
+private fun FavoritesList(
     stops: List<BusStop>,
+    busFavorites: Map<String, List<FavoriteBusItem>>,
     onClickItem: (String) -> Unit,
     onLongClickItem: (BusStop) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(modifier = modifier
-        .padding(top = 20.dp)
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(top = 20.dp)
     ) {
-        LazyColumn {
-            items(
-                items = stops,
-                key = { stop -> stop.stopId }
-            ) { stop ->
-                StopItem(
-                    stop = stop,
-                    onClick = onClickItem,
-                    onLongClick = { onLongClickItem(stop) }
-                )
-            }
+        items(
+            items = stops,
+            key = { stop -> stop.stopId }
+        ) { stop ->
+            StopItem(
+                stop = stop,
+                onClick = onClickItem,
+                onLongClick = { onLongClickItem(stop) }
+            )
+        }
+
+        items(
+            items = busFavorites.values.toList(),
+            key = { it.first().stopId }
+        ) { busItems ->
+            FavoriteBusCard(busItems)
         }
     }
 }
@@ -632,14 +615,6 @@ private fun FavoritesScreenPreview() {
         navigateToStopList = {},
         navigateToStopDetail = {},
         navigateToNearbyStops = {}
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun FavoritesStopListPreview() {
-    FavoritesStopList(
-        stops = dummyData, onClickItem = {}, onLongClickItem = {}
     )
 }
 
