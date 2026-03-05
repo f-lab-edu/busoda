@@ -67,7 +67,7 @@ fun FavoritesScreen(
             onHomeClick = { },
             onNearbyStopsClick = navigateToNearbyStops
         )
-        if (uiState.favorites.isEmpty() && uiState.busFavorites.isEmpty()) {
+        if (uiState.favorites.isEmpty()) {
             FavoritesGuide()
         } else {
             FavoritesList(
@@ -406,65 +406,6 @@ private fun BusInfo(
 }
 
 @Composable
-private fun FavoriteBusCard(
-    busItems: List<FavoriteBusItem>,
-    modifier: Modifier = Modifier
-) {
-    val stopInfo = busItems.first()
-
-    Card(
-        modifier = modifier
-            .padding(horizontal = 30.dp)
-            .padding(bottom = 15.dp),
-        shape = RoundedCornerShape(15.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-    ) {
-        Text(
-            text = stopInfo.stopName,
-            color = Color.Black,
-            style = MaterialTheme.typography.titleMedium,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier
-                .padding(horizontal = 15.dp)
-                .padding(top = 15.dp, bottom = 5.dp)
-        )
-        Row(
-            modifier = Modifier
-                .padding(horizontal = 15.dp)
-                .padding(bottom = 15.dp)
-        ) {
-            Text(
-                text = stopInfo.stopId,
-                color = Gray60,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.weight(0.3f)
-            )
-            Text(
-                text = stopInfo.nextStopName,
-                color = Gray60,
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.Right,
-                modifier = Modifier.weight(0.7f)
-            )
-        }
-
-        busItems.forEach { busItem ->
-            HorizontalDivider(
-                color = Gray60.copy(alpha = 0.3f)
-            )
-            BusInfo(
-                busNumber = busItem.busNumber,
-                nextStopName = busItem.nextStopName
-            )
-        }
-    }
-}
-
-@Composable
 private fun FavoritesGuide(
     modifier: Modifier = Modifier
 ) {
@@ -497,18 +438,87 @@ private fun FavoritesList(
             items = stops,
             key = { stop -> stop.stopId }
         ) { stop ->
-            StopItem(
-                stop = stop,
-                onClick = onClickItem,
-                onLongClick = { onLongClickItem(stop) }
+            val buses = busFavorites[stop.stopId]
+
+            if (buses != null) {
+                StopWithBusesCard(
+                    stop = stop,
+                    buses = buses,
+                    onClick = onClickItem,
+                    onLongClick = { onLongClickItem(stop) }
+                )
+            } else {
+                StopItem(
+                    stop = stop,
+                    onClick = onClickItem,
+                    onLongClick = { onLongClickItem(stop) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun StopWithBusesCard(
+    stop: BusStop,
+    buses: List<FavoriteBusItem>,
+    onClick: (String) -> Unit,
+    onLongClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .padding(horizontal = 30.dp)
+            .padding(bottom = 15.dp)
+            .clip(RoundedCornerShape(15.dp))
+            .combinedClickable(
+                onClick = { onClick(stop.stopId) },
+                onLongClick = { onLongClick() }
+            ),
+        shape = RoundedCornerShape(15.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Text(
+            text = stop.stopName,
+            color = Color.Black,
+            style = MaterialTheme.typography.titleMedium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier
+                .padding(horizontal = 15.dp)
+                .padding(top = 15.dp, bottom = 5.dp)
+        )
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 15.dp)
+                .padding(bottom = 15.dp)
+        ) {
+            Text(
+                text = stop.stopId,
+                color = Gray60,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.weight(0.3f)
+            )
+            Text(
+                text = stop.nextStopName,
+                color = Gray60,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Right,
+                modifier = Modifier.weight(0.7f)
             )
         }
 
-        items(
-            items = busFavorites.values.toList(),
-            key = { it.first().stopId }
-        ) { busItems ->
-            FavoriteBusCard(busItems)
+        buses.forEach { busItem ->
+            HorizontalDivider(
+                color = Gray60.copy(alpha = 0.3f)
+            )
+            BusInfo(
+                busNumber = busItem.busNumber,
+                nextStopName = busItem.nextStopName
+            )
         }
     }
 }
