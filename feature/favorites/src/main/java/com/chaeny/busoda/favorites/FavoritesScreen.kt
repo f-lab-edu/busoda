@@ -67,12 +67,12 @@ fun FavoritesScreen(
             onHomeClick = { },
             onNearbyStopsClick = navigateToNearbyStops
         )
-        if (uiState.favorites.isEmpty()) {
+        if (uiState.favoriteStops.isEmpty()) {
             FavoritesGuide()
         } else {
             FavoritesList(
-                stops = uiState.favorites,
-                busFavorites = uiState.busFavorites,
+                favoriteStops = uiState.favoriteStops,
+                favoriteBuses = uiState.favoriteBuses,
                 onClickItem = { viewModel.onIntent(FavoritesIntent.NavigateToDetail(it)) },
                 onLongClickItem = { viewModel.onIntent(FavoritesIntent.RequestDeleteFavorite(it)) }
             )
@@ -423,8 +423,8 @@ private fun FavoritesGuide(
 
 @Composable
 private fun FavoritesList(
-    stops: List<BusStop>,
-    busFavorites: Map<String, List<FavoriteBusItem>>,
+    favoriteStops: List<BusStop>,
+    favoriteBuses: Map<String, List<FavoriteBusItem>>,
     onClickItem: (String) -> Unit,
     onLongClickItem: (BusStop) -> Unit,
     modifier: Modifier = Modifier
@@ -435,10 +435,10 @@ private fun FavoritesList(
             .padding(top = 20.dp)
     ) {
         items(
-            items = stops,
+            items = favoriteStops,
             key = { stop -> stop.stopId }
         ) { stop ->
-            val buses = busFavorites[stop.stopId]
+            val buses = favoriteBuses[stop.stopId]
 
             if (buses != null) {
                 StopWithBusesCard(
@@ -469,12 +469,12 @@ private fun StopHeader(
         style = MaterialTheme.typography.titleMedium,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
-        modifier = Modifier
+        modifier = modifier
             .padding(horizontal = 15.dp)
             .padding(top = 15.dp, bottom = 5.dp)
     )
     Row(
-        modifier = Modifier
+        modifier = modifier
             .padding(horizontal = 15.dp)
             .padding(bottom = 15.dp)
     ) {

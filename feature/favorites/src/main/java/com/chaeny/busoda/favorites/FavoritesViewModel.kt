@@ -28,25 +28,25 @@ internal class FavoritesViewModel @Inject constructor(
 ) {
 
     init {
-        collectFavorites()
-        collectBusFavorites()
+        collectFavoriteStops()
+        collectFavoriteBuses()
     }
 
-    private fun collectFavorites() {
+    private fun collectFavoriteStops() {
         viewModelScope.launch {
-            favoriteRepository.getFavorites().collect { favorites ->
-                setState { copy(favorites = favorites) }
+            favoriteRepository.getFavoriteStops().collect { favoriteStops ->
+                setState { copy(favoriteStops = favoriteStops) }
             }
         }
     }
 
-    private fun collectBusFavorites() {
+    private fun collectFavoriteBuses() {
         viewModelScope.launch {
-            favoriteBusRepository.getFavoriteBuses().collect { busFavorites ->
-                val busFavoritesByStop = busFavorites.groupBy { it.stopId }
-                setState { copy(busFavorites = busFavoritesByStop) }
+            favoriteBusRepository.getFavoriteBuses().collect { favoriteBuses ->
+                val favoriteBusesByStop = favoriteBuses.groupBy { it.stopId }
+                setState { copy(favoriteBuses = favoriteBusesByStop) }
 
-                if (busFavorites.isNotEmpty()) {
+                if (favoriteBuses.isNotEmpty()) {
                     loadFavoriteBusInfo()
                 }
             }
@@ -59,7 +59,7 @@ internal class FavoritesViewModel @Inject constructor(
     }
 
     private suspend fun getBusStopDetailsMap(): Map<String, BusStopDetail> {
-        val stopIds = currentState.busFavorites.keys
+        val stopIds = currentState.favoriteBuses.keys
 
         return coroutineScope {
             stopIds.map { stopId ->
@@ -101,8 +101,8 @@ sealed class Popup {
 }
 
 data class FavoritesUiState(
-    val favorites: List<BusStop> = emptyList(),
-    val busFavorites: Map<String, List<FavoriteBusItem>> = emptyMap(),
+    val favoriteStops: List<BusStop> = emptyList(),
+    val favoriteBuses: Map<String, List<FavoriteBusItem>> = emptyMap(),
     val favoriteBusInfo: Map<String, BusStopDetail> = emptyMap(),
     val popup: Popup? = null
 ) : UiState
