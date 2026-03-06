@@ -459,6 +459,44 @@ private fun FavoritesList(
 }
 
 @Composable
+private fun StopHeader(
+    stop: BusStop,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = stop.stopName,
+        color = Color.Black,
+        style = MaterialTheme.typography.titleMedium,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        modifier = Modifier
+            .padding(horizontal = 15.dp)
+            .padding(top = 15.dp, bottom = 5.dp)
+    )
+    Row(
+        modifier = Modifier
+            .padding(horizontal = 15.dp)
+            .padding(bottom = 15.dp)
+    ) {
+        Text(
+            text = stop.stopId,
+            color = Gray60,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.weight(0.3f)
+        )
+        Text(
+            text = stop.nextStopName,
+            color = Gray60,
+            style = MaterialTheme.typography.bodyMedium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Right,
+            modifier = Modifier.weight(0.7f)
+        )
+    }
+}
+
+@Composable
 private fun StopWithBusesCard(
     stop: BusStop,
     buses: List<FavoriteBusItem>,
@@ -479,45 +517,15 @@ private fun StopWithBusesCard(
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
-        Text(
-            text = stop.stopName,
-            color = Color.Black,
-            style = MaterialTheme.typography.titleMedium,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier
-                .padding(horizontal = 15.dp)
-                .padding(top = 15.dp, bottom = 5.dp)
-        )
-        Row(
-            modifier = Modifier
-                .padding(horizontal = 15.dp)
-                .padding(bottom = 15.dp)
-        ) {
-            Text(
-                text = stop.stopId,
-                color = Gray60,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.weight(0.3f)
-            )
-            Text(
-                text = stop.nextStopName,
-                color = Gray60,
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.Right,
-                modifier = Modifier.weight(0.7f)
-            )
-        }
+        StopHeader(stop)
 
-        buses.forEach { busItem ->
+        buses.forEach { bus ->
             HorizontalDivider(
                 color = Gray60.copy(alpha = 0.3f)
             )
             BusInfo(
-                busNumber = busItem.busNumber,
-                nextStopName = busItem.nextStopName
+                busNumber = bus.busNumber,
+                nextStopName = bus.nextStopName
             )
         }
     }
@@ -543,37 +551,7 @@ private fun StopItem(
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
-        Text(
-            text = stop.stopName,
-            color = Color.Black,
-            style = MaterialTheme.typography.titleMedium,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier
-                .padding(horizontal = 15.dp)
-                .padding(top = 15.dp, bottom = 5.dp)
-        )
-        Row(
-            modifier = Modifier
-                .padding(horizontal = 15.dp)
-                .padding(bottom = 15.dp)
-        ) {
-            Text(
-                text = stop.stopId,
-                color = Gray60,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.weight(0.3f)
-            )
-            Text(
-                text = stop.nextStopName,
-                color = Gray60,
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.Right,
-                modifier = Modifier.weight(0.7f)
-            )
-        }
+        StopHeader(stop)
     }
 }
 
