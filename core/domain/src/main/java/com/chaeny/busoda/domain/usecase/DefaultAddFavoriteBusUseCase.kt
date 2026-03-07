@@ -1,4 +1,4 @@
-package com.chaeny.busoda.domain
+package com.chaeny.busoda.domain.usecase
 
 import com.chaeny.busoda.data.repository.FavoriteBusRepository
 import com.chaeny.busoda.data.repository.FavoriteRepository

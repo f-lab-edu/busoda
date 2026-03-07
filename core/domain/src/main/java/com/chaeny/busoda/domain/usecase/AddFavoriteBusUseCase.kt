@@ -1,4 +1,4 @@
-package com.chaeny.busoda.domain
+package com.chaeny.busoda.domain.usecase
 
 interface AddFavoriteBusUseCase {
     suspend operator fun invoke(
