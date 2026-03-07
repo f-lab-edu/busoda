@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.data.repository.FavoriteBusRepository
 import com.chaeny.busoda.data.repository.FavoriteRepository
+import com.chaeny.busoda.domain.usecase.AddFavoriteBusUseCase
 import com.chaeny.busoda.model.BusStop
 import com.chaeny.busoda.model.BusStopDetail
 import com.chaeny.busoda.mvi.BaseViewModel
@@ -21,6 +22,7 @@ internal class StopDetailViewModel @Inject constructor(
     private val busStopDetailRepository: BusStopDetailRepository,
     private val favoriteRepository: FavoriteRepository,
     private val favoriteBusRepository: FavoriteBusRepository,
+    private val addFavoriteBusUseCase: AddFavoriteBusUseCase,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel<StopDetailIntent, StopDetailUiState, StopDetailEffect>(
     initialState = StopDetailUiState(stopId = savedStateHandle.get(BUS_STOP_ID) ?: "")
@@ -128,7 +130,7 @@ internal class StopDetailViewModel @Inject constructor(
 
     private fun addToBusFavorites(busNumber: String) {
         viewModelScope.launch {
-            favoriteBusRepository.addFavoriteBus(
+            addFavoriteBusUseCase(
                 stopId = currentState.stopId,
                 stopName = currentState.stopDetail.stopName,
                 busNumber = busNumber,
