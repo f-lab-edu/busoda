@@ -1,6 +1,7 @@
 package com.chaeny.busoda.database.di
 
 import com.chaeny.busoda.database.AppDatabase
+import com.chaeny.busoda.database.dao.FavoriteBusDao
 import com.chaeny.busoda.database.dao.FavoriteStopDao
 import dagger.Module
 import dagger.Provides
@@ -14,4 +15,9 @@ internal object DaoModule {
     fun provideFavoriteStopDao(
         database: AppDatabase
     ): FavoriteStopDao = database.favoriteStopDao()
+
+    @Provides
+    fun provideFavoriteBusDao(
+        database: AppDatabase
+    ): FavoriteBusDao = database.favoriteBusDao()
 }
