@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -189,18 +190,10 @@ private fun StopWithBusesCard(
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
+    FavoriteCard(
+        onClick = { onClick(stop.stopId) },
+        onLongClick = onLongClick,
         modifier = modifier
-            .padding(horizontal = 30.dp)
-            .padding(bottom = 15.dp)
-            .clip(RoundedCornerShape(15.dp))
-            .combinedClickable(
-                onClick = { onClick(stop.stopId) },
-                onLongClick = { onLongClick() }
-            ),
-        shape = RoundedCornerShape(15.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         StopHeader(stop)
 
@@ -220,18 +213,10 @@ private fun StopItem(
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
+    FavoriteCard(
+        onClick = { onClick(stop.stopId) },
+        onLongClick = onLongClick,
         modifier = modifier
-            .padding(horizontal = 30.dp)
-            .padding(bottom = 15.dp)
-            .clip(RoundedCornerShape(15.dp))
-            .combinedClickable(
-                onClick = { onClick(stop.stopId) },
-                onLongClick = { onLongClick() }
-            ),
-        shape = RoundedCornerShape(15.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         StopHeader(stop)
     }
@@ -275,6 +260,29 @@ private fun StopHeader(
             )
         }
     }
+}
+
+@Composable
+private fun FavoriteCard(
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Card(
+        modifier = modifier
+            .padding(horizontal = 30.dp)
+            .padding(bottom = 15.dp)
+            .clip(RoundedCornerShape(15.dp))
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick
+            ),
+        shape = RoundedCornerShape(15.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        content = content
+    )
 }
 
 @Composable
