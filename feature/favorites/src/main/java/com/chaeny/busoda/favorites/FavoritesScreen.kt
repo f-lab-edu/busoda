@@ -126,42 +126,6 @@ private fun CollectEffect(
 }
 
 @Composable
-private fun BusInfo(
-    busNumber: String,
-    nextStopName: String,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp)
-            .padding(vertical = 15.dp),
-        verticalAlignment = Alignment.Bottom
-    ) {
-        Text(
-            text = busNumber,
-            modifier = Modifier.weight(0.3f),
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold
-        )
-        Text(
-            text = nextStopName,
-            modifier = Modifier
-                .weight(0.45f)
-                .padding(end = 5.dp),
-            style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.End,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-        Text(
-            text = stringResource(R.string.way),
-            style = MaterialTheme.typography.bodyLarge
-        )
-    }
-}
-
-@Composable
 private fun FavoritesGuide(
     modifier: Modifier = Modifier
 ) {
@@ -212,91 +176,6 @@ private fun FavoritesList(
                     onLongClick = { onLongClickItem(stop) }
                 )
             }
-        }
-    }
-}
-
-@Composable
-private fun StopHeader(
-    stop: BusStop,
-    modifier: Modifier = Modifier
-) {
-    Text(
-        text = stop.stopName,
-        color = Color.Black,
-        style = MaterialTheme.typography.titleMedium,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        modifier = modifier
-            .padding(horizontal = 15.dp)
-            .padding(top = 15.dp, bottom = 5.dp)
-    )
-    Row(
-        modifier = modifier
-            .padding(horizontal = 15.dp)
-            .padding(bottom = 15.dp)
-    ) {
-        Text(
-            text = stop.stopId,
-            color = Gray60,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.weight(0.3f)
-        )
-        Text(
-            text = stop.nextStopName,
-            color = Gray60,
-            style = MaterialTheme.typography.bodyMedium,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            textAlign = TextAlign.Right,
-            modifier = Modifier.weight(0.7f)
-        )
-    }
-}
-
-@Composable
-private fun BusArrivalInfoList(
-    busInfo: BusInfo,
-    modifier: Modifier = Modifier
-) {
-    Spacer(modifier = Modifier.height(8.dp))
-
-    ArrivalInfo(
-        arrivalInfo = busInfo.arrivalInfos.getOrNull(0),
-        position = 0,
-        modifier = Modifier.padding(horizontal = 20.dp)
-    )
-
-    Spacer(modifier = Modifier.height(8.dp))
-
-    ArrivalInfo(
-        arrivalInfo = busInfo.arrivalInfos.getOrNull(1),
-        position = 1,
-        modifier = Modifier
-            .padding(horizontal = 20.dp)
-            .padding(bottom = 15.dp)
-    )
-}
-
-@Composable
-private fun FavoriteBusItem(
-    bus: FavoriteBusItem,
-    busStopDetail: BusStopDetail?,
-    modifier: Modifier = Modifier
-) {
-    HorizontalDivider(
-        color = Gray60.copy(alpha = 0.3f)
-    )
-
-    BusInfo(
-        busNumber = bus.busNumber,
-        nextStopName = bus.nextStopName
-    )
-
-    if (busStopDetail != null) {
-        val busInfo = busStopDetail.busInfos.find { it.busNumber == bus.busNumber }
-        if (busInfo != null) {
-            BusArrivalInfoList(busInfo = busInfo)
         }
     }
 }
@@ -356,6 +235,127 @@ private fun StopItem(
     ) {
         StopHeader(stop)
     }
+}
+
+@Composable
+private fun StopHeader(
+    stop: BusStop,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = stop.stopName,
+        color = Color.Black,
+        style = MaterialTheme.typography.titleMedium,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        modifier = modifier
+            .padding(horizontal = 15.dp)
+            .padding(top = 15.dp, bottom = 5.dp)
+    )
+    Row(
+        modifier = modifier
+            .padding(horizontal = 15.dp)
+            .padding(bottom = 15.dp)
+    ) {
+        Text(
+            text = stop.stopId,
+            color = Gray60,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.weight(0.3f)
+        )
+        Text(
+            text = stop.nextStopName,
+            color = Gray60,
+            style = MaterialTheme.typography.bodyMedium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Right,
+            modifier = Modifier.weight(0.7f)
+        )
+    }
+}
+
+@Composable
+private fun FavoriteBusItem(
+    bus: FavoriteBusItem,
+    busStopDetail: BusStopDetail?,
+    modifier: Modifier = Modifier
+) {
+    HorizontalDivider(
+        color = Gray60.copy(alpha = 0.3f)
+    )
+
+    BusInfoHeader(
+        busNumber = bus.busNumber,
+        nextStopName = bus.nextStopName
+    )
+
+    if (busStopDetail != null) {
+        val busInfo = busStopDetail.busInfos.find { it.busNumber == bus.busNumber }
+        if (busInfo != null) {
+            BusArrivalInfoList(busInfo = busInfo)
+        }
+    }
+}
+
+@Composable
+private fun BusInfoHeader(
+    busNumber: String,
+    nextStopName: String,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp)
+            .padding(vertical = 15.dp),
+        verticalAlignment = Alignment.Bottom
+    ) {
+        Text(
+            text = busNumber,
+            modifier = Modifier.weight(0.3f),
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = nextStopName,
+            modifier = Modifier
+                .weight(0.45f)
+                .padding(end = 5.dp),
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.End,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+        Text(
+            text = stringResource(R.string.way),
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
+}
+
+@Composable
+private fun BusArrivalInfoList(
+    busInfo: BusInfo,
+    modifier: Modifier = Modifier
+) {
+    Spacer(modifier = Modifier.height(8.dp))
+
+    ArrivalInfo(
+        arrivalInfo = busInfo.arrivalInfos.getOrNull(0),
+        position = 0,
+        modifier = Modifier.padding(horizontal = 20.dp)
+    )
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    ArrivalInfo(
+        arrivalInfo = busInfo.arrivalInfos.getOrNull(1),
+        position = 1,
+        modifier = Modifier
+            .padding(horizontal = 20.dp)
+            .padding(bottom = 15.dp)
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
