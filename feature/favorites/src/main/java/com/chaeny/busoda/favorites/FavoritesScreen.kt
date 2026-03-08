@@ -5,6 +5,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,6 +23,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -38,7 +40,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.chaeny.busoda.model.BusStop
+import com.chaeny.busoda.model.BusStopDetail
 import com.chaeny.busoda.model.FavoriteBusItem
+import com.chaeny.busoda.ui.component.ArrivalInfo
+import com.chaeny.busoda.ui.component.LocalCurrentTime
 import com.chaeny.busoda.ui.component.MainSearchBar
 import com.chaeny.busoda.ui.component.MainTab
 import com.chaeny.busoda.ui.component.MainTabRow
@@ -56,26 +61,29 @@ fun FavoritesScreen(
 
     CollectEffect(viewModel, navigateToStopDetail)
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .systemBarsPadding()
-    ) {
-        MainSearchBar(onSearchClick = navigateToStopList)
-        MainTabRow(
-            selectedTab = MainTab.HOME,
-            onHomeClick = { },
-            onNearbyStopsClick = navigateToNearbyStops
-        )
-        if (uiState.favoriteStops.isEmpty()) {
-            FavoritesGuide()
-        } else {
-            FavoritesList(
-                favoriteStops = uiState.favoriteStops,
-                favoriteBuses = uiState.favoriteBuses,
-                onClickItem = { viewModel.onIntent(FavoritesIntent.NavigateToDetail(it)) },
-                onLongClickItem = { viewModel.onIntent(FavoritesIntent.RequestDeleteFavorite(it)) }
+    CompositionLocalProvider(LocalCurrentTime provides uiState.currentTime) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .systemBarsPadding()
+        ) {
+            MainSearchBar(onSearchClick = navigateToStopList)
+            MainTabRow(
+                selectedTab = MainTab.HOME,
+                onHomeClick = { },
+                onNearbyStopsClick = navigateToNearbyStops
             )
+            if (uiState.favoriteStops.isEmpty()) {
+                FavoritesGuide()
+            } else {
+                FavoritesList(
+                    favoriteStops = uiState.favoriteStops,
+                    favoriteBuses = uiState.favoriteBuses,
+                    favoriteBusInfo = uiState.favoriteBusInfo,
+                    onClickItem = { viewModel.onIntent(FavoritesIntent.NavigateToDetail(it)) },
+                    onLongClickItem = { viewModel.onIntent(FavoritesIntent.RequestDeleteFavorite(it)) }
+                )
+            }
         }
     }
 
@@ -425,6 +433,7 @@ private fun FavoritesGuide(
 private fun FavoritesList(
     favoriteStops: List<BusStop>,
     favoriteBuses: Map<String, List<FavoriteBusItem>>,
+    favoriteBusInfo: Map<String, BusStopDetail>,
     onClickItem: (String) -> Unit,
     onLongClickItem: (BusStop) -> Unit,
     modifier: Modifier = Modifier
@@ -444,6 +453,7 @@ private fun FavoritesList(
                 StopWithBusesCard(
                     stop = stop,
                     buses = buses,
+                    busStopDetail = favoriteBusInfo[stop.stopId],
                     onClick = onClickItem,
                     onLongClick = { onLongClickItem(stop) }
                 )
@@ -500,6 +510,7 @@ private fun StopHeader(
 private fun StopWithBusesCard(
     stop: BusStop,
     buses: List<FavoriteBusItem>,
+    busStopDetail: BusStopDetail?,
     onClick: (String) -> Unit,
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -523,10 +534,34 @@ private fun StopWithBusesCard(
             HorizontalDivider(
                 color = Gray60.copy(alpha = 0.3f)
             )
+
             BusInfo(
                 busNumber = bus.busNumber,
                 nextStopName = bus.nextStopName
             )
+
+            if (busStopDetail != null) {
+                val busInfo = busStopDetail.busInfos.find { it.busNumber == bus.busNumber }
+                if (busInfo != null) {
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    ArrivalInfo(
+                        arrivalInfo = busInfo.arrivalInfos.getOrNull(0),
+                        position = 0,
+                        modifier = Modifier.padding(horizontal = 20.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    ArrivalInfo(
+                        arrivalInfo = busInfo.arrivalInfos.getOrNull(1),
+                        position = 1,
+                        modifier = Modifier
+                            .padding(horizontal = 20.dp)
+                            .padding(bottom = 15.dp)
+                    )
+                }
+            }
         }
     }
 }
