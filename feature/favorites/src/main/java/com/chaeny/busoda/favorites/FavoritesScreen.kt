@@ -39,6 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.chaeny.busoda.model.BusInfo
 import com.chaeny.busoda.model.BusStop
 import com.chaeny.busoda.model.BusStopDetail
 import com.chaeny.busoda.model.FavoriteBusItem
@@ -120,259 +121,6 @@ private fun CollectEffect(
                     ).show()
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun HardcodedCardWithBuses(
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier
-            .padding(horizontal = 30.dp)
-            .padding(bottom = 15.dp),
-        shape = RoundedCornerShape(15.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-    ) {
-        Text(
-            text = "남대문경찰서",
-            color = Color.Black,
-            style = MaterialTheme.typography.titleMedium,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier
-                .padding(horizontal = 15.dp)
-                .padding(top = 15.dp, bottom = 5.dp)
-        )
-        Row(
-            modifier = Modifier
-                .padding(horizontal = 15.dp)
-                .padding(bottom = 15.dp)
-        ) {
-            Text(
-                text = "16206",
-                color = Gray60,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.weight(0.3f)
-            )
-            Text(
-                text = "강남역",
-                color = Gray60,
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.Right,
-                modifier = Modifier.weight(0.7f)
-            )
-        }
-
-        // Divider
-        androidx.compose.material3.HorizontalDivider(
-            color = Gray60.copy(alpha = 0.3f)
-        )
-
-        // 버스 1 (StopDetail BusItem 양식)
-        // BusInfoHeader (별 제외)
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-                .padding(top = 15.dp),
-            verticalAlignment = Alignment.Bottom
-        ) {
-            Text(
-                text = "120",
-                modifier = Modifier.weight(0.3f),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = "강남역",
-                modifier = Modifier
-                    .weight(0.45f)
-                    .padding(end = 5.dp),
-                style = MaterialTheme.typography.bodyLarge,
-                textAlign = TextAlign.End,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Text(
-                text = "방면",
-                style = MaterialTheme.typography.bodyLarge
-            )
-        }
-
-        androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(8.dp))
-
-        // ArrivalInfo 1
-        Row(
-            modifier = Modifier
-                .padding(horizontal = 20.dp)
-                .fillMaxWidth()
-        ) {
-            Text(
-                text = "1번째 버스:",
-                modifier = Modifier.weight(2f),
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = "3분 30초",
-                modifier = Modifier.weight(2.5f),
-                textAlign = TextAlign.End,
-                style = MaterialTheme.typography.titleSmall
-            )
-            Text(
-                text = "3번째 전",
-                modifier = Modifier.weight(2f),
-                textAlign = TextAlign.End,
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = "여유",
-                color = Color(0xFF008000),
-                modifier = Modifier.weight(1.5f),
-                textAlign = TextAlign.End,
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
-
-        androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(8.dp))
-
-        // ArrivalInfo 2
-        Row(
-            modifier = Modifier
-                .padding(horizontal = 20.dp)
-                .fillMaxWidth()
-                .padding(bottom = 15.dp)
-        ) {
-            Text(
-                text = "2번째 버스:",
-                modifier = Modifier.weight(2f),
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = "7분 20초",
-                modifier = Modifier.weight(2.5f),
-                textAlign = TextAlign.End,
-                style = MaterialTheme.typography.titleSmall
-            )
-            Text(
-                text = "7번째 전",
-                modifier = Modifier.weight(2f),
-                textAlign = TextAlign.End,
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = "혼잡",
-                color = Color(0xFFFF0000),
-                modifier = Modifier.weight(1.5f),
-                textAlign = TextAlign.End,
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
-
-        // Divider
-        androidx.compose.material3.HorizontalDivider(
-            color = Gray60.copy(alpha = 0.3f)
-        )
-
-        // 버스 2
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-                .padding(top = 15.dp),
-            verticalAlignment = Alignment.Bottom
-        ) {
-            Text(
-                text = "146",
-                modifier = Modifier.weight(0.3f),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = "신촌역",
-                modifier = Modifier
-                    .weight(0.45f)
-                    .padding(end = 5.dp),
-                style = MaterialTheme.typography.bodyLarge,
-                textAlign = TextAlign.End,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Text(
-                text = "방면",
-                style = MaterialTheme.typography.bodyLarge
-            )
-        }
-
-        androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(8.dp))
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-        ) {
-            Text(
-                text = "1번째 버스:",
-                modifier = Modifier.weight(2f),
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = "25분 10초",
-                modifier = Modifier.weight(2.5f),
-                textAlign = TextAlign.End,
-                style = MaterialTheme.typography.titleSmall
-            )
-            Text(
-                text = "11번째 전",
-                modifier = Modifier.weight(2f),
-                textAlign = TextAlign.End,
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = "보통",
-                color = Color(0xFFFFAB40),
-                modifier = Modifier.weight(1.5f),
-                textAlign = TextAlign.End,
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
-
-        androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(8.dp))
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-                .padding(bottom = 15.dp)
-        ) {
-            Text(
-                text = "2번째 버스:",
-                modifier = Modifier.weight(2f),
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = "10분 30초",
-                modifier = Modifier.weight(2.5f),
-                textAlign = TextAlign.End,
-                style = MaterialTheme.typography.titleSmall
-            )
-            Text(
-                text = "15번째 전",
-                modifier = Modifier.weight(2f),
-                textAlign = TextAlign.End,
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = "여유",
-                color = Color(0xFF008000),
-                modifier = Modifier.weight(1.5f),
-                textAlign = TextAlign.End,
-                style = MaterialTheme.typography.bodyMedium
-            )
         }
     }
 }
@@ -507,6 +255,53 @@ private fun StopHeader(
 }
 
 @Composable
+private fun BusArrivalInfoList(
+    busInfo: BusInfo,
+    modifier: Modifier = Modifier
+) {
+    Spacer(modifier = Modifier.height(8.dp))
+
+    ArrivalInfo(
+        arrivalInfo = busInfo.arrivalInfos.getOrNull(0),
+        position = 0,
+        modifier = Modifier.padding(horizontal = 20.dp)
+    )
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    ArrivalInfo(
+        arrivalInfo = busInfo.arrivalInfos.getOrNull(1),
+        position = 1,
+        modifier = Modifier
+            .padding(horizontal = 20.dp)
+            .padding(bottom = 15.dp)
+    )
+}
+
+@Composable
+private fun FavoriteBusItem(
+    bus: FavoriteBusItem,
+    busStopDetail: BusStopDetail?,
+    modifier: Modifier = Modifier
+) {
+    HorizontalDivider(
+        color = Gray60.copy(alpha = 0.3f)
+    )
+
+    BusInfo(
+        busNumber = bus.busNumber,
+        nextStopName = bus.nextStopName
+    )
+
+    if (busStopDetail != null) {
+        val busInfo = busStopDetail.busInfos.find { it.busNumber == bus.busNumber }
+        if (busInfo != null) {
+            BusArrivalInfoList(busInfo = busInfo)
+        }
+    }
+}
+
+@Composable
 private fun StopWithBusesCard(
     stop: BusStop,
     buses: List<FavoriteBusItem>,
@@ -531,37 +326,10 @@ private fun StopWithBusesCard(
         StopHeader(stop)
 
         buses.forEach { bus ->
-            HorizontalDivider(
-                color = Gray60.copy(alpha = 0.3f)
+            FavoriteBusItem(
+                bus = bus,
+                busStopDetail = busStopDetail
             )
-
-            BusInfo(
-                busNumber = bus.busNumber,
-                nextStopName = bus.nextStopName
-            )
-
-            if (busStopDetail != null) {
-                val busInfo = busStopDetail.busInfos.find { it.busNumber == bus.busNumber }
-                if (busInfo != null) {
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    ArrivalInfo(
-                        arrivalInfo = busInfo.arrivalInfos.getOrNull(0),
-                        position = 0,
-                        modifier = Modifier.padding(horizontal = 20.dp)
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    ArrivalInfo(
-                        arrivalInfo = busInfo.arrivalInfos.getOrNull(1),
-                        position = 1,
-                        modifier = Modifier
-                            .padding(horizontal = 20.dp)
-                            .padding(bottom = 15.dp)
-                    )
-                }
-            }
         }
     }
 }
@@ -640,10 +408,3 @@ private fun FavoritesScreenPreview() {
         navigateToNearbyStops = {}
     )
 }
-
-private val dummyData = listOf(
-    BusStop("02218", "남대문경찰서.서울역10번출구", "숭례문"),
-    BusStop("03119", "신용산역3번출구", "신용산지하차도"),
-    BusStop("19114", "영등포역", "신길역5호선"),
-    BusStop("19113", "영등포역.패어필드호텔", "경방타임스퀘어.신세계백화점")
-)
