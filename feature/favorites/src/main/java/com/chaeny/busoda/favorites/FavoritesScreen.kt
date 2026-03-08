@@ -242,36 +242,38 @@ private fun StopHeader(
     stop: BusStop,
     modifier: Modifier = Modifier
 ) {
-    Text(
-        text = stop.stopName,
-        color = Color.Black,
-        style = MaterialTheme.typography.titleMedium,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        modifier = modifier
-            .padding(horizontal = 15.dp)
-            .padding(top = 15.dp, bottom = 5.dp)
-    )
-    Row(
-        modifier = modifier
-            .padding(horizontal = 15.dp)
-            .padding(bottom = 15.dp)
-    ) {
+    Column(modifier = modifier) {
         Text(
-            text = stop.stopId,
-            color = Gray60,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.weight(0.3f)
-        )
-        Text(
-            text = stop.nextStopName,
-            color = Gray60,
-            style = MaterialTheme.typography.bodyMedium,
+            text = stop.stopName,
+            color = Color.Black,
+            style = MaterialTheme.typography.titleMedium,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            textAlign = TextAlign.Right,
-            modifier = Modifier.weight(0.7f)
+            modifier = Modifier
+                .padding(horizontal = 15.dp)
+                .padding(top = 15.dp, bottom = 5.dp)
         )
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 15.dp)
+                .padding(bottom = 15.dp)
+        ) {
+            Text(
+                text = stop.stopId,
+                color = Gray60,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.weight(0.3f)
+            )
+            Text(
+                text = stop.nextStopName,
+                color = Gray60,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Right,
+                modifier = Modifier.weight(0.7f)
+            )
+        }
     }
 }
 
