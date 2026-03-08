@@ -3,4 +3,13 @@
     <string name="stop_search">정류장 검색</string>
     <string name="tab_home">홈</string>
     <string name="tab_nearby_stops">주변정류소</string>
+    <string name="nth_bus">%1$d번째 버스:</string>
+    <string name="no_data"> </string>
+    <string name="congestion_very_high">매우 혼잡</string>
+    <string name="congestion_high">혼잡</string>
+    <string name="congestion_medium">보통</string>
+    <string name="congestion_low">여유</string>
+    <string name="minutes_seconds">%1$d분 %2$d초</string>
+    <string name="minutes">%1$d분</string>
+    <string name="seconds">%1$d초</string>
 </resources>

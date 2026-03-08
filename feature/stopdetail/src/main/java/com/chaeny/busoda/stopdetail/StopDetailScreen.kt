@@ -36,19 +36,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -57,12 +53,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.chaeny.busoda.model.BusArrivalInfo
 import com.chaeny.busoda.model.BusInfo
 import com.chaeny.busoda.model.BusStopDetail
+import com.chaeny.busoda.ui.component.ArrivalInfo
+import com.chaeny.busoda.ui.component.LocalCurrentTime
 import com.chaeny.busoda.ui.theme.DarkGreen
-
-private val LocalCurrentTime = compositionLocalOf<Long> { 0L }
 
 @Composable
 fun StopDetailScreen(
@@ -335,59 +330,6 @@ private fun BusInfoHeader(
     }
 }
 
-@Composable
-private fun ArrivalTimeText(
-    arrivalTime: Long?,
-    modifier: Modifier = Modifier
-) {
-    val currentTime = LocalCurrentTime.current
-    var displayTime by rememberSaveable { mutableStateOf("") }
-
-    if (arrivalTime != null) {
-        displayTime = setTextRemainingTime(arrivalTime, currentTime)
-    }
-
-    Text(
-        text = displayTime,
-        modifier = modifier,
-        textAlign = TextAlign.End,
-        style = MaterialTheme.typography.titleSmall
-    )
-}
-
-@Composable
-private fun ArrivalInfo(
-    arrivalInfo: BusArrivalInfo?,
-    position: Int,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier.fillMaxWidth()
-    ) {
-        Text(
-            text = stringResource(R.string.nth_bus, position + 1),
-            modifier = Modifier.weight(2f),
-            style = MaterialTheme.typography.bodyMedium
-        )
-        ArrivalTimeText(
-            arrivalTime = arrivalInfo?.arrivalTime,
-            modifier = Modifier.weight(2.5f)
-        )
-        Text(
-            text = arrivalInfo?.position ?: stringResource(R.string.no_data),
-            modifier = Modifier.weight(2f),
-            textAlign = TextAlign.End,
-            style = MaterialTheme.typography.bodyMedium
-        )
-        Text(
-            text = arrivalInfo?.getCongestionText() ?: stringResource(R.string.no_data),
-            color = arrivalInfo?.getCongestionColor() ?: colorResource(R.color.congestion_unknown),
-            modifier = Modifier.weight(1.5f),
-            textAlign = TextAlign.End,
-            style = MaterialTheme.typography.bodyMedium
-        )
-    }
-}
 
 @Composable
 private fun BusItem(

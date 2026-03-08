@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="way">Direction</string>
+    <string name="no_info">No arrival info</string>
+    <string name="refresh">Refresh</string>
+    <string name="bookmark">Bookmark</string>
     <string name="bus_favorite">Bus favorite</string>
+    <string name="bus_emoji">🚌</string>
+    <string name="stop_emoji">🚏</string>
     <string name="favorite_added">Added to favorites</string>
     <string name="favorite_removed">Removed from favorites</string>
 </resources>
