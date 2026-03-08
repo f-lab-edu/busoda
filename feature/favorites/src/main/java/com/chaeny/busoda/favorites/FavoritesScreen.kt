@@ -205,7 +205,7 @@ private fun StopWithBusesCard(
         StopHeader(stop)
 
         buses.forEach { bus ->
-            FavoriteBusItem(
+            FavoriteBusContent(
                 bus = bus,
                 busStopDetail = busStopDetail
             )
@@ -276,7 +276,7 @@ private fun StopHeader(
 }
 
 @Composable
-private fun FavoriteBusItem(
+private fun FavoriteBusContent(
     bus: FavoriteBusItem,
     busStopDetail: BusStopDetail?,
     modifier: Modifier = Modifier
