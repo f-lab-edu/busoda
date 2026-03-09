@@ -46,6 +46,7 @@ import com.chaeny.busoda.ui.component.LocalCurrentTime
 import com.chaeny.busoda.ui.component.MainSearchBar
 import com.chaeny.busoda.ui.component.MainTab
 import com.chaeny.busoda.ui.component.MainTabRow
+import com.chaeny.busoda.ui.component.StopInfo
 import com.chaeny.busoda.ui.theme.Gray60
 import com.chaeny.busoda.ui.theme.White
 
@@ -192,7 +193,7 @@ private fun StopWithBusesCard(
         onLongClick = onLongClick,
         modifier = modifier
     ) {
-        StopHeader(stop)
+        StopInfo(stop)
 
         buses.forEach { bus ->
             FavoriteBusContent(
@@ -215,47 +216,7 @@ private fun StopItem(
         onLongClick = onLongClick,
         modifier = modifier
     ) {
-        StopHeader(stop)
-    }
-}
-
-@Composable
-private fun StopHeader(
-    stop: BusStop,
-    modifier: Modifier = Modifier
-) {
-    Column(modifier = modifier) {
-        Text(
-            text = stop.stopName,
-            color = Color.Black,
-            style = MaterialTheme.typography.titleMedium,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier
-                .padding(horizontal = 15.dp)
-                .padding(top = 15.dp, bottom = 5.dp)
-        )
-        Row(
-            modifier = Modifier
-                .padding(horizontal = 15.dp)
-                .padding(bottom = 15.dp)
-        ) {
-            Text(
-                text = stop.stopId,
-                color = Gray60,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.weight(0.3f)
-            )
-            Text(
-                text = stop.nextStopName,
-                color = Gray60,
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.Right,
-                modifier = Modifier.weight(0.7f)
-            )
-        }
+        StopInfo(stop)
     }
 }
 
