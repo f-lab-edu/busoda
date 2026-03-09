@@ -8,10 +8,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -55,7 +53,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.chaeny.busoda.model.BusInfo
 import com.chaeny.busoda.model.BusStopDetail
-import com.chaeny.busoda.ui.component.ArrivalInfo
+import com.chaeny.busoda.ui.component.BusArrivalInfoList
 import com.chaeny.busoda.ui.component.LocalCurrentTime
 import com.chaeny.busoda.ui.theme.DarkGreen
 
@@ -355,21 +353,7 @@ private fun BusItem(
                 .padding(start = 10.dp, end = 20.dp)
                 .padding(top = 15.dp)
         )
-        Spacer(modifier = Modifier.height(8.dp))
-        ArrivalInfo(
-            arrivalInfo = busInfo.arrivalInfos.getOrNull(0),
-            position = 0,
-            modifier = Modifier
-                .padding(horizontal = 20.dp)
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        ArrivalInfo(
-            arrivalInfo = busInfo.arrivalInfos.getOrNull(1),
-            position = 1,
-            modifier = Modifier
-                .padding(horizontal = 20.dp)
-                .padding(bottom = 15.dp)
-        )
+        BusArrivalInfoList(busInfo = busInfo)
     }
 }
 

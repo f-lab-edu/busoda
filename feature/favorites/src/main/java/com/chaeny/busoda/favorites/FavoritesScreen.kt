@@ -6,10 +6,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -40,11 +38,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.chaeny.busoda.model.BusInfo
 import com.chaeny.busoda.model.BusStop
 import com.chaeny.busoda.model.BusStopDetail
 import com.chaeny.busoda.model.FavoriteBusItem
-import com.chaeny.busoda.ui.component.ArrivalInfo
+import com.chaeny.busoda.ui.component.BusArrivalInfoList
 import com.chaeny.busoda.ui.component.LocalCurrentTime
 import com.chaeny.busoda.ui.component.MainSearchBar
 import com.chaeny.busoda.ui.component.MainTab
@@ -342,30 +339,6 @@ private fun BusInfoHeader(
             style = MaterialTheme.typography.bodyLarge
         )
     }
-}
-
-@Composable
-private fun BusArrivalInfoList(
-    busInfo: BusInfo,
-    modifier: Modifier = Modifier
-) {
-    Spacer(modifier = Modifier.height(8.dp))
-
-    ArrivalInfo(
-        arrivalInfo = busInfo.arrivalInfos.getOrNull(0),
-        position = 0,
-        modifier = Modifier.padding(horizontal = 20.dp)
-    )
-
-    Spacer(modifier = Modifier.height(8.dp))
-
-    ArrivalInfo(
-        arrivalInfo = busInfo.arrivalInfos.getOrNull(1),
-        position = 1,
-        modifier = Modifier
-            .padding(horizontal = 20.dp)
-            .padding(bottom = 15.dp)
-    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
