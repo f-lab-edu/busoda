@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -47,6 +48,7 @@ import com.chaeny.busoda.ui.component.MainSearchBar
 import com.chaeny.busoda.ui.component.MainTab
 import com.chaeny.busoda.ui.component.MainTabRow
 import com.chaeny.busoda.ui.component.StopInfo
+import com.chaeny.busoda.ui.theme.DarkGreen
 import com.chaeny.busoda.ui.theme.Gray60
 import com.chaeny.busoda.ui.theme.White
 
@@ -80,6 +82,7 @@ fun FavoritesScreen(
                     favoriteStops = uiState.favoriteStops,
                     favoriteBuses = uiState.favoriteBuses,
                     favoriteBusInfo = uiState.favoriteBusInfo,
+                    isLoading = uiState.isLoading,
                     onClickItem = { viewModel.onIntent(FavoritesIntent.NavigateToDetail(it)) },
                     onLongClickItem = { viewModel.onIntent(FavoritesIntent.RequestDeleteFavorite(it)) }
                 )
@@ -145,36 +148,49 @@ private fun FavoritesList(
     favoriteStops: List<BusStop>,
     favoriteBuses: Map<String, List<FavoriteBusItem>>,
     favoriteBusInfo: Map<String, BusStopDetail>,
+    isLoading: Boolean,
     onClickItem: (String) -> Unit,
     onLongClickItem: (BusStop) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(
+    Box(
         modifier = modifier
             .fillMaxSize()
             .padding(top = 20.dp)
     ) {
-        items(
-            items = favoriteStops,
-            key = { stop -> stop.stopId }
-        ) { stop ->
-            val buses = favoriteBuses[stop.stopId]
+        if (!isLoading) {
+            LazyColumn {
+                items(
+                    items = favoriteStops,
+                    key = { stop -> stop.stopId }
+                ) { stop ->
+                    val buses = favoriteBuses[stop.stopId]
+                    val busStopDetail = favoriteBusInfo[stop.stopId]
 
-            if (buses != null) {
-                StopWithBusesCard(
-                    stop = stop,
-                    buses = buses,
-                    busStopDetail = favoriteBusInfo[stop.stopId],
-                    onClick = onClickItem,
-                    onLongClick = { onLongClickItem(stop) }
-                )
-            } else {
-                StopItem(
-                    stop = stop,
-                    onClick = onClickItem,
-                    onLongClick = { onLongClickItem(stop) }
-                )
+                    if (buses != null && busStopDetail != null) {
+                        StopWithBusesCard(
+                            stop = stop,
+                            buses = buses,
+                            busStopDetail = busStopDetail,
+                            onClick = onClickItem,
+                            onLongClick = { onLongClickItem(stop) }
+                        )
+                    } else {
+                        StopItem(
+                            stop = stop,
+                            onClick = onClickItem,
+                            onLongClick = { onLongClickItem(stop) }
+                        )
+                    }
+                }
             }
+        }
+
+        if (isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center),
+                color = DarkGreen
+            )
         }
     }
 }

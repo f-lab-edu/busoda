@@ -54,11 +54,13 @@ internal class FavoritesViewModel @Inject constructor(
     }
 
     private suspend fun loadFavoriteBusInfo() {
+        setState { copy(isLoading = true) }
         val busInfoMap = getBusStopDetailsMap()
         setState {
             copy(
                 favoriteBusInfo = busInfoMap,
-                currentTime = System.currentTimeMillis() / 1000
+                currentTime = System.currentTimeMillis() / 1000,
+                isLoading = false
             )
         }
     }
@@ -110,6 +112,7 @@ data class FavoritesUiState(
     val favoriteBuses: Map<String, List<FavoriteBusItem>> = emptyMap(),
     val favoriteBusInfo: Map<String, BusStopDetail> = emptyMap(),
     val currentTime: Long = 0L,
+    val isLoading: Boolean = false,
     val popup: Popup? = null
 ) : UiState
 
