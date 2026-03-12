@@ -8,11 +8,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -21,7 +20,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.BookmarkAdd
+import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -33,19 +34,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -54,12 +51,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.chaeny.busoda.model.BusArrivalInfo
 import com.chaeny.busoda.model.BusInfo
 import com.chaeny.busoda.model.BusStopDetail
+import com.chaeny.busoda.ui.component.BusArrivalInfoList
+import com.chaeny.busoda.ui.component.LocalCurrentTime
 import com.chaeny.busoda.ui.theme.DarkGreen
-
-private val LocalCurrentTime = compositionLocalOf<Long> { 0L }
 
 @Composable
 fun StopDetailScreen(
@@ -82,8 +78,12 @@ fun StopDetailScreen(
             timer = uiState.timer,
             rotation = rotation,
             isFavorite = uiState.isFavorite,
+            favoriteBusNumbers = uiState.favoriteBusNumbers,
             onRefresh = { viewModel.onIntent(StopDetailIntent.RefreshData) },
             onToggleFavorite = { viewModel.onIntent(StopDetailIntent.ToggleFavorite) },
+            onToggleBusFavorite = { busNumber ->
+                viewModel.onIntent(StopDetailIntent.ToggleBusFavorite(busNumber))
+            },
             modifier = modifier
         )
     }
@@ -123,8 +123,10 @@ private fun StopDetailContent(
     timer: Int,
     rotation: Float,
     isFavorite: Boolean,
+    favoriteBusNumbers: Set<String>,
     onRefresh: () -> Unit,
     onToggleFavorite: () -> Unit,
+    onToggleBusFavorite: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -157,7 +159,9 @@ private fun StopDetailContent(
             }
             BusList(
                 busInfos = stopDetail.busInfos,
-                isLoading = isLoading
+                isLoading = isLoading,
+                favoriteBusNumbers = favoriteBusNumbers,
+                onToggleBusFavorite = onToggleBusFavorite
             )
         }
         RefreshButton(
@@ -282,12 +286,25 @@ private fun RefreshButton(
 private fun BusInfoHeader(
     busNumber: String,
     nextStopName: String,
+    isBusFavorite: Boolean,
+    onToggleBusFavorite: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Bottom
     ) {
+        IconButton(
+            onClick = onToggleBusFavorite,
+            modifier = Modifier.size(32.dp)
+        ) {
+            Icon(
+                imageVector = if (isBusFavorite) Icons.Filled.Star else Icons.Outlined.StarBorder,
+                contentDescription = stringResource(R.string.bus_favorite),
+                tint = Color.Gray,
+                modifier = Modifier.size(20.dp)
+            )
+        }
         Text(
             text = busNumber,
             modifier = Modifier.weight(0.3f),
@@ -297,7 +314,7 @@ private fun BusInfoHeader(
         Text(
             text = nextStopName,
             modifier = Modifier
-                .weight(0.55f)
+                .weight(0.45f)
                 .padding(end = 5.dp),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.End,
@@ -311,63 +328,12 @@ private fun BusInfoHeader(
     }
 }
 
-@Composable
-private fun ArrivalTimeText(
-    arrivalTime: Long?,
-    modifier: Modifier = Modifier
-) {
-    val currentTime = LocalCurrentTime.current
-    var displayTime by rememberSaveable { mutableStateOf("") }
-
-    if (arrivalTime != null) {
-        displayTime = setTextRemainingTime(arrivalTime, currentTime)
-    }
-
-    Text(
-        text = displayTime,
-        modifier = modifier,
-        textAlign = TextAlign.End,
-        style = MaterialTheme.typography.titleSmall
-    )
-}
-
-@Composable
-private fun ArrivalInfo(
-    arrivalInfo: BusArrivalInfo?,
-    position: Int,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier.fillMaxWidth()
-    ) {
-        Text(
-            text = stringResource(R.string.nth_bus, position + 1),
-            modifier = Modifier.weight(2f),
-            style = MaterialTheme.typography.bodyMedium
-        )
-        ArrivalTimeText(
-            arrivalTime = arrivalInfo?.arrivalTime,
-            modifier = Modifier.weight(2.5f)
-        )
-        Text(
-            text = arrivalInfo?.position ?: stringResource(R.string.no_data),
-            modifier = Modifier.weight(2f),
-            textAlign = TextAlign.End,
-            style = MaterialTheme.typography.bodyMedium
-        )
-        Text(
-            text = arrivalInfo?.getCongestionText() ?: stringResource(R.string.no_data),
-            color = arrivalInfo?.getCongestionColor() ?: colorResource(R.color.congestion_unknown),
-            modifier = Modifier.weight(1.5f),
-            textAlign = TextAlign.End,
-            style = MaterialTheme.typography.bodyMedium
-        )
-    }
-}
 
 @Composable
 private fun BusItem(
     busInfo: BusInfo,
+    isBusFavorite: Boolean,
+    onToggleBusFavorite: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -381,25 +347,13 @@ private fun BusItem(
         BusInfoHeader(
             busNumber = busInfo.busNumber,
             nextStopName = busInfo.nextStopName,
+            isBusFavorite = isBusFavorite,
+            onToggleBusFavorite = { onToggleBusFavorite(busInfo.busNumber) },
             modifier = Modifier
-                .padding(horizontal = 20.dp)
+                .padding(start = 10.dp, end = 20.dp)
                 .padding(top = 15.dp)
         )
-        Spacer(modifier = Modifier.height(8.dp))
-        ArrivalInfo(
-            arrivalInfo = busInfo.arrivalInfos.getOrNull(0),
-            position = 0,
-            modifier = Modifier
-                .padding(horizontal = 20.dp)
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        ArrivalInfo(
-            arrivalInfo = busInfo.arrivalInfos.getOrNull(1),
-            position = 1,
-            modifier = Modifier
-                .padding(horizontal = 20.dp)
-                .padding(bottom = 15.dp)
-        )
+        BusArrivalInfoList(busInfo = busInfo)
     }
 }
 
@@ -407,6 +361,8 @@ private fun BusItem(
 private fun BusList(
     busInfos: List<BusInfo>,
     isLoading: Boolean,
+    favoriteBusNumbers: Set<String>,
+    onToggleBusFavorite: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -417,7 +373,11 @@ private fun BusList(
                 items = busInfos,
                 key = { index, busInfo -> "$index-${busInfo.busNumber}" }
             ) { index, busInfo ->
-                BusItem(busInfo)
+                BusItem(
+                    busInfo = busInfo,
+                    isBusFavorite = favoriteBusNumbers.contains(busInfo.busNumber),
+                    onToggleBusFavorite = onToggleBusFavorite
+                )
             }
         }
 

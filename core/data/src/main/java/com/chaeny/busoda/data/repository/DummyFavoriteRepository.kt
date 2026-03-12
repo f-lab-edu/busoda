@@ -14,7 +14,7 @@ class DummyFavoriteRepository @Inject constructor() : FavoriteRepository {
         BusStop("19113", "영등포역.패어필드호텔", "경방타임스퀘어.신세계백화점")
     )
 
-    override fun getFavorites(): Flow<List<BusStop>> {
+    override fun getFavoriteStops(): Flow<List<BusStop>> {
         return MutableStateFlow(dummyData)
     }
 

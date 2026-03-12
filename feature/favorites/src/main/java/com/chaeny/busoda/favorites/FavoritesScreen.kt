@@ -4,8 +4,10 @@ import android.widget.Toast
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,12 +15,15 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -27,6 +32,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,9 +40,15 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.chaeny.busoda.model.BusStop
+import com.chaeny.busoda.model.BusStopDetail
+import com.chaeny.busoda.model.FavoriteBusItem
+import com.chaeny.busoda.ui.component.BusArrivalInfoList
+import com.chaeny.busoda.ui.component.LocalCurrentTime
 import com.chaeny.busoda.ui.component.MainSearchBar
 import com.chaeny.busoda.ui.component.MainTab
 import com.chaeny.busoda.ui.component.MainTabRow
+import com.chaeny.busoda.ui.component.StopInfo
+import com.chaeny.busoda.ui.theme.DarkGreen
 import com.chaeny.busoda.ui.theme.Gray60
 import com.chaeny.busoda.ui.theme.White
 
@@ -51,29 +63,30 @@ fun FavoritesScreen(
 
     CollectEffect(viewModel, navigateToStopDetail)
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .systemBarsPadding()
-    ) {
-        MainSearchBar(onSearchClick = navigateToStopList)
-        MainTabRow(
-            selectedTab = MainTab.HOME,
-            onHomeClick = { },
-            onNearbyStopsClick = navigateToNearbyStops
-        )
-        if (uiState.favorites.isEmpty()) {
-            FavoritesGuide()
-        } else {
-            FavoritesStopList(
-                stops = uiState.favorites,
-                onClickItem = { stopId ->
-                    viewModel.onIntent(FavoritesIntent.NavigateToDetail(stopId))
-                },
-                onLongClickItem = { stop ->
-                    viewModel.onIntent(FavoritesIntent.RequestDeleteFavorite(stop))
-                }
+    CompositionLocalProvider(LocalCurrentTime provides uiState.currentTime) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .systemBarsPadding()
+        ) {
+            MainSearchBar(onSearchClick = navigateToStopList)
+            MainTabRow(
+                selectedTab = MainTab.HOME,
+                onHomeClick = { },
+                onNearbyStopsClick = navigateToNearbyStops
             )
+            if (uiState.favoriteStops.isEmpty()) {
+                FavoritesGuide()
+            } else {
+                FavoritesList(
+                    favoriteStops = uiState.favoriteStops,
+                    favoriteBuses = uiState.favoriteBuses,
+                    favoriteBusInfo = uiState.favoriteBusInfo,
+                    isLoading = uiState.isLoading,
+                    onClickItem = { viewModel.onIntent(FavoritesIntent.NavigateToDetail(it)) },
+                    onLongClickItem = { viewModel.onIntent(FavoritesIntent.RequestDeleteFavorite(it)) }
+                )
+            }
         }
     }
 
@@ -131,27 +144,76 @@ private fun FavoritesGuide(
 }
 
 @Composable
-private fun FavoritesStopList(
-    stops: List<BusStop>,
+private fun FavoritesList(
+    favoriteStops: List<BusStop>,
+    favoriteBuses: Map<String, List<FavoriteBusItem>>,
+    favoriteBusInfo: Map<String, BusStopDetail>,
+    isLoading: Boolean,
     onClickItem: (String) -> Unit,
     onLongClickItem: (BusStop) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(modifier = modifier
-        .fillMaxSize()
-        .padding(top = 20.dp)
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(top = 20.dp)
     ) {
-        LazyColumn {
-            items(
-                items = stops,
-                key = { stop -> stop.stopId }
-            ) { stop ->
-                StopItem(
-                    stop = stop,
-                    onClick = onClickItem,
-                    onLongClick = { onLongClickItem(stop) }
-                )
+        if (!isLoading) {
+            LazyColumn {
+                items(
+                    items = favoriteStops,
+                    key = { stop -> stop.stopId }
+                ) { stop ->
+                    val buses = favoriteBuses[stop.stopId]
+                    val busStopDetail = favoriteBusInfo[stop.stopId]
+
+                    if (buses != null) {
+                        StopWithBusesCard(
+                            stop = stop,
+                            buses = buses,
+                            busStopDetail = busStopDetail,
+                            onClick = onClickItem,
+                            onLongClick = { onLongClickItem(stop) }
+                        )
+                    } else {
+                        StopItem(
+                            stop = stop,
+                            onClick = onClickItem,
+                            onLongClick = { onLongClickItem(stop) }
+                        )
+                    }
+                }
             }
+        } else {
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center),
+                color = DarkGreen
+            )
+        }
+    }
+}
+
+@Composable
+private fun StopWithBusesCard(
+    stop: BusStop,
+    buses: List<FavoriteBusItem>,
+    busStopDetail: BusStopDetail?,
+    onClick: (String) -> Unit,
+    onLongClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    FavoriteCard(
+        onClick = { onClick(stop.stopId) },
+        onLongClick = onLongClick,
+        modifier = modifier
+    ) {
+        StopInfo(stop)
+
+        buses.forEach { bus ->
+            FavoriteBusContent(
+                bus = bus,
+                busStopDetail = busStopDetail
+            )
         }
     }
 }
@@ -163,50 +225,94 @@ private fun StopItem(
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    FavoriteCard(
+        onClick = { onClick(stop.stopId) },
+        onLongClick = onLongClick,
+        modifier = modifier
+    ) {
+        StopInfo(stop)
+    }
+}
+
+@Composable
+private fun FavoriteCard(
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.() -> Unit
+) {
     Card(
         modifier = modifier
             .padding(horizontal = 30.dp)
             .padding(bottom = 15.dp)
             .clip(RoundedCornerShape(15.dp))
             .combinedClickable(
-                onClick = { onClick(stop.stopId) },
-                onLongClick = { onLongClick() }
+                onClick = onClick,
+                onLongClick = onLongClick
             ),
         shape = RoundedCornerShape(15.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        content = content
+    )
+}
+
+@Composable
+private fun FavoriteBusContent(
+    bus: FavoriteBusItem,
+    busStopDetail: BusStopDetail?,
+    modifier: Modifier = Modifier
+) {
+    HorizontalDivider(
+        color = Gray60.copy(alpha = 0.3f)
+    )
+
+    BusInfoHeader(
+        busNumber = bus.busNumber,
+        nextStopName = bus.nextStopName
+    )
+
+    if (busStopDetail != null) {
+        val busInfo = busStopDetail.busInfos.find { it.busNumber == bus.busNumber }
+        if (busInfo != null) {
+            BusArrivalInfoList(busInfo = busInfo)
+        }
+    }
+}
+
+@Composable
+private fun BusInfoHeader(
+    busNumber: String,
+    nextStopName: String,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp)
+            .padding(top = 15.dp),
+        verticalAlignment = Alignment.Bottom
     ) {
         Text(
-            text = stop.stopName,
-            color = Color.Black,
-            style = MaterialTheme.typography.titleMedium,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier
-                .padding(horizontal = 15.dp)
-                .padding(top = 15.dp, bottom = 5.dp)
+            text = busNumber,
+            modifier = Modifier.weight(0.3f),
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
         )
-        Row(
+        Text(
+            text = nextStopName,
             modifier = Modifier
-                .padding(horizontal = 15.dp)
-                .padding(bottom = 15.dp)
-        ) {
-            Text(
-                text = stop.stopId,
-                color = Gray60,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.weight(0.3f)
-            )
-            Text(
-                text = stop.nextStopName,
-                color = Gray60,
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.Right,
-                modifier = Modifier.weight(0.7f)
-            )
-        }
+                .weight(0.45f)
+                .padding(end = 5.dp),
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.End,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+        Text(
+            text = stringResource(R.string.way),
+            style = MaterialTheme.typography.bodyLarge
+        )
     }
 }
 
@@ -260,18 +366,3 @@ private fun FavoritesScreenPreview() {
         navigateToNearbyStops = {}
     )
 }
-
-@Preview(showBackground = true)
-@Composable
-private fun FavoritesStopListPreview() {
-    FavoritesStopList(
-        stops = dummyData, onClickItem = {}, onLongClickItem = {}
-    )
-}
-
-private val dummyData = listOf(
-    BusStop("02218", "남대문경찰서.서울역10번출구", "숭례문"),
-    BusStop("03119", "신용산역3번출구", "신용산지하차도"),
-    BusStop("19114", "영등포역", "신길역5호선"),
-    BusStop("19113", "영등포역.패어필드호텔", "경방타임스퀘어.신세계백화점")
-)

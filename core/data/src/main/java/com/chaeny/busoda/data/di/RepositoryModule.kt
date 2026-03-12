@@ -5,8 +5,10 @@ import com.chaeny.busoda.data.repository.ApiBusStopRepository
 import com.chaeny.busoda.data.repository.ApiNearbyBusStopsRepository
 import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.data.repository.BusStopRepository
+import com.chaeny.busoda.data.repository.FavoriteBusRepository
 import com.chaeny.busoda.data.repository.FavoriteRepository
 import com.chaeny.busoda.data.repository.NearbyBusStopsRepository
+import com.chaeny.busoda.data.repository.RoomFavoriteBusRepository
 import com.chaeny.busoda.data.repository.RoomFavoriteRepository
 import dagger.Binds
 import dagger.Module
@@ -29,6 +31,10 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindFavoriteRepository(implementation: RoomFavoriteRepository) : FavoriteRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindFavoriteBusRepository(implementation: RoomFavoriteBusRepository): FavoriteBusRepository
 
     @Binds
     @Singleton

@@ -1,32 +1,80 @@
 package com.chaeny.busoda.favorites
 
 import androidx.lifecycle.viewModelScope
+import com.chaeny.busoda.data.repository.BusStopDetailRepository
+import com.chaeny.busoda.data.repository.FavoriteBusRepository
 import com.chaeny.busoda.data.repository.FavoriteRepository
 import com.chaeny.busoda.model.BusStop
+import com.chaeny.busoda.model.BusStopDetail
+import com.chaeny.busoda.model.FavoriteBusItem
 import com.chaeny.busoda.mvi.BaseViewModel
 import com.chaeny.busoda.mvi.SideEffect
 import com.chaeny.busoda.mvi.UiIntent
 import com.chaeny.busoda.mvi.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 internal class FavoritesViewModel @Inject constructor(
-    private val favoriteRepository: FavoriteRepository
+    private val favoriteRepository: FavoriteRepository,
+    private val favoriteBusRepository: FavoriteBusRepository,
+    private val busStopDetailRepository: BusStopDetailRepository
 ) : BaseViewModel<FavoritesIntent, FavoritesUiState, FavoritesEffect>(
     initialState = FavoritesUiState()
 ) {
 
     init {
-        collectFavorites()
+        collectFavoriteStops()
+        collectFavoriteBuses()
     }
 
-    private fun collectFavorites() {
+    private fun collectFavoriteStops() {
         viewModelScope.launch {
-            favoriteRepository.getFavorites().collect { favorites ->
-                setState { copy(favorites = favorites) }
+            favoriteRepository.getFavoriteStops().collect { favoriteStops ->
+                setState { copy(favoriteStops = favoriteStops) }
             }
+        }
+    }
+
+    private fun collectFavoriteBuses() {
+        viewModelScope.launch {
+            favoriteBusRepository.getFavoriteBuses().collect { favoriteBuses ->
+                val favoriteBusesByStop = favoriteBuses.groupBy { it.stopId }
+                setState { copy(favoriteBuses = favoriteBusesByStop) }
+
+                if (favoriteBuses.isNotEmpty()) {
+                    loadFavoriteBusInfo()
+                }
+            }
+        }
+    }
+
+    private suspend fun loadFavoriteBusInfo() {
+        setState { copy(isLoading = true) }
+        val busInfoMap = getBusStopDetailsMap()
+        setState {
+            copy(
+                favoriteBusInfo = busInfoMap,
+                currentTime = System.currentTimeMillis() / 1000,
+                isLoading = false
+            )
+        }
+    }
+
+    private suspend fun getBusStopDetailsMap(): Map<String, BusStopDetail> {
+        val stopIds = currentState.favoriteBuses.keys
+
+        return coroutineScope {
+            stopIds.map { stopId ->
+                async {
+                    val busStopDetail = busStopDetailRepository.getBusStopDetail(stopId)
+                    stopId to busStopDetail
+                }
+            }.awaitAll().toMap()
         }
     }
 
@@ -60,7 +108,11 @@ sealed class Popup {
 }
 
 data class FavoritesUiState(
-    val favorites: List<BusStop> = emptyList(),
+    val favoriteStops: List<BusStop> = emptyList(),
+    val favoriteBuses: Map<String, List<FavoriteBusItem>> = emptyMap(),
+    val favoriteBusInfo: Map<String, BusStopDetail> = emptyMap(),
+    val currentTime: Long = 0L,
+    val isLoading: Boolean = false,
     val popup: Popup? = null
 ) : UiState
 
