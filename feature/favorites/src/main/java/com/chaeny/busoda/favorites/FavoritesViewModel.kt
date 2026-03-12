@@ -15,6 +15,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,9 +28,12 @@ internal class FavoritesViewModel @Inject constructor(
     initialState = FavoritesUiState()
 ) {
 
+    private var currentCount = 15
+
     init {
         collectFavoriteStops()
         collectFavoriteBuses()
+        startTimer()
     }
 
     private fun collectFavoriteStops() {
@@ -78,6 +82,25 @@ internal class FavoritesViewModel @Inject constructor(
         }
     }
 
+    private fun startTimer() {
+        viewModelScope.launch {
+            while (true) {
+                setState {
+                    copy(
+                        timer = currentCount,
+                        currentTime = System.currentTimeMillis() / 1000
+                    )
+                }
+                delay(1000)
+                currentCount--
+
+                if (currentCount == 0) {
+                    currentCount = 15
+                }
+            }
+        }
+    }
+
     override fun onIntent(intent: FavoritesIntent) {
         when (intent) {
             is FavoritesIntent.NavigateToDetail -> {
@@ -112,6 +135,7 @@ data class FavoritesUiState(
     val favoriteBuses: Map<String, List<FavoriteBusItem>> = emptyMap(),
     val favoriteBusInfo: Map<String, BusStopDetail> = emptyMap(),
     val currentTime: Long = 0L,
+    val timer: Int = 15,
     val isLoading: Boolean = false,
     val popup: Popup? = null
 ) : UiState
