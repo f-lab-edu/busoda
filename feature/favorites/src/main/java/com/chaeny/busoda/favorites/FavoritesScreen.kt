@@ -167,7 +167,7 @@ private fun FavoritesList(
                     val buses = favoriteBuses[stop.stopId]
                     val busStopDetail = favoriteBusInfo[stop.stopId]
 
-                    if (buses != null && busStopDetail != null) {
+                    if (buses != null) {
                         StopWithBusesCard(
                             stop = stop,
                             buses = buses,
@@ -184,9 +184,7 @@ private fun FavoritesList(
                     }
                 }
             }
-        }
-
-        if (isLoading) {
+        } else {
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center),
                 color = DarkGreen
