@@ -12,6 +12,7 @@ import com.chaeny.busoda.mvi.SideEffect
 import com.chaeny.busoda.mvi.UiIntent
 import com.chaeny.busoda.mvi.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -28,7 +29,8 @@ internal class FavoritesViewModel @Inject constructor(
     initialState = FavoritesUiState()
 ) {
 
-    private var currentCount = 15
+    private var currentCount = REFRESH_INTERVAL_SECONDS
+    private var loadJob: Job? = null
 
     init {
         collectFavoriteStops()
@@ -51,20 +53,18 @@ internal class FavoritesViewModel @Inject constructor(
                 setState { copy(favoriteBuses = favoriteBusesByStop) }
 
                 if (favoriteBuses.isNotEmpty()) {
-                    loadFavoriteBusInfo()
+                    refreshBusInfo()
                 }
             }
         }
     }
 
     private suspend fun loadFavoriteBusInfo() {
-        setState { copy(isLoading = true) }
         val busInfoMap = getBusStopDetailsMap()
         setState {
             copy(
                 favoriteBusInfo = busInfoMap,
-                currentTime = System.currentTimeMillis() / 1000,
-                isLoading = false
+                currentTime = System.currentTimeMillis() / 1000
             )
         }
     }
@@ -95,9 +95,23 @@ internal class FavoritesViewModel @Inject constructor(
                 currentCount--
 
                 if (currentCount == 0) {
-                    currentCount = 15
+                    currentCount = REFRESH_INTERVAL_SECONDS
+                    if (currentState.favoriteBuses.isNotEmpty()) {
+                        refreshBusInfo()
+                    }
                 }
             }
+        }
+    }
+
+    private fun refreshBusInfo() {
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
+            if (currentState.favoriteBusInfo.isEmpty()) {
+                setState { copy(isLoading = true) }
+            }
+            loadFavoriteBusInfo()
+            setState { copy(isLoading = false) }
         }
     }
 
@@ -124,6 +138,10 @@ internal class FavoritesViewModel @Inject constructor(
             }
         }
     }
+
+    companion object {
+        internal const val REFRESH_INTERVAL_SECONDS = 15
+    }
 }
 
 sealed class Popup {
@@ -135,7 +153,7 @@ data class FavoritesUiState(
     val favoriteBuses: Map<String, List<FavoriteBusItem>> = emptyMap(),
     val favoriteBusInfo: Map<String, BusStopDetail> = emptyMap(),
     val currentTime: Long = 0L,
-    val timer: Int = 15,
+    val timer: Int = FavoritesViewModel.REFRESH_INTERVAL_SECONDS,
     val isLoading: Boolean = false,
     val popup: Popup? = null
 ) : UiState
