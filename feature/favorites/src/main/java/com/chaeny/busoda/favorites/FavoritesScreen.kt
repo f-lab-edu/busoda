@@ -42,6 +42,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.chaeny.busoda.model.BusInfo
 import com.chaeny.busoda.model.BusStop
 import com.chaeny.busoda.model.BusStopDetail
 import com.chaeny.busoda.model.FavoriteBusItem
@@ -283,8 +284,7 @@ private fun FavoriteCard(
 @Composable
 private fun FavoriteBusContent(
     bus: FavoriteBusItem,
-    busStopDetail: BusStopDetail?,
-    modifier: Modifier = Modifier
+    busStopDetail: BusStopDetail?
 ) {
     HorizontalDivider(
         color = Gray60.copy(alpha = 0.3f)
@@ -295,12 +295,14 @@ private fun FavoriteBusContent(
         nextStopName = bus.nextStopName
     )
 
-    if (busStopDetail != null) {
-        val busInfo = busStopDetail.busInfos.find { it.busNumber == bus.busNumber }
-        if (busInfo != null) {
-            BusArrivalInfoList(busInfo = busInfo)
-        }
-    }
+    val busInfo = busStopDetail?.busInfos?.find { it.busNumber == bus.busNumber }
+        ?: BusInfo(
+            busNumber = bus.busNumber,
+            nextStopName = bus.nextStopName,
+            arrivalInfos = emptyList()
+        )
+
+    BusArrivalInfoList(busInfo = busInfo)
 }
 
 @Composable
