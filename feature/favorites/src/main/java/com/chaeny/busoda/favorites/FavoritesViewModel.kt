@@ -86,10 +86,7 @@ internal class FavoritesViewModel @Inject constructor(
         viewModelScope.launch {
             while (true) {
                 setState {
-                    copy(
-                        timer = currentCount,
-                        currentTime = System.currentTimeMillis() / 1000
-                    )
+                    copy(currentTime = System.currentTimeMillis() / 1000)
                 }
                 delay(1000)
                 currentCount--
@@ -147,7 +144,7 @@ internal class FavoritesViewModel @Inject constructor(
     }
 
     companion object {
-        internal const val REFRESH_INTERVAL_SECONDS = 15
+        private const val REFRESH_INTERVAL_SECONDS = 15
     }
 }
 
@@ -160,7 +157,6 @@ data class FavoritesUiState(
     val favoriteBuses: Map<String, List<FavoriteBusItem>> = emptyMap(),
     val favoriteBusInfo: Map<String, BusStopDetail> = emptyMap(),
     val currentTime: Long = 0L,
-    val timer: Int = FavoritesViewModel.REFRESH_INTERVAL_SECONDS,
     val isLoading: Boolean = false,
     val popup: Popup? = null
 ) : UiState
