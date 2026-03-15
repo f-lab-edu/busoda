@@ -26,6 +26,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,6 +42,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.chaeny.busoda.model.BusInfo
 import com.chaeny.busoda.model.BusStop
 import com.chaeny.busoda.model.BusStopDetail
 import com.chaeny.busoda.model.FavoriteBusItem
@@ -47,6 +51,7 @@ import com.chaeny.busoda.ui.component.LocalCurrentTime
 import com.chaeny.busoda.ui.component.MainSearchBar
 import com.chaeny.busoda.ui.component.MainTab
 import com.chaeny.busoda.ui.component.MainTabRow
+import com.chaeny.busoda.ui.component.RefreshButton
 import com.chaeny.busoda.ui.component.StopInfo
 import com.chaeny.busoda.ui.theme.DarkGreen
 import com.chaeny.busoda.ui.theme.Gray60
@@ -60,31 +65,46 @@ fun FavoritesScreen(
 ) {
     val viewModel: FavoritesViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var rotation by remember { mutableFloatStateOf(0f) }
 
-    CollectEffect(viewModel, navigateToStopDetail)
+    CollectEffect(
+        viewModel = viewModel,
+        navigateToStopDetail = navigateToStopDetail,
+        onRotate = { rotation += 180f }
+    )
 
     CompositionLocalProvider(LocalCurrentTime provides uiState.currentTime) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .systemBarsPadding()
-        ) {
-            MainSearchBar(onSearchClick = navigateToStopList)
-            MainTabRow(
-                selectedTab = MainTab.HOME,
-                onHomeClick = { },
-                onNearbyStopsClick = navigateToNearbyStops
-            )
-            if (uiState.favoriteStops.isEmpty()) {
-                FavoritesGuide()
-            } else {
-                FavoritesList(
-                    favoriteStops = uiState.favoriteStops,
-                    favoriteBuses = uiState.favoriteBuses,
-                    favoriteBusInfo = uiState.favoriteBusInfo,
-                    isLoading = uiState.isLoading,
-                    onClickItem = { viewModel.onIntent(FavoritesIntent.NavigateToDetail(it)) },
-                    onLongClickItem = { viewModel.onIntent(FavoritesIntent.RequestDeleteFavorite(it)) }
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .systemBarsPadding()
+            ) {
+                MainSearchBar(onSearchClick = navigateToStopList)
+                MainTabRow(
+                    selectedTab = MainTab.HOME,
+                    onHomeClick = { },
+                    onNearbyStopsClick = navigateToNearbyStops
+                )
+                if (uiState.favoriteStops.isEmpty()) {
+                    FavoritesGuide()
+                } else {
+                    FavoritesList(
+                        favoriteStops = uiState.favoriteStops,
+                        favoriteBuses = uiState.favoriteBuses,
+                        favoriteBusInfo = uiState.favoriteBusInfo,
+                        isLoading = uiState.isLoading,
+                        onClickItem = { viewModel.onIntent(FavoritesIntent.NavigateToDetail(it)) },
+                        onLongClickItem = { viewModel.onIntent(FavoritesIntent.RequestDeleteFavorite(it)) }
+                    )
+                }
+            }
+
+            if (uiState.favoriteStops.isNotEmpty()) {
+                RefreshButton(
+                    rotation = rotation,
+                    onClick = { viewModel.onIntent(FavoritesIntent.RefreshData) },
+                    modifier = Modifier.align(Alignment.BottomEnd)
                 )
             }
         }
@@ -107,7 +127,8 @@ fun FavoritesScreen(
 @Composable
 private fun CollectEffect(
     viewModel: FavoritesViewModel,
-    navigateToStopDetail: (String) -> Unit
+    navigateToStopDetail: (String) -> Unit,
+    onRotate: () -> Unit
 ) {
     val context = LocalContext.current
 
@@ -121,6 +142,9 @@ private fun CollectEffect(
                     Toast.makeText(
                         context, context.getString(R.string.delete_success), Toast.LENGTH_SHORT
                     ).show()
+                }
+                is FavoritesEffect.RotateRefreshBtn -> {
+                    onRotate()
                 }
             }
         }
@@ -260,8 +284,7 @@ private fun FavoriteCard(
 @Composable
 private fun FavoriteBusContent(
     bus: FavoriteBusItem,
-    busStopDetail: BusStopDetail?,
-    modifier: Modifier = Modifier
+    busStopDetail: BusStopDetail?
 ) {
     HorizontalDivider(
         color = Gray60.copy(alpha = 0.3f)
@@ -272,12 +295,14 @@ private fun FavoriteBusContent(
         nextStopName = bus.nextStopName
     )
 
-    if (busStopDetail != null) {
-        val busInfo = busStopDetail.busInfos.find { it.busNumber == bus.busNumber }
-        if (busInfo != null) {
-            BusArrivalInfoList(busInfo = busInfo)
-        }
-    }
+    val busInfo = busStopDetail?.busInfos?.find { it.busNumber == bus.busNumber }
+        ?: BusInfo(
+            busNumber = bus.busNumber,
+            nextStopName = bus.nextStopName,
+            arrivalInfos = emptyList()
+        )
+
+    BusArrivalInfoList(busInfo = busInfo)
 }
 
 @Composable

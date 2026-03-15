@@ -12,9 +12,11 @@ import com.chaeny.busoda.mvi.SideEffect
 import com.chaeny.busoda.mvi.UiIntent
 import com.chaeny.busoda.mvi.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,9 +29,13 @@ internal class FavoritesViewModel @Inject constructor(
     initialState = FavoritesUiState()
 ) {
 
+    private var currentCount = REFRESH_INTERVAL_SECONDS
+    private var loadJob: Job? = null
+
     init {
         collectFavoriteStops()
         collectFavoriteBuses()
+        startTimer()
     }
 
     private fun collectFavoriteStops() {
@@ -47,20 +53,18 @@ internal class FavoritesViewModel @Inject constructor(
                 setState { copy(favoriteBuses = favoriteBusesByStop) }
 
                 if (favoriteBuses.isNotEmpty()) {
-                    loadFavoriteBusInfo()
+                    refreshBusInfo()
                 }
             }
         }
     }
 
     private suspend fun loadFavoriteBusInfo() {
-        setState { copy(isLoading = true) }
         val busInfoMap = getBusStopDetailsMap()
         setState {
             copy(
                 favoriteBusInfo = busInfoMap,
-                currentTime = System.currentTimeMillis() / 1000,
-                isLoading = false
+                currentTime = System.currentTimeMillis() / 1000
             )
         }
     }
@@ -75,6 +79,36 @@ internal class FavoritesViewModel @Inject constructor(
                     stopId to busStopDetail
                 }
             }.awaitAll().toMap()
+        }
+    }
+
+    private fun startTimer() {
+        viewModelScope.launch {
+            while (true) {
+                setState {
+                    copy(currentTime = System.currentTimeMillis() / 1000)
+                }
+                delay(1000)
+                currentCount--
+
+                if (currentCount == 0) {
+                    currentCount = REFRESH_INTERVAL_SECONDS
+                    if (currentState.favoriteBuses.isNotEmpty()) {
+                        refreshBusInfo()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun refreshBusInfo() {
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
+            if (currentState.favoriteBusInfo.isEmpty()) {
+                setState { copy(isLoading = true) }
+            }
+            loadFavoriteBusInfo()
+            setState { copy(isLoading = false) }
         }
     }
 
@@ -99,7 +133,18 @@ internal class FavoritesViewModel @Inject constructor(
                     }
                 }
             }
+            is FavoritesIntent.RefreshData -> {
+                currentCount = REFRESH_INTERVAL_SECONDS
+                postSideEffect(FavoritesEffect.RotateRefreshBtn)
+                if (currentState.favoriteBuses.isNotEmpty()) {
+                    refreshBusInfo()
+                }
+            }
         }
+    }
+
+    companion object {
+        private const val REFRESH_INTERVAL_SECONDS = 15
     }
 }
 
@@ -121,9 +166,11 @@ sealed class FavoritesIntent : UiIntent {
     data class RequestDeleteFavorite(val stop: BusStop) : FavoritesIntent()
     data object CancelDeleteFavorite : FavoritesIntent()
     data object ConfirmDeleteFavorite : FavoritesIntent()
+    data object RefreshData : FavoritesIntent()
 }
 
 sealed class FavoritesEffect : SideEffect {
     data class NavigateToStopDetail(val stopId: String) : FavoritesEffect()
     data object ShowDeleteSuccess : FavoritesEffect()
+    data object RotateRefreshBtn : FavoritesEffect()
 }
