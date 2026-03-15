@@ -136,6 +136,13 @@ internal class FavoritesViewModel @Inject constructor(
                     }
                 }
             }
+            is FavoritesIntent.RefreshData -> {
+                currentCount = REFRESH_INTERVAL_SECONDS
+                postSideEffect(FavoritesEffect.RotateRefreshBtn)
+                if (currentState.favoriteBuses.isNotEmpty()) {
+                    refreshBusInfo()
+                }
+            }
         }
     }
 
@@ -163,9 +170,11 @@ sealed class FavoritesIntent : UiIntent {
     data class RequestDeleteFavorite(val stop: BusStop) : FavoritesIntent()
     data object CancelDeleteFavorite : FavoritesIntent()
     data object ConfirmDeleteFavorite : FavoritesIntent()
+    data object RefreshData : FavoritesIntent()
 }
 
 sealed class FavoritesEffect : SideEffect {
     data class NavigateToStopDetail(val stopId: String) : FavoritesEffect()
     data object ShowDeleteSuccess : FavoritesEffect()
+    data object RotateRefreshBtn : FavoritesEffect()
 }
