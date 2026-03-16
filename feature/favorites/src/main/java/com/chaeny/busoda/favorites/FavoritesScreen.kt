@@ -44,8 +44,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.chaeny.busoda.model.BusInfo
 import com.chaeny.busoda.model.BusStop
-import com.chaeny.busoda.model.BusStopDetail
-import com.chaeny.busoda.model.FavoriteBusItem
 import com.chaeny.busoda.ui.component.BusArrivalInfoList
 import com.chaeny.busoda.ui.component.LocalCurrentTime
 import com.chaeny.busoda.ui.component.MainSearchBar
@@ -91,7 +89,6 @@ fun FavoritesScreen(
                 } else {
                     FavoritesList(
                         favoriteStops = uiState.favoriteStops,
-                        favoriteBuses = uiState.favoriteBuses,
                         favoriteBusInfo = uiState.favoriteBusInfo,
                         isLoading = uiState.isLoading,
                         onClickItem = { viewModel.onIntent(FavoritesIntent.NavigateToDetail(it)) },
@@ -170,8 +167,7 @@ private fun FavoritesGuide(
 @Composable
 private fun FavoritesList(
     favoriteStops: List<BusStop>,
-    favoriteBuses: Map<String, List<FavoriteBusItem>>,
-    favoriteBusInfo: Map<String, BusStopDetail>,
+    favoriteBusInfo: Map<String, List<BusInfo>>,
     isLoading: Boolean,
     onClickItem: (String) -> Unit,
     onLongClickItem: (BusStop) -> Unit,
@@ -188,13 +184,12 @@ private fun FavoritesList(
                     items = favoriteStops,
                     key = { stop -> stop.stopId }
                 ) { stop ->
-                    val buses = favoriteBuses[stop.stopId]
-                    val busStopDetail = favoriteBusInfo[stop.stopId]
+                    val busInfos = favoriteBusInfo[stop.stopId]
 
-                    if (buses != null) {
+                    if (busInfos != null) {
                         StopWithBusesCard(
                             stop = stop,
-                            busStopDetail = busStopDetail,
+                            busInfos = busInfos,
                             onClick = onClickItem,
                             onLongClick = { onLongClickItem(stop) }
                         )
@@ -219,7 +214,7 @@ private fun FavoritesList(
 @Composable
 private fun StopWithBusesCard(
     stop: BusStop,
-    busStopDetail: BusStopDetail?,
+    busInfos: List<BusInfo>,
     onClick: (String) -> Unit,
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -231,7 +226,7 @@ private fun StopWithBusesCard(
     ) {
         StopInfo(stop)
 
-        busStopDetail?.busInfos?.forEach { busInfo ->
+        busInfos.forEach { busInfo ->
             FavoriteBusContent(busInfo = busInfo)
         }
     }

@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.data.repository.FavoriteBusRepository
 import com.chaeny.busoda.data.repository.FavoriteRepository
+import com.chaeny.busoda.model.BusInfo
 import com.chaeny.busoda.model.BusStop
 import com.chaeny.busoda.model.BusStopDetail
 import com.chaeny.busoda.model.FavoriteBusItem
@@ -60,23 +61,29 @@ internal class FavoritesViewModel @Inject constructor(
     }
 
     private suspend fun loadFavoriteBusInfo() {
-        val busInfoMap = getBusStopDetailsMap()
-        val filteredToFavoriteBuses = busInfoMap.mapValues { (stopId, detail) ->
-            detail.copy(
-                busInfos = detail.busInfos.filter { busInfo ->
-                    currentState.favoriteBuses[stopId]
-                        .orEmpty()
-                        .any { it.busNumber == busInfo.busNumber }
-                }
-            )
+        val busStopDetailsMap = getBusStopDetailsMap()
+
+        val favoriteBusInfo = currentState.favoriteBuses.mapValues { (stopId, favoriteBusList) ->
+            favoriteBusList.map { favoriteBus ->
+                getFilteredFavoriteBus(busStopDetailsMap[stopId], favoriteBus)
+            }
         }
 
         setState {
             copy(
-                favoriteBusInfo = filteredToFavoriteBuses,
+                favoriteBusInfo = favoriteBusInfo,
                 currentTime = System.currentTimeMillis() / 1000
             )
         }
+    }
+
+    private fun getFilteredFavoriteBus(stopDetail: BusStopDetail?, favoriteBus: FavoriteBusItem): BusInfo {
+        return stopDetail?.busInfos?.find { it.busNumber == favoriteBus.busNumber }
+            ?: BusInfo(
+                busNumber = favoriteBus.busNumber,
+                nextStopName = favoriteBus.nextStopName,
+                arrivalInfos = emptyList()
+            )
     }
 
     private suspend fun getBusStopDetailsMap(): Map<String, BusStopDetail> {
@@ -165,7 +172,7 @@ sealed class Popup {
 data class FavoritesUiState(
     val favoriteStops: List<BusStop> = emptyList(),
     val favoriteBuses: Map<String, List<FavoriteBusItem>> = emptyMap(),
-    val favoriteBusInfo: Map<String, BusStopDetail> = emptyMap(),
+    val favoriteBusInfo: Map<String, List<BusInfo>> = emptyMap(),
     val currentTime: Long = 0L,
     val isLoading: Boolean = false,
     val popup: Popup? = null
