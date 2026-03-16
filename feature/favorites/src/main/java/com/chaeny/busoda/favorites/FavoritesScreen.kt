@@ -194,7 +194,6 @@ private fun FavoritesList(
                     if (buses != null) {
                         StopWithBusesCard(
                             stop = stop,
-                            buses = buses,
                             busStopDetail = busStopDetail,
                             onClick = onClickItem,
                             onLongClick = { onLongClickItem(stop) }
@@ -220,7 +219,6 @@ private fun FavoritesList(
 @Composable
 private fun StopWithBusesCard(
     stop: BusStop,
-    buses: List<FavoriteBusItem>,
     busStopDetail: BusStopDetail?,
     onClick: (String) -> Unit,
     onLongClick: () -> Unit,
@@ -233,11 +231,8 @@ private fun StopWithBusesCard(
     ) {
         StopInfo(stop)
 
-        buses.forEach { bus ->
-            FavoriteBusContent(
-                bus = bus,
-                busStopDetail = busStopDetail
-            )
+        busStopDetail?.busInfos?.forEach { busInfo ->
+            FavoriteBusContent(busInfo = busInfo)
         }
     }
 }
@@ -283,24 +278,16 @@ private fun FavoriteCard(
 
 @Composable
 private fun FavoriteBusContent(
-    bus: FavoriteBusItem,
-    busStopDetail: BusStopDetail?
+    busInfo: BusInfo
 ) {
     HorizontalDivider(
         color = Gray60.copy(alpha = 0.3f)
     )
 
     BusInfoHeader(
-        busNumber = bus.busNumber,
-        nextStopName = bus.nextStopName
+        busNumber = busInfo.busNumber,
+        nextStopName = busInfo.nextStopName
     )
-
-    val busInfo = busStopDetail?.busInfos?.find { it.busNumber == bus.busNumber }
-        ?: BusInfo(
-            busNumber = bus.busNumber,
-            nextStopName = bus.nextStopName,
-            arrivalInfos = emptyList()
-        )
 
     BusArrivalInfoList(busInfo = busInfo)
 }

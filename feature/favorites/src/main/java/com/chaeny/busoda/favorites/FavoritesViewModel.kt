@@ -61,9 +61,19 @@ internal class FavoritesViewModel @Inject constructor(
 
     private suspend fun loadFavoriteBusInfo() {
         val busInfoMap = getBusStopDetailsMap()
+        val filteredToFavoriteBuses = busInfoMap.mapValues { (stopId, detail) ->
+            detail.copy(
+                busInfos = detail.busInfos.filter { busInfo ->
+                    currentState.favoriteBuses[stopId]
+                        .orEmpty()
+                        .any { it.busNumber == busInfo.busNumber }
+                }
+            )
+        }
+
         setState {
             copy(
-                favoriteBusInfo = busInfoMap,
+                favoriteBusInfo = filteredToFavoriteBuses,
                 currentTime = System.currentTimeMillis() / 1000
             )
         }
