@@ -112,6 +112,7 @@ internal class FavoritesViewModel @Inject constructor(
     }
 
     private fun refreshBusInfo() {
+        postSideEffect(FavoritesEffect.RotateRefreshBtn)
         loadJob?.cancel()
         loadJob = viewModelScope.launch {
             if (currentState.favoriteBusInfo.isEmpty()) {
@@ -145,7 +146,6 @@ internal class FavoritesViewModel @Inject constructor(
             }
             is FavoritesIntent.RefreshData -> {
                 currentCount = REFRESH_INTERVAL_SECONDS
-                postSideEffect(FavoritesEffect.RotateRefreshBtn)
                 if (currentState.favoriteBuses.isNotEmpty()) {
                     refreshBusInfo()
                 }
