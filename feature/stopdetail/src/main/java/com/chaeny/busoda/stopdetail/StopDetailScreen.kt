@@ -15,10 +15,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.BookmarkAdd
@@ -26,7 +24,6 @@ import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -55,6 +52,7 @@ import com.chaeny.busoda.model.BusInfo
 import com.chaeny.busoda.model.BusStopDetail
 import com.chaeny.busoda.ui.component.BusArrivalInfoList
 import com.chaeny.busoda.ui.component.LocalCurrentTime
+import com.chaeny.busoda.ui.component.RefreshButton
 import com.chaeny.busoda.ui.theme.DarkGreen
 
 @Composable
@@ -248,38 +246,6 @@ private fun StopEmoji(
         fontSize = 30.dp.toSp(),
         textAlign = TextAlign.End
     )
-}
-
-@Composable
-private fun RefreshButton(
-    rotation: Float,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val animRotation by animateFloatAsState(
-        targetValue = rotation,
-        animationSpec = tween(
-            durationMillis = 500,
-            easing = LinearEasing
-        )
-    )
-
-    FloatingActionButton(
-        onClick = onClick,
-        containerColor = DarkGreen,
-        shape = CircleShape,
-        modifier = modifier
-            .padding(25.dp)
-            .graphicsLayer {
-                rotationZ = animRotation
-            }
-    ) {
-        Icon(
-            imageVector = Icons.Filled.Autorenew,
-            contentDescription = stringResource(R.string.refresh),
-            tint = Color.Black
-        )
-    }
 }
 
 @Composable

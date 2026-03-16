@@ -3,4 +3,5 @@
     <string name="stop_search">Search for bus stop</string>
     <string name="tab_home">Home</string>
     <string name="tab_nearby_stops">Nearby Stops</string>
+    <string name="refresh">Refresh</string>
 </resources>
