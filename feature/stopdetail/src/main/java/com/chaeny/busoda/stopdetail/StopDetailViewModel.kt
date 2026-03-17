@@ -41,9 +41,7 @@ internal class StopDetailViewModel @Inject constructor(
         when (intent) {
             is StopDetailIntent.RefreshData -> refreshData()
             is StopDetailIntent.ToggleFavorite -> toggleFavorite()
-            is StopDetailIntent.ToggleFavoriteBus -> {
-                addToBusFavorites(intent.busNumber)
-            }
+            is StopDetailIntent.ToggleFavoriteBus -> toggleFavoriteBus(intent.busNumber)
         }
     }
 
@@ -128,7 +126,15 @@ internal class StopDetailViewModel @Inject constructor(
         }
     }
 
-    private fun addToBusFavorites(busNumber: String) {
+    private fun toggleFavoriteBus(busNumber: String) {
+        if (currentState.favoriteBusNumbers.contains(busNumber)) {
+            removeFromFavoriteBus(busNumber)
+        } else {
+            addToFavoriteBus(busNumber)
+        }
+    }
+
+    private fun addToFavoriteBus(busNumber: String) {
         viewModelScope.launch {
             addFavoriteBusUseCase(
                 stopId = currentState.stopId,
@@ -138,6 +144,12 @@ internal class StopDetailViewModel @Inject constructor(
                     .find { it.busNumber == busNumber }
                     ?.nextStopName ?: ""
             )
+        }
+    }
+
+    private fun removeFromFavoriteBus(busNumber: String) {
+        viewModelScope.launch {
+            favoriteBusRepository.deleteFavoriteBus(currentState.stopId, busNumber)
         }
     }
 
