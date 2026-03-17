@@ -41,7 +41,7 @@ internal class StopDetailViewModel @Inject constructor(
         when (intent) {
             is StopDetailIntent.RefreshData -> refreshData()
             is StopDetailIntent.ToggleFavorite -> toggleFavorite()
-            is StopDetailIntent.ToggleBusFavorite -> {
+            is StopDetailIntent.ToggleFavoriteBus -> {
                 addToBusFavorites(intent.busNumber)
             }
         }
@@ -159,7 +159,7 @@ data class StopDetailUiState(
 sealed class StopDetailIntent : UiIntent {
     data object RefreshData : StopDetailIntent()
     data object ToggleFavorite : StopDetailIntent()
-    data class ToggleBusFavorite(val busNumber: String) : StopDetailIntent()
+    data class ToggleFavoriteBus(val busNumber: String) : StopDetailIntent()
 }
 
 sealed class StopDetailEffect : SideEffect {

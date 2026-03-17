@@ -79,8 +79,8 @@ fun StopDetailScreen(
             favoriteBusNumbers = uiState.favoriteBusNumbers,
             onRefresh = { viewModel.onIntent(StopDetailIntent.RefreshData) },
             onToggleFavorite = { viewModel.onIntent(StopDetailIntent.ToggleFavorite) },
-            onToggleBusFavorite = { busNumber ->
-                viewModel.onIntent(StopDetailIntent.ToggleBusFavorite(busNumber))
+            onToggleFavoriteBus = { busNumber ->
+                viewModel.onIntent(StopDetailIntent.ToggleFavoriteBus(busNumber))
             },
             modifier = modifier
         )
@@ -124,7 +124,7 @@ private fun StopDetailContent(
     favoriteBusNumbers: Set<String>,
     onRefresh: () -> Unit,
     onToggleFavorite: () -> Unit,
-    onToggleBusFavorite: (String) -> Unit,
+    onToggleFavoriteBus: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -159,7 +159,7 @@ private fun StopDetailContent(
                 busInfos = stopDetail.busInfos,
                 isLoading = isLoading,
                 favoriteBusNumbers = favoriteBusNumbers,
-                onToggleBusFavorite = onToggleBusFavorite
+                onToggleFavoriteBus = onToggleFavoriteBus
             )
         }
         RefreshButton(
@@ -252,8 +252,8 @@ private fun StopEmoji(
 private fun BusInfoHeader(
     busNumber: String,
     nextStopName: String,
-    isBusFavorite: Boolean,
-    onToggleBusFavorite: () -> Unit,
+    isFavoriteBus: Boolean,
+    onToggleFavoriteBus: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -261,11 +261,11 @@ private fun BusInfoHeader(
         verticalAlignment = Alignment.Bottom
     ) {
         IconButton(
-            onClick = onToggleBusFavorite,
+            onClick = onToggleFavoriteBus,
             modifier = Modifier.size(32.dp)
         ) {
             Icon(
-                imageVector = if (isBusFavorite) Icons.Filled.Star else Icons.Outlined.StarBorder,
+                imageVector = if (isFavoriteBus) Icons.Filled.Star else Icons.Outlined.StarBorder,
                 contentDescription = stringResource(R.string.bus_favorite),
                 tint = Color.Gray,
                 modifier = Modifier.size(20.dp)
@@ -298,8 +298,8 @@ private fun BusInfoHeader(
 @Composable
 private fun BusItem(
     busInfo: BusInfo,
-    isBusFavorite: Boolean,
-    onToggleBusFavorite: (String) -> Unit,
+    isFavoriteBus: Boolean,
+    onToggleFavoriteBus: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -313,8 +313,8 @@ private fun BusItem(
         BusInfoHeader(
             busNumber = busInfo.busNumber,
             nextStopName = busInfo.nextStopName,
-            isBusFavorite = isBusFavorite,
-            onToggleBusFavorite = { onToggleBusFavorite(busInfo.busNumber) },
+            isFavoriteBus = isFavoriteBus,
+            onToggleFavoriteBus = { onToggleFavoriteBus(busInfo.busNumber) },
             modifier = Modifier
                 .padding(start = 10.dp, end = 20.dp)
                 .padding(top = 15.dp)
@@ -328,7 +328,7 @@ private fun BusList(
     busInfos: List<BusInfo>,
     isLoading: Boolean,
     favoriteBusNumbers: Set<String>,
-    onToggleBusFavorite: (String) -> Unit,
+    onToggleFavoriteBus: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -341,8 +341,8 @@ private fun BusList(
             ) { index, busInfo ->
                 BusItem(
                     busInfo = busInfo,
-                    isBusFavorite = favoriteBusNumbers.contains(busInfo.busNumber),
-                    onToggleBusFavorite = onToggleBusFavorite
+                    isFavoriteBus = favoriteBusNumbers.contains(busInfo.busNumber),
+                    onToggleFavoriteBus = onToggleFavoriteBus
                 )
             }
         }
