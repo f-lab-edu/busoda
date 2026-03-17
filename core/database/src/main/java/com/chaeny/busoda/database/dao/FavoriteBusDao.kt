@@ -18,6 +18,9 @@ interface FavoriteBusDao {
     @Query("DELETE FROM favorite_buses WHERE stopId = :stopId AND busNumber = :busNumber")
     suspend fun deleteFavoriteBus(stopId: String, busNumber: String)
 
+    @Query("DELETE FROM favorite_buses WHERE stopId = :stopId")
+    suspend fun deleteFavoriteBusesByStop(stopId: String)
+
     @Query("SELECT EXISTS(SELECT 1 FROM favorite_buses WHERE stopId = :stopId AND busNumber = :busNumber LIMIT 1)")
     fun isFavoriteBus(stopId: String, busNumber: String): Flow<Boolean>
 }
