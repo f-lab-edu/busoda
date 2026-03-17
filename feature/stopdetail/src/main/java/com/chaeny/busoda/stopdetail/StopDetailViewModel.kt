@@ -144,12 +144,14 @@ internal class StopDetailViewModel @Inject constructor(
                     .find { it.busNumber == busNumber }
                     ?.nextStopName ?: ""
             )
+            postSideEffect(StopDetailEffect.ShowFavoriteAdded)
         }
     }
 
     private fun removeFromFavoriteBus(busNumber: String) {
         viewModelScope.launch {
             favoriteBusRepository.deleteFavoriteBus(currentState.stopId, busNumber)
+            postSideEffect(StopDetailEffect.ShowFavoriteRemoved)
         }
     }
 
