@@ -385,7 +385,7 @@ private fun DeletePopup(
                     .padding(horizontal = 25.dp)
                     .padding(top = 15.dp, bottom = 5.dp),
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
             Text(

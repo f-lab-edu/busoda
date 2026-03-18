@@ -109,8 +109,10 @@ fun FavoritesScreen(
 
     val popup = uiState.popup
     if (popup is Popup.Delete) {
+        val hasFavoriteBuses = popup.stop.stopId in uiState.favoriteBuses
         DeletePopup(
             stopName = popup.stop.stopName,
+            hasFavoriteBuses = hasFavoriteBuses,
             onDismiss = {
                 viewModel.onIntent(FavoritesIntent.CancelDeleteFavorite)
             },
@@ -327,6 +329,7 @@ private fun BusInfoHeader(
 @Composable
 private fun DeletePopup(
     stopName: String,
+    hasFavoriteBuses: Boolean,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit
 ) {
@@ -338,9 +341,24 @@ private fun DeletePopup(
             Text(
                 text = stringResource(R.string.delete_confirmation, stopName),
                 modifier = Modifier
-                    .padding(horizontal = 25.dp, vertical = 15.dp)
+                    .fillMaxWidth()
+                    .padding(horizontal = 25.dp)
+                    .padding(top = 15.dp, bottom = 5.dp),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
             )
-            Row {
+            if (hasFavoriteBuses) {
+                Text(
+                    text = stringResource(R.string.delete_favorite_bus_message),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 25.dp)
+                        .padding(top = 5.dp),
+                    textAlign = TextAlign.Center
+                )
+            }
+            Row(modifier = Modifier.padding(top = 20.dp)) {
                 TextButton(
                     onClick = onDismiss,
                     modifier = Modifier.weight(1f)
