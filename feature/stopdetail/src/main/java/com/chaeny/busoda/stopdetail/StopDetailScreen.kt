@@ -24,10 +24,13 @@ import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -54,6 +57,7 @@ import com.chaeny.busoda.ui.component.BusArrivalInfoList
 import com.chaeny.busoda.ui.component.LocalCurrentTime
 import com.chaeny.busoda.ui.component.RefreshButton
 import com.chaeny.busoda.ui.theme.DarkGreen
+import com.chaeny.busoda.ui.theme.White
 
 @Composable
 fun StopDetailScreen(
@@ -83,6 +87,13 @@ fun StopDetailScreen(
                 viewModel.onIntent(StopDetailIntent.ToggleFavoriteBus(busNumber))
             },
             modifier = modifier
+        )
+    }
+
+    if (uiState.popup is Popup.DeleteStop) {
+        DeletePopup(
+            onDismiss = { viewModel.onIntent(StopDetailIntent.CancelDeleteFavorite) },
+            onConfirm = { viewModel.onIntent(StopDetailIntent.ConfirmDeleteFavorite) }
         )
     }
 }
@@ -352,6 +363,53 @@ private fun BusList(
                 modifier = Modifier.align(Alignment.Center),
                 color = DarkGreen
             )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DeletePopup(
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = White
+    ) {
+        Column(modifier = Modifier.padding(bottom = 10.dp)) {
+            Text(
+                text = stringResource(R.string.delete_favorite_title),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 25.dp)
+                    .padding(top = 15.dp, bottom = 5.dp),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = stringResource(R.string.delete_favorite_bus_message),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 25.dp)
+                    .padding(top = 5.dp, bottom = 20.dp),
+                textAlign = TextAlign.Center
+            )
+            Row {
+                TextButton(
+                    onClick = onDismiss,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(stringResource(R.string.cancel))
+                }
+                TextButton(
+                    onClick = onConfirm,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(stringResource(R.string.confirm))
+                }
+            }
         }
     }
 }
