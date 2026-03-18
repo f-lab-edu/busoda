@@ -160,6 +160,10 @@ internal class StopDetailViewModel @Inject constructor(
     }
 }
 
+sealed class Popup {
+    data object DeleteStop : Popup()
+}
+
 data class StopDetailUiState(
     val stopId: String = "",
     val stopDetail: BusStopDetail = BusStopDetail("", emptyList()),
@@ -167,7 +171,8 @@ data class StopDetailUiState(
     val timer: Int = 15,
     val currentTime: Long = 0L,
     val isFavorite: Boolean = false,
-    val favoriteBusNumbers: Set<String> = emptySet()
+    val favoriteBusNumbers: Set<String> = emptySet(),
+    val popup: Popup? = null
 ) : UiState
 
 sealed class StopDetailIntent : UiIntent {
