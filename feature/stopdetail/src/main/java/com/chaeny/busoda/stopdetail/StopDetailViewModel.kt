@@ -6,6 +6,7 @@ import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.data.repository.FavoriteBusRepository
 import com.chaeny.busoda.data.repository.FavoriteRepository
 import com.chaeny.busoda.domain.usecase.AddFavoriteBusUseCase
+import com.chaeny.busoda.domain.usecase.DeleteFavoriteStopUseCase
 import com.chaeny.busoda.model.BusStop
 import com.chaeny.busoda.model.BusStopDetail
 import com.chaeny.busoda.mvi.BaseViewModel
@@ -23,6 +24,7 @@ internal class StopDetailViewModel @Inject constructor(
     private val favoriteRepository: FavoriteRepository,
     private val favoriteBusRepository: FavoriteBusRepository,
     private val addFavoriteBusUseCase: AddFavoriteBusUseCase,
+    private val deleteFavoriteStopUseCase: DeleteFavoriteStopUseCase,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel<StopDetailIntent, StopDetailUiState, StopDetailEffect>(
     initialState = StopDetailUiState(stopId = savedStateHandle.get(BUS_STOP_ID) ?: "")
@@ -42,6 +44,8 @@ internal class StopDetailViewModel @Inject constructor(
             is StopDetailIntent.RefreshData -> refreshData()
             is StopDetailIntent.ToggleFavorite -> toggleFavorite()
             is StopDetailIntent.ToggleFavoriteBus -> toggleFavoriteBus(intent.busNumber)
+            is StopDetailIntent.ConfirmDeleteFavorite -> confirmDeleteFavorite()
+            is StopDetailIntent.CancelDeleteFavorite -> setState { copy(popup = null) }
         }
     }
 
@@ -120,8 +124,20 @@ internal class StopDetailViewModel @Inject constructor(
     }
 
     private fun removeFromFavorites() {
+        if (currentState.favoriteBusNumbers.isNotEmpty()) {
+            setState { copy(popup = Popup.DeleteStop) }
+        } else {
+            viewModelScope.launch {
+                favoriteRepository.deleteFavorite(currentState.stopId)
+                postSideEffect(StopDetailEffect.ShowFavoriteRemoved)
+            }
+        }
+    }
+
+    private fun confirmDeleteFavorite() {
         viewModelScope.launch {
-            favoriteRepository.deleteFavorite(currentState.stopId)
+            deleteFavoriteStopUseCase(currentState.stopId)
+            setState { copy(popup = null) }
             postSideEffect(StopDetailEffect.ShowFavoriteRemoved)
         }
     }
@@ -179,6 +195,8 @@ sealed class StopDetailIntent : UiIntent {
     data object RefreshData : StopDetailIntent()
     data object ToggleFavorite : StopDetailIntent()
     data class ToggleFavoriteBus(val busNumber: String) : StopDetailIntent()
+    data object ConfirmDeleteFavorite : StopDetailIntent()
+    data object CancelDeleteFavorite : StopDetailIntent()
 }
 
 sealed class StopDetailEffect : SideEffect {
