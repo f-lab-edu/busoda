@@ -7,4 +7,8 @@
     <string name="stop_emoji">🚏</string>
     <string name="favorite_added">즐겨찾기에 추가되었습니다.</string>
     <string name="favorite_removed">즐겨찾기에서 제거되었습니다.</string>
+    <string name="delete_favorite_title">즐겨찾기를 삭제할까요?</string>
+    <string name="delete_favorite_bus_message">함께 즐겨찾기한 버스도\n즐겨찾기에서 삭제됩니다.</string>
+    <string name="confirm">확인</string>
+    <string name="cancel">취소</string>
 </resources>

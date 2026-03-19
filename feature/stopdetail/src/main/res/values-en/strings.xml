@@ -8,4 +8,8 @@
     <string name="stop_emoji">🚏</string>
     <string name="favorite_added">Added to favorites</string>
     <string name="favorite_removed">Removed from favorites</string>
+    <string name="delete_favorite_title">Delete from favorites?</string>
+    <string name="delete_favorite_bus_message">Buses added to favorites\nwill also be removed.</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
 </resources>

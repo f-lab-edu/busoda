@@ -26,6 +26,10 @@ class RoomFavoriteBusRepository @Inject constructor(
         favoriteBusDao.deleteFavoriteBus(stopId, busNumber)
     }
 
+    override suspend fun deleteFavoriteBusesByStop(stopId: String) {
+        favoriteBusDao.deleteFavoriteBusesByStop(stopId)
+    }
+
     override fun getFavoriteBuses(): Flow<List<FavoriteBusItem>> {
         return favoriteBusDao.getFavoriteBuses().map { entities ->
             entities.map { it.toFavoriteBusItem() }

@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.data.repository.FavoriteBusRepository
 import com.chaeny.busoda.data.repository.FavoriteRepository
+import com.chaeny.busoda.domain.usecase.DeleteFavoriteStopUseCase
 import com.chaeny.busoda.model.BusInfo
 import com.chaeny.busoda.model.BusStop
 import com.chaeny.busoda.model.BusStopDetail
@@ -25,7 +26,8 @@ import javax.inject.Inject
 internal class FavoritesViewModel @Inject constructor(
     private val favoriteRepository: FavoriteRepository,
     private val favoriteBusRepository: FavoriteBusRepository,
-    private val busStopDetailRepository: BusStopDetailRepository
+    private val busStopDetailRepository: BusStopDetailRepository,
+    private val deleteFavoriteStopUseCase: DeleteFavoriteStopUseCase
 ) : BaseViewModel<FavoritesIntent, FavoritesUiState, FavoritesEffect>(
     initialState = FavoritesUiState()
 ) {
@@ -145,7 +147,12 @@ internal class FavoritesViewModel @Inject constructor(
                 val popup = currentState.popup
                 if (popup is Popup.Delete) {
                     viewModelScope.launch {
-                        favoriteRepository.deleteFavorite(popup.stop.stopId)
+                        val stopId = popup.stop.stopId
+                        if (currentState.favoriteBuses[stopId].isNullOrEmpty()) {
+                            favoriteRepository.deleteFavorite(stopId)
+                        } else {
+                            deleteFavoriteStopUseCase(stopId)
+                        }
                         setState { copy(popup = null) }
                         postSideEffect(FavoritesEffect.ShowDeleteSuccess)
                     }

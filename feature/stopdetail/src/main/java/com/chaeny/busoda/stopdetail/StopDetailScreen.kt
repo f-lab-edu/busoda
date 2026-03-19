@@ -24,10 +24,13 @@ import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -54,6 +57,7 @@ import com.chaeny.busoda.ui.component.BusArrivalInfoList
 import com.chaeny.busoda.ui.component.LocalCurrentTime
 import com.chaeny.busoda.ui.component.RefreshButton
 import com.chaeny.busoda.ui.theme.DarkGreen
+import com.chaeny.busoda.ui.theme.White
 
 @Composable
 fun StopDetailScreen(
@@ -79,10 +83,17 @@ fun StopDetailScreen(
             favoriteBusNumbers = uiState.favoriteBusNumbers,
             onRefresh = { viewModel.onIntent(StopDetailIntent.RefreshData) },
             onToggleFavorite = { viewModel.onIntent(StopDetailIntent.ToggleFavorite) },
-            onToggleBusFavorite = { busNumber ->
-                viewModel.onIntent(StopDetailIntent.ToggleBusFavorite(busNumber))
+            onToggleFavoriteBus = { busNumber ->
+                viewModel.onIntent(StopDetailIntent.ToggleFavoriteBus(busNumber))
             },
             modifier = modifier
+        )
+    }
+
+    if (uiState.popup is Popup.DeleteStop) {
+        DeletePopup(
+            onDismiss = { viewModel.onIntent(StopDetailIntent.CancelDeleteFavorite) },
+            onConfirm = { viewModel.onIntent(StopDetailIntent.ConfirmDeleteFavorite) }
         )
     }
 }
@@ -124,7 +135,7 @@ private fun StopDetailContent(
     favoriteBusNumbers: Set<String>,
     onRefresh: () -> Unit,
     onToggleFavorite: () -> Unit,
-    onToggleBusFavorite: (String) -> Unit,
+    onToggleFavoriteBus: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -159,7 +170,7 @@ private fun StopDetailContent(
                 busInfos = stopDetail.busInfos,
                 isLoading = isLoading,
                 favoriteBusNumbers = favoriteBusNumbers,
-                onToggleBusFavorite = onToggleBusFavorite
+                onToggleFavoriteBus = onToggleFavoriteBus
             )
         }
         RefreshButton(
@@ -252,8 +263,8 @@ private fun StopEmoji(
 private fun BusInfoHeader(
     busNumber: String,
     nextStopName: String,
-    isBusFavorite: Boolean,
-    onToggleBusFavorite: () -> Unit,
+    isFavoriteBus: Boolean,
+    onToggleFavoriteBus: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -261,11 +272,11 @@ private fun BusInfoHeader(
         verticalAlignment = Alignment.Bottom
     ) {
         IconButton(
-            onClick = onToggleBusFavorite,
+            onClick = onToggleFavoriteBus,
             modifier = Modifier.size(32.dp)
         ) {
             Icon(
-                imageVector = if (isBusFavorite) Icons.Filled.Star else Icons.Outlined.StarBorder,
+                imageVector = if (isFavoriteBus) Icons.Filled.Star else Icons.Outlined.StarBorder,
                 contentDescription = stringResource(R.string.bus_favorite),
                 tint = Color.Gray,
                 modifier = Modifier.size(20.dp)
@@ -298,8 +309,8 @@ private fun BusInfoHeader(
 @Composable
 private fun BusItem(
     busInfo: BusInfo,
-    isBusFavorite: Boolean,
-    onToggleBusFavorite: (String) -> Unit,
+    isFavoriteBus: Boolean,
+    onToggleFavoriteBus: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -313,8 +324,8 @@ private fun BusItem(
         BusInfoHeader(
             busNumber = busInfo.busNumber,
             nextStopName = busInfo.nextStopName,
-            isBusFavorite = isBusFavorite,
-            onToggleBusFavorite = { onToggleBusFavorite(busInfo.busNumber) },
+            isFavoriteBus = isFavoriteBus,
+            onToggleFavoriteBus = { onToggleFavoriteBus(busInfo.busNumber) },
             modifier = Modifier
                 .padding(start = 10.dp, end = 20.dp)
                 .padding(top = 15.dp)
@@ -328,7 +339,7 @@ private fun BusList(
     busInfos: List<BusInfo>,
     isLoading: Boolean,
     favoriteBusNumbers: Set<String>,
-    onToggleBusFavorite: (String) -> Unit,
+    onToggleFavoriteBus: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -341,8 +352,8 @@ private fun BusList(
             ) { index, busInfo ->
                 BusItem(
                     busInfo = busInfo,
-                    isBusFavorite = favoriteBusNumbers.contains(busInfo.busNumber),
-                    onToggleBusFavorite = onToggleBusFavorite
+                    isFavoriteBus = favoriteBusNumbers.contains(busInfo.busNumber),
+                    onToggleFavoriteBus = onToggleFavoriteBus
                 )
             }
         }
@@ -352,6 +363,53 @@ private fun BusList(
                 modifier = Modifier.align(Alignment.Center),
                 color = DarkGreen
             )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DeletePopup(
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = White
+    ) {
+        Column(modifier = Modifier.padding(bottom = 10.dp)) {
+            Text(
+                text = stringResource(R.string.delete_favorite_title),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 25.dp)
+                    .padding(top = 15.dp, bottom = 5.dp),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = stringResource(R.string.delete_favorite_bus_message),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 25.dp)
+                    .padding(top = 5.dp, bottom = 20.dp),
+                textAlign = TextAlign.Center
+            )
+            Row {
+                TextButton(
+                    onClick = onDismiss,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(stringResource(R.string.cancel))
+                }
+                TextButton(
+                    onClick = onConfirm,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(stringResource(R.string.confirm))
+                }
+            }
         }
     }
 }
