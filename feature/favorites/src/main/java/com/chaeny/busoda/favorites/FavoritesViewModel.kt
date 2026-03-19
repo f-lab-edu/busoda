@@ -56,7 +56,7 @@ internal class FavoritesViewModel @Inject constructor(
                 setState { copy(favoriteBuses = favoriteBusesByStop) }
 
                 if (favoriteBuses.isNotEmpty()) {
-                    refreshBusInfo()
+                    loadBusInfo()
                 }
             }
         }
@@ -122,6 +122,10 @@ internal class FavoritesViewModel @Inject constructor(
 
     private fun refreshBusInfo() {
         postSideEffect(FavoritesEffect.RotateRefreshBtn)
+        loadBusInfo()
+    }
+
+    private fun loadBusInfo() {
         loadJob?.cancel()
         loadJob = viewModelScope.launch {
             if (currentState.favoriteBusInfo.isEmpty()) {
