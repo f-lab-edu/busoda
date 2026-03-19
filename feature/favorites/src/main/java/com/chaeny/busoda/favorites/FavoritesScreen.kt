@@ -3,6 +3,7 @@ package com.chaeny.busoda.favorites
 import android.widget.Toast
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -181,7 +182,7 @@ private fun FavoritesList(
             .padding(top = 20.dp)
     ) {
         if (!isLoading) {
-            LazyColumn {
+            LazyColumn(contentPadding = PaddingValues(bottom = 90.dp)) {
                 items(
                     items = favoriteStops,
                     key = { stop -> stop.stopId }

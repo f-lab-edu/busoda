@@ -6,6 +6,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -345,7 +346,7 @@ private fun BusList(
     Box(
         modifier = modifier.fillMaxSize()
     ) {
-        LazyColumn {
+        LazyColumn(contentPadding = PaddingValues(bottom = 90.dp)) {
             itemsIndexed(
                 items = busInfos,
                 key = { index, busInfo -> "$index-${busInfo.busNumber}" }
