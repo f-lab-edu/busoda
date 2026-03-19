@@ -110,10 +110,9 @@ fun FavoritesScreen(
 
     val popup = uiState.popup
     if (popup is Popup.Delete) {
-        val hasFavoriteBuses = popup.stop.stopId in uiState.favoriteBuses
         DeletePopup(
             stopName = popup.stop.stopName,
-            hasFavoriteBuses = hasFavoriteBuses,
+            hasFavoriteBuses = uiState.hasFavoriteBuses,
             onDismiss = {
                 viewModel.onIntent(FavoritesIntent.CancelDeleteFavorite)
             },

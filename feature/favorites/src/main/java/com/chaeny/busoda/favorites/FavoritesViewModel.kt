@@ -34,6 +34,7 @@ internal class FavoritesViewModel @Inject constructor(
 
     private var currentCount = REFRESH_INTERVAL_SECONDS
     private var loadJob: Job? = null
+    private var favoriteBuses: Map<String, List<FavoriteBusItem>> = emptyMap()
 
     init {
         collectFavoriteStops()
@@ -51,11 +52,10 @@ internal class FavoritesViewModel @Inject constructor(
 
     private fun collectFavoriteBuses() {
         viewModelScope.launch {
-            favoriteBusRepository.getFavoriteBuses().collect { favoriteBuses ->
-                val favoriteBusesByStop = favoriteBuses.groupBy { it.stopId }
-                setState { copy(favoriteBuses = favoriteBusesByStop) }
+            favoriteBusRepository.getFavoriteBuses().collect { busList ->
+                favoriteBuses = busList.groupBy { it.stopId }
 
-                if (favoriteBuses.isNotEmpty()) {
+                if (busList.isNotEmpty()) {
                     loadBusInfo()
                 }
             }
@@ -65,7 +65,7 @@ internal class FavoritesViewModel @Inject constructor(
     private suspend fun loadFavoriteBusInfo() {
         val busStopDetailsMap = getBusStopDetailsMap()
 
-        val favoriteBusInfo = currentState.favoriteBuses.mapValues { (stopId, favoriteBusList) ->
+        val favoriteBusInfo = favoriteBuses.mapValues { (stopId, favoriteBusList) ->
             favoriteBusList.map { favoriteBus ->
                 getFilteredFavoriteBus(busStopDetailsMap[stopId], favoriteBus)
             }
@@ -89,7 +89,7 @@ internal class FavoritesViewModel @Inject constructor(
     }
 
     private suspend fun getBusStopDetailsMap(): Map<String, BusStopDetail> {
-        val stopIds = currentState.favoriteBuses.keys
+        val stopIds = favoriteBuses.keys
 
         return coroutineScope {
             stopIds.map { stopId ->
@@ -112,7 +112,7 @@ internal class FavoritesViewModel @Inject constructor(
 
                 if (currentCount == 0) {
                     currentCount = REFRESH_INTERVAL_SECONDS
-                    if (currentState.favoriteBuses.isNotEmpty()) {
+                    if (favoriteBuses.isNotEmpty()) {
                         refreshBusInfo()
                     }
                 }
@@ -142,7 +142,12 @@ internal class FavoritesViewModel @Inject constructor(
                 postSideEffect(FavoritesEffect.NavigateToStopDetail(intent.stopId))
             }
             is FavoritesIntent.RequestDeleteFavorite -> {
-                setState { copy(popup = Popup.Delete(intent.stop)) }
+                setState {
+                    copy(
+                        popup = Popup.Delete(intent.stop),
+                        hasFavoriteBuses = intent.stop.stopId in favoriteBuses
+                    )
+                }
             }
             is FavoritesIntent.CancelDeleteFavorite -> {
                 setState { copy(popup = null) }
@@ -152,7 +157,7 @@ internal class FavoritesViewModel @Inject constructor(
                 if (popup is Popup.Delete) {
                     viewModelScope.launch {
                         val stopId = popup.stop.stopId
-                        if (currentState.favoriteBuses[stopId].isNullOrEmpty()) {
+                        if (favoriteBuses[stopId].isNullOrEmpty()) {
                             favoriteRepository.deleteFavorite(stopId)
                         } else {
                             deleteFavoriteStopUseCase(stopId)
@@ -164,7 +169,7 @@ internal class FavoritesViewModel @Inject constructor(
             }
             is FavoritesIntent.RefreshData -> {
                 currentCount = REFRESH_INTERVAL_SECONDS
-                if (currentState.favoriteBuses.isNotEmpty()) {
+                if (favoriteBuses.isNotEmpty()) {
                     refreshBusInfo()
                 }
             }
@@ -182,10 +187,10 @@ sealed class Popup {
 
 data class FavoritesUiState(
     val favoriteStops: List<BusStop> = emptyList(),
-    val favoriteBuses: Map<String, List<FavoriteBusItem>> = emptyMap(),
     val favoriteBusInfo: Map<String, List<BusInfo>> = emptyMap(),
     val currentTime: Long = 0L,
     val isLoading: Boolean = false,
+    val hasFavoriteBuses: Boolean = false,
     val popup: Popup? = null
 ) : UiState
 
