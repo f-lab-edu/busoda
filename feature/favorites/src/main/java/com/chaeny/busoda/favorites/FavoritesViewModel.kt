@@ -104,8 +104,8 @@ internal class FavoritesViewModel @Inject constructor(
     private fun startTimer() {
         viewModelScope.launch {
             while (true) {
-                setState {
-                    copy(currentTime = System.currentTimeMillis() / 1000)
+                if (favoriteBuses.isNotEmpty()) {
+                    setState { copy(currentTime = System.currentTimeMillis() / 1000) }
                 }
                 delay(1000)
                 currentCount--
