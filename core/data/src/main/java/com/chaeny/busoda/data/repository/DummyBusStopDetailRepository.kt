@@ -116,9 +116,14 @@ class DummyBusStopDetailRepository @Inject constructor() : BusStopDetailReposito
         )
     )
 
-    override suspend fun getBusStopDetail(stopId: String): BusStopDetail {
+    override suspend fun getBusStopDetail(stopId: String): GetBusStopDetailResult {
         delay(3000)
-        return dummyData[stopId] ?: BusStopDetail("", emptyList())
+        val busStopDetail = dummyData[stopId]
+        return if (busStopDetail != null) {
+            GetBusStopDetailResult.Success(busStopDetail)
+        } else {
+            GetBusStopDetailResult.NoResult
+        }
     }
 
     override suspend fun getNextStopName(stopId: String): String {
