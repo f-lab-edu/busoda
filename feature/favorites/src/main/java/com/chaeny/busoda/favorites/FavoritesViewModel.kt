@@ -2,6 +2,7 @@ package com.chaeny.busoda.favorites
 
 import androidx.lifecycle.viewModelScope
 import com.chaeny.busoda.data.repository.BusStopDetailRepository
+import com.chaeny.busoda.data.repository.GetBusStopDetailResult
 import com.chaeny.busoda.data.repository.FavoriteBusRepository
 import com.chaeny.busoda.data.repository.FavoriteRepository
 import com.chaeny.busoda.domain.usecase.DeleteFavoriteStopUseCase
@@ -98,7 +99,12 @@ internal class FavoritesViewModel @Inject constructor(
         return coroutineScope {
             stopIds.map { stopId ->
                 async {
-                    val busStopDetail = busStopDetailRepository.getBusStopDetail(stopId)
+                    val result = busStopDetailRepository.getBusStopDetail(stopId)
+                    val busStopDetail = if (result is GetBusStopDetailResult.Success) {
+                        result.data
+                    } else {
+                        BusStopDetail("", emptyList())
+                    }
                     stopId to busStopDetail
                 }
             }.awaitAll().toMap()
