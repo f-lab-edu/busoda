@@ -57,6 +57,8 @@ internal class FavoritesViewModel @Inject constructor(
 
                 if (busList.isNotEmpty()) {
                     loadBusInfo()
+                } else if (currentState.favoriteBusInfo.isNotEmpty()) {
+                    setState { copy(favoriteBusInfo = emptyMap()) }
                 }
             }
         }
