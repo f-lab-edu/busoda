@@ -34,12 +34,12 @@ internal class FavoritesViewModel @Inject constructor(
 
     private var currentCount = REFRESH_INTERVAL_SECONDS
     private var loadJob: Job? = null
+    private var timerJob: Job? = null
     private var favoriteBuses: Map<String, List<FavoriteBusItem>> = emptyMap()
 
     init {
         collectFavoriteStops()
         collectFavoriteBuses()
-        startTimer()
     }
 
     private fun collectFavoriteStops() {
@@ -56,8 +56,10 @@ internal class FavoritesViewModel @Inject constructor(
                 favoriteBuses = busList.groupBy { it.stopId }
 
                 if (busList.isNotEmpty()) {
+                    startTimer()
                     loadBusInfo()
                 } else if (currentState.favoriteBusInfo.isNotEmpty()) {
+                    stopTimer()
                     setState { copy(favoriteBusInfo = emptyMap()) }
                 }
             }
@@ -104,22 +106,25 @@ internal class FavoritesViewModel @Inject constructor(
     }
 
     private fun startTimer() {
-        viewModelScope.launch {
+        if (timerJob?.isActive == true) return
+        timerJob = viewModelScope.launch {
             while (true) {
-                if (favoriteBuses.isNotEmpty()) {
-                    setState { copy(currentTime = System.currentTimeMillis() / 1000) }
-                }
+                setState { copy(currentTime = System.currentTimeMillis() / 1000) }
                 delay(1000)
                 currentCount--
 
                 if (currentCount == 0) {
                     currentCount = REFRESH_INTERVAL_SECONDS
-                    if (favoriteBuses.isNotEmpty()) {
-                        refreshBusInfo()
-                    }
+                    refreshBusInfo()
                 }
             }
         }
+    }
+
+    private fun stopTimer() {
+        timerJob?.cancel()
+        timerJob = null
+        currentCount = REFRESH_INTERVAL_SECONDS
     }
 
     private fun refreshBusInfo() {
