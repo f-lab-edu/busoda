@@ -1,5 +1,6 @@
 package com.chaeny.busoda.favorites
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
@@ -137,14 +138,10 @@ private fun CollectEffect(
                 is FavoritesEffect.NavigateToStopDetail -> {
                     navigateToStopDetail(effect.stopId)
                 }
-                is FavoritesEffect.ShowDeleteSuccess -> {
-                    Toast.makeText(
-                        context, context.getString(R.string.delete_success), Toast.LENGTH_SHORT
-                    ).show()
-                }
-                is FavoritesEffect.RotateRefreshBtn -> {
-                    onRotate()
-                }
+                is FavoritesEffect.ShowDeleteSuccess -> showToast(context, R.string.delete_success)
+                is FavoritesEffect.RotateRefreshBtn -> onRotate()
+                is FavoritesEffect.ShowNoInternet -> showToast(context, R.string.no_internet)
+                is FavoritesEffect.ShowNetworkError -> showToast(context, R.string.network_error)
             }
         }
     }
@@ -374,6 +371,10 @@ private fun DeletePopup(
             }
         }
     }
+}
+
+private fun showToast(context: Context, messageResId: Int) {
+    Toast.makeText(context, context.getString(messageResId), Toast.LENGTH_SHORT).show()
 }
 
 @Preview(showBackground = true)

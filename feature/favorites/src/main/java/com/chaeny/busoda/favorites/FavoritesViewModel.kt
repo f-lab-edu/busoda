@@ -96,18 +96,31 @@ internal class FavoritesViewModel @Inject constructor(
     private suspend fun getBusStopDetailsMap(): Map<String, BusStopDetail> {
         val stopIds = favoriteBuses.keys
 
-        return coroutineScope {
+        val results = coroutineScope {
             stopIds.map { stopId ->
-                async {
-                    val result = busStopDetailRepository.getBusStopDetail(stopId)
-                    val busStopDetail = if (result is GetBusStopDetailResult.Success) {
-                        result.data
-                    } else {
-                        BusStopDetail("", emptyList())
-                    }
-                    stopId to busStopDetail
-                }
-            }.awaitAll().toMap()
+                async { stopId to busStopDetailRepository.getBusStopDetail(stopId) }
+            }.awaitAll()
+        }
+        handleError(results)
+
+        return results.associate { (stopId, result) ->
+            val busStopDetail = if (result is GetBusStopDetailResult.Success) {
+                result.data
+            } else {
+                BusStopDetail("", emptyList())
+            }
+            stopId to busStopDetail
+        }
+    }
+
+    private fun handleError(results: List<Pair<String, GetBusStopDetailResult>>) {
+        val error = results.map { it.second }
+            .firstOrNull { it !is GetBusStopDetailResult.Success } ?: return
+
+        when (error) {
+            is GetBusStopDetailResult.NoInternet -> postSideEffect(FavoritesEffect.ShowNoInternet)
+            is GetBusStopDetailResult.NetworkError -> postSideEffect(FavoritesEffect.ShowNetworkError)
+            else -> {}
         }
     }
 
@@ -219,4 +232,6 @@ sealed class FavoritesEffect : SideEffect {
     data class NavigateToStopDetail(val stopId: String) : FavoritesEffect()
     data object ShowDeleteSuccess : FavoritesEffect()
     data object RotateRefreshBtn : FavoritesEffect()
+    data object ShowNoInternet : FavoritesEffect()
+    data object ShowNetworkError : FavoritesEffect()
 }
