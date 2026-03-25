@@ -37,6 +37,7 @@ internal class FavoritesViewModel @Inject constructor(
     private var loadJob: Job? = null
     private var timerJob: Job? = null
     private var favoriteBuses: Map<String, List<FavoriteBusItem>> = emptyMap()
+    private var hasError = false
 
     init {
         collectFavoriteStops()
@@ -114,8 +115,16 @@ internal class FavoritesViewModel @Inject constructor(
     }
 
     private fun handleError(results: List<Pair<String, GetBusStopDetailResult>>) {
-        val error = results.map { it.second }
-            .firstOrNull { it !is GetBusStopDetailResult.Success } ?: return
+        val error = results.map { it.second }.firstOrNull { it !is GetBusStopDetailResult.Success }
+
+        if (error == null) {
+            hasError = false
+            return
+        }
+        if (hasError) {
+            return
+        }
+        hasError = true
 
         when (error) {
             is GetBusStopDetailResult.NoInternet -> postSideEffect(FavoritesEffect.ShowNoInternet)
