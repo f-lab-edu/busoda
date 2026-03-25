@@ -1,8 +1,10 @@
 package com.chaeny.busoda.favorites
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -97,7 +99,7 @@ fun FavoritesScreen(
                 }
             }
 
-            if (uiState.favoriteStops.isNotEmpty()) {
+            if (uiState.favoriteBusInfo.isNotEmpty()) {
                 RefreshButton(
                     rotation = rotation,
                     onClick = { viewModel.onIntent(FavoritesIntent.RefreshData) },
@@ -109,10 +111,9 @@ fun FavoritesScreen(
 
     val popup = uiState.popup
     if (popup is Popup.Delete) {
-        val hasFavoriteBuses = popup.stop.stopId in uiState.favoriteBuses
         DeletePopup(
             stopName = popup.stop.stopName,
-            hasFavoriteBuses = hasFavoriteBuses,
+            hasFavoriteBuses = uiState.hasFavoriteBuses,
             onDismiss = {
                 viewModel.onIntent(FavoritesIntent.CancelDeleteFavorite)
             },
@@ -137,14 +138,10 @@ private fun CollectEffect(
                 is FavoritesEffect.NavigateToStopDetail -> {
                     navigateToStopDetail(effect.stopId)
                 }
-                is FavoritesEffect.ShowDeleteSuccess -> {
-                    Toast.makeText(
-                        context, context.getString(R.string.delete_success), Toast.LENGTH_SHORT
-                    ).show()
-                }
-                is FavoritesEffect.RotateRefreshBtn -> {
-                    onRotate()
-                }
+                is FavoritesEffect.ShowDeleteSuccess -> showToast(context, R.string.delete_success)
+                is FavoritesEffect.RotateRefreshBtn -> onRotate()
+                is FavoritesEffect.ShowNoInternet -> showToast(context, R.string.no_internet)
+                is FavoritesEffect.ShowNetworkError -> showToast(context, R.string.network_error)
             }
         }
     }
@@ -181,7 +178,7 @@ private fun FavoritesList(
             .padding(top = 20.dp)
     ) {
         if (!isLoading) {
-            LazyColumn {
+            LazyColumn(contentPadding = PaddingValues(bottom = 90.dp)) {
                 items(
                     items = favoriteStops,
                     key = { stop -> stop.stopId }
@@ -374,6 +371,10 @@ private fun DeletePopup(
             }
         }
     }
+}
+
+private fun showToast(context: Context, messageResId: Int) {
+    Toast.makeText(context, context.getString(messageResId), Toast.LENGTH_SHORT).show()
 }
 
 @Preview(showBackground = true)

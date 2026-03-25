@@ -2,6 +2,7 @@ package com.chaeny.busoda.nearbystops
 
 import androidx.lifecycle.viewModelScope
 import com.chaeny.busoda.data.repository.BusStopDetailRepository
+import com.chaeny.busoda.data.repository.GetBusStopDetailResult
 import com.chaeny.busoda.data.repository.NearbyBusStopsRepository
 import com.chaeny.busoda.model.BusStopPosition
 import com.chaeny.busoda.mvi.BaseViewModel
@@ -42,10 +43,13 @@ internal class NearbystopsViewModel @Inject constructor(
             is NearbystopsIntent.ShowMarkerInfo -> {
                 setState { copy(selectedMarkerInfo = intent.stop) }
                 viewModelScope.launch {
-                    val stopDetail = busStopDetailRepository.getBusStopDetail(intent.stop.stopId)
-                    val nextStop = stopDetail.busInfos.firstOrNull()?.nextStopName ?: ""
-                    val buses = stopDetail.busInfos.map { it.busNumber }
-                    setState { copy(nextStopName = nextStop, busNumbers = buses) }
+                    val result = busStopDetailRepository.getBusStopDetail(intent.stop.stopId)
+                    if (result is GetBusStopDetailResult.Success) {
+                        val busStopDetail = result.data
+                        val nextStop = busStopDetail.busInfos.firstOrNull()?.nextStopName ?: ""
+                        val buses = busStopDetail.busInfos.map { it.busNumber }
+                        setState { copy(nextStopName = nextStop, busNumbers = buses) }
+                    }
                 }
             }
             is NearbystopsIntent.HideMarkerInfo -> {

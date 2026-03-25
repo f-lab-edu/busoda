@@ -3,6 +3,7 @@ package com.chaeny.busoda.stopdetail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.chaeny.busoda.data.repository.BusStopDetailRepository
+import com.chaeny.busoda.data.repository.GetBusStopDetailResult
 import com.chaeny.busoda.data.repository.FavoriteBusRepository
 import com.chaeny.busoda.data.repository.FavoriteRepository
 import com.chaeny.busoda.domain.usecase.AddFavoriteBusUseCase
@@ -52,8 +53,13 @@ internal class StopDetailViewModel @Inject constructor(
     private fun asyncDataLoad() {
         setState { copy(isLoading = true) }
         viewModelScope.launch {
-            val busStopDetail = busStopDetailRepository.getBusStopDetail(currentState.stopId)
-            setState { copy(stopDetail = busStopDetail, isLoading = false) }
+            val result = busStopDetailRepository.getBusStopDetail(currentState.stopId)
+            if (result is GetBusStopDetailResult.Success) {
+                val busStopDetail = result.data
+                setState { copy(stopDetail = busStopDetail, isLoading = false) }
+            } else {
+                setState { copy(isLoading = false) }
+            }
         }
     }
 

@@ -8,20 +8,28 @@ import com.chaeny.busoda.model.BusInfo
 import com.chaeny.busoda.model.BusStopDetail
 import com.chaeny.busoda.model.CongestionLevel
 import java.io.IOException
+import java.net.UnknownHostException
 import javax.inject.Inject
 
 class ApiBusStopDetailRepository @Inject constructor(
     private val busApiService: BusApiService
 ) : BusStopDetailRepository {
 
-    override suspend fun getBusStopDetail(stopId: String): BusStopDetail {
+    override suspend fun getBusStopDetail(stopId: String): GetBusStopDetailResult {
         return try {
             val response = busApiService.getStationByUid(stopId = stopId)
-            response.toBusStopDetail()
-        } catch (e: IOException) {
-            BusStopDetail("", emptyList())
+            val busStopDetail = response.toBusStopDetail()
+            if (busStopDetail.busInfos.isEmpty()) {
+                GetBusStopDetailResult.NoResult
+            } else {
+                GetBusStopDetailResult.Success(busStopDetail)
+            }
         } catch (e: Exception) {
-            BusStopDetail("", emptyList())
+            when (e) {
+                is UnknownHostException -> GetBusStopDetailResult.NoInternet
+                is IOException -> GetBusStopDetailResult.NetworkError
+                else -> GetBusStopDetailResult.NetworkError
+            }
         }
     }
 
