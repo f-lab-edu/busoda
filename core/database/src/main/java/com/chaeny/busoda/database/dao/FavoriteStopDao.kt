@@ -18,6 +18,12 @@ interface FavoriteStopDao {
     @Query("DELETE FROM favorite_stops WHERE stopId = :stopId")
     suspend fun deleteFavorite(stopId: String)
 
+    @Query("UPDATE favorite_stops SET `order` = :order WHERE stopId = :stopId")
+    suspend fun updateOrder(stopId: String, order: Int)
+
+    @Query("SELECT COUNT(*) FROM favorite_stops")
+    suspend fun getCount(): Int
+
     @Query("SELECT EXISTS(SELECT 1 FROM favorite_stops WHERE stopId = :stopId LIMIT 1)")
     fun isFavorite(stopId: String): Flow<Boolean>
 }
