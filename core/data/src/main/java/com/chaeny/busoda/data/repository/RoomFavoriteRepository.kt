@@ -28,6 +28,10 @@ class RoomFavoriteRepository @Inject constructor(
 
     override fun isFavorite(stopId: String) = favoriteStopDao.isFavorite(stopId)
 
+    override suspend fun updateFavoriteOrder(stopId: String, order: Int) {
+        favoriteStopDao.updateOrder(stopId, order)
+    }
+
     private fun BusStop.toFavoriteStop(order: Int) = FavoriteStop(stopId, stopName, nextStopName, order)
 
     private fun FavoriteStop.toBusStop() = BusStop(stopId, stopName, nextStopName)

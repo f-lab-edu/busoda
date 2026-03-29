@@ -29,4 +29,8 @@ class DummyFavoriteRepository @Inject constructor() : FavoriteRepository {
     override suspend fun deleteFavorite(stopId: String) {
         dummyData.removeIf { it.stopId == stopId }
     }
+
+    override suspend fun updateFavoriteOrder(stopId: String, order: Int) {
+        TODO("Not yet implemented")
+    }
 }
