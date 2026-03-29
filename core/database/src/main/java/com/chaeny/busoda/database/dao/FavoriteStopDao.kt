@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FavoriteStopDao {
-    @Query("SELECT * FROM favorite_stops")
+    @Query("SELECT * FROM favorite_stops ORDER BY `order` ASC")
     fun getFavorites(): Flow<List<FavoriteStop>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
