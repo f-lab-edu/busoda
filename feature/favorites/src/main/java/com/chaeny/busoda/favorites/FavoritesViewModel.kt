@@ -202,6 +202,13 @@ internal class FavoritesViewModel @Inject constructor(
                     refreshBusInfo()
                 }
             }
+            is FavoritesIntent.ReorderFavorites -> {
+                viewModelScope.launch {
+                    intent.stops.forEachIndexed { index, stop ->
+                        favoriteRepository.updateFavoriteOrder(stop.stopId, index)
+                    }
+                }
+            }
         }
     }
 
@@ -229,6 +236,7 @@ sealed class FavoritesIntent : UiIntent {
     data object CancelDeleteFavorite : FavoritesIntent()
     data object ConfirmDeleteFavorite : FavoritesIntent()
     data object RefreshData : FavoritesIntent()
+    data class ReorderFavorites(val stops: List<BusStop>) : FavoritesIntent()
 }
 
 sealed class FavoritesEffect : SideEffect {
