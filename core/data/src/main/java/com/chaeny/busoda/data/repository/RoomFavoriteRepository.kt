@@ -12,7 +12,7 @@ class RoomFavoriteRepository @Inject constructor(
 ) : FavoriteRepository {
 
     override suspend fun addFavorite(stop: BusStop) {
-        val order = favoriteStopDao.getCount()
+        val order = favoriteStopDao.getNextOrder()
         favoriteStopDao.insertFavorite(stop.toFavoriteStop(order))
     }
 
