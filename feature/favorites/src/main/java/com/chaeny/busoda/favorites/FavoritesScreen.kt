@@ -217,13 +217,15 @@ private fun FavoritesList(
                                 stop = stop,
                                 busInfos = busInfos,
                                 onClick = onClickItem,
-                                onLongClick = { onLongClickItem(stop) }
+                                onLongClick = { onLongClickItem(stop) },
+                                dragHandleModifier = Modifier.draggableHandle()
                             )
                         } else {
                             StopItem(
                                 stop = stop,
                                 onClick = onClickItem,
-                                onLongClick = { onLongClickItem(stop) }
+                                onLongClick = { onLongClickItem(stop) },
+                                dragHandleModifier = Modifier.draggableHandle()
                             )
                         }
                     }
@@ -244,6 +246,7 @@ private fun StopWithBusesCard(
     busInfos: List<BusInfo>,
     onClick: (String) -> Unit,
     onLongClick: () -> Unit,
+    dragHandleModifier: Modifier = Modifier,
     modifier: Modifier = Modifier
 ) {
     FavoriteCard(
@@ -264,6 +267,7 @@ private fun StopItem(
     stop: BusStop,
     onClick: (String) -> Unit,
     onLongClick: () -> Unit,
+    dragHandleModifier: Modifier = Modifier,
     modifier: Modifier = Modifier
 ) {
     FavoriteCard(
