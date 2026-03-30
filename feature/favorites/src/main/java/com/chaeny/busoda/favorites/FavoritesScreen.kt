@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -29,6 +30,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -38,6 +40,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -172,32 +176,44 @@ private fun FavoritesList(
     onLongClickItem: (BusStop) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var list by remember(favoriteStops) { mutableStateOf(favoriteStops) }
+    val lazyListState = rememberLazyListState()
+    val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
+        list = list.toMutableList().apply {
+            add(to.index, removeAt(from.index))
+        }
+    }
+
     Box(
         modifier = modifier
             .fillMaxSize()
             .padding(top = 20.dp)
     ) {
         if (!isLoading) {
-            LazyColumn(contentPadding = PaddingValues(bottom = 90.dp)) {
+            LazyColumn(
+                state = lazyListState,
+                contentPadding = PaddingValues(bottom = 90.dp)
+            ) {
                 items(
-                    items = favoriteStops,
+                    items = list,
                     key = { stop -> stop.stopId }
                 ) { stop ->
-                    val busInfos = favoriteBusInfo[stop.stopId]
-
-                    if (busInfos != null) {
-                        StopWithBusesCard(
-                            stop = stop,
-                            busInfos = busInfos,
-                            onClick = onClickItem,
-                            onLongClick = { onLongClickItem(stop) }
-                        )
-                    } else {
-                        StopItem(
-                            stop = stop,
-                            onClick = onClickItem,
-                            onLongClick = { onLongClickItem(stop) }
-                        )
+                    ReorderableItem(reorderableLazyListState, key = stop.stopId) {
+                        val busInfos = favoriteBusInfo[stop.stopId]
+                        if (busInfos != null) {
+                            StopWithBusesCard(
+                                stop = stop,
+                                busInfos = busInfos,
+                                onClick = onClickItem,
+                                onLongClick = { onLongClickItem(stop) }
+                            )
+                        } else {
+                            StopItem(
+                                stop = stop,
+                                onClick = onClickItem,
+                                onLongClick = { onLongClickItem(stop) }
+                            )
+                        }
                     }
                 }
             }
