@@ -15,6 +15,9 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.Icon
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -254,8 +257,15 @@ private fun StopWithBusesCard(
         onLongClick = onLongClick,
         modifier = modifier
     ) {
-        StopInfo(stop)
-
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = Icons.Default.Menu,
+                contentDescription = null,
+                modifier = dragHandleModifier.padding(start = 16.dp),
+                tint = Gray60
+            )
+            StopInfo(stop, modifier = Modifier.weight(1f))
+        }
         busInfos.forEach { busInfo ->
             FavoriteBusContent(busInfo = busInfo)
         }
@@ -275,7 +285,15 @@ private fun StopItem(
         onLongClick = onLongClick,
         modifier = modifier
     ) {
-        StopInfo(stop)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = Icons.Default.Menu,
+                contentDescription = null,
+                modifier = dragHandleModifier.padding(start = 16.dp),
+                tint = Gray60
+            )
+            StopInfo(stop, modifier = Modifier.weight(1f))
+        }
     }
 }
 
