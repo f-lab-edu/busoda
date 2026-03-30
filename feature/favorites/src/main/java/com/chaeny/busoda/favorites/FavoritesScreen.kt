@@ -98,7 +98,8 @@ fun FavoritesScreen(
                         favoriteBusInfo = uiState.favoriteBusInfo,
                         isLoading = uiState.isLoading,
                         onClickItem = { viewModel.onIntent(FavoritesIntent.NavigateToDetail(it)) },
-                        onLongClickItem = { viewModel.onIntent(FavoritesIntent.RequestDeleteFavorite(it)) }
+                        onLongClickItem = { viewModel.onIntent(FavoritesIntent.RequestDeleteFavorite(it)) },
+                        onReorder = { viewModel.onIntent(FavoritesIntent.ReorderFavorites(it)) }
                     )
                 }
             }
@@ -174,6 +175,7 @@ private fun FavoritesList(
     isLoading: Boolean,
     onClickItem: (String) -> Unit,
     onLongClickItem: (BusStop) -> Unit,
+    onReorder: (List<BusStop>) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var list by remember(favoriteStops) { mutableStateOf(favoriteStops) }
@@ -181,6 +183,16 @@ private fun FavoritesList(
     val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
         list = list.toMutableList().apply {
             add(to.index, removeAt(from.index))
+        }
+    }
+    var hasDragged by remember { mutableStateOf(false) }
+
+    LaunchedEffect(reorderableLazyListState.isAnyItemDragging) {
+        if (reorderableLazyListState.isAnyItemDragging) {
+            hasDragged = true
+        } else if (hasDragged) {
+            hasDragged = false
+            onReorder(list)
         }
     }
 
