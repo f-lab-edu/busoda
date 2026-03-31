@@ -258,10 +258,7 @@ private fun StopWithBusesCard(
         onLongClick = onLongClick,
         modifier = modifier
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            dragHandle()
-            StopInfo(stop, modifier = Modifier.weight(1f))
-        }
+        StopHeader(stop, dragHandle)
         busInfos.forEach { busInfo ->
             FavoriteBusContent(busInfo = busInfo)
         }
@@ -281,10 +278,18 @@ private fun StopItem(
         onLongClick = onLongClick,
         modifier = modifier
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            dragHandle()
-            StopInfo(stop, modifier = Modifier.weight(1f))
-        }
+        StopHeader(stop, dragHandle)
+    }
+}
+
+@Composable
+private fun StopHeader(
+    stop: BusStop,
+    dragHandle: @Composable () -> Unit
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        dragHandle()
+        StopInfo(stop, modifier = Modifier.weight(1f))
     }
 }
 
