@@ -214,6 +214,14 @@ private fun FavoritesList(
                     key = { stop -> stop.stopId }
                 ) { stop ->
                     ReorderableItem(reorderableLazyListState, key = stop.stopId) {
+                        val dragHandle: @Composable () -> Unit = {
+                            Icon(
+                                imageVector = Icons.Default.Menu,
+                                contentDescription = null,
+                                modifier = Modifier.draggableHandle().padding(start = 16.dp),
+                                tint = Gray60
+                            )
+                        }
                         val busInfos = favoriteBusInfo[stop.stopId]
                         if (busInfos != null) {
                             StopWithBusesCard(
@@ -221,14 +229,14 @@ private fun FavoritesList(
                                 busInfos = busInfos,
                                 onClick = onClickItem,
                                 onLongClick = { onLongClickItem(stop) },
-                                dragHandleModifier = Modifier.draggableHandle()
+                                dragHandle = dragHandle
                             )
                         } else {
                             StopItem(
                                 stop = stop,
                                 onClick = onClickItem,
                                 onLongClick = { onLongClickItem(stop) },
-                                dragHandleModifier = Modifier.draggableHandle()
+                                dragHandle = dragHandle
                             )
                         }
                     }
@@ -249,8 +257,8 @@ private fun StopWithBusesCard(
     busInfos: List<BusInfo>,
     onClick: (String) -> Unit,
     onLongClick: () -> Unit,
-    dragHandleModifier: Modifier = Modifier,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    dragHandle: @Composable () -> Unit = {}
 ) {
     FavoriteCard(
         onClick = { onClick(stop.stopId) },
@@ -258,12 +266,7 @@ private fun StopWithBusesCard(
         modifier = modifier
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                imageVector = Icons.Default.Menu,
-                contentDescription = null,
-                modifier = dragHandleModifier.padding(start = 16.dp),
-                tint = Gray60
-            )
+            dragHandle()
             StopInfo(stop, modifier = Modifier.weight(1f))
         }
         busInfos.forEach { busInfo ->
@@ -277,8 +280,8 @@ private fun StopItem(
     stop: BusStop,
     onClick: (String) -> Unit,
     onLongClick: () -> Unit,
-    dragHandleModifier: Modifier = Modifier,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    dragHandle: @Composable () -> Unit = {}
 ) {
     FavoriteCard(
         onClick = { onClick(stop.stopId) },
@@ -286,12 +289,7 @@ private fun StopItem(
         modifier = modifier
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                imageVector = Icons.Default.Menu,
-                contentDescription = null,
-                modifier = dragHandleModifier.padding(start = 16.dp),
-                tint = Gray60
-            )
+            dragHandle()
             StopInfo(stop, modifier = Modifier.weight(1f))
         }
     }
