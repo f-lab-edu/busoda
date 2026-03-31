@@ -182,10 +182,10 @@ private fun FavoritesList(
     onReorder: (List<BusStop>) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var list by remember(favoriteStops) { mutableStateOf(favoriteStops) }
+    var orderedStops by remember(favoriteStops) { mutableStateOf(favoriteStops) }
     val lazyListState = rememberLazyListState()
     val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
-        list = list.toMutableList().apply {
+        orderedStops = orderedStops.toMutableList().apply {
             add(to.index, removeAt(from.index))
         }
     }
@@ -196,7 +196,7 @@ private fun FavoritesList(
             hasDragged = true
         } else if (hasDragged) {
             hasDragged = false
-            onReorder(list)
+            onReorder(orderedStops)
         }
     }
 
@@ -211,7 +211,7 @@ private fun FavoritesList(
                 contentPadding = PaddingValues(bottom = 90.dp)
             ) {
                 items(
-                    items = list,
+                    items = orderedStops,
                     key = { stop -> stop.stopId }
                 ) { stop ->
                     ReorderableItem(reorderableLazyListState, key = stop.stopId) {
