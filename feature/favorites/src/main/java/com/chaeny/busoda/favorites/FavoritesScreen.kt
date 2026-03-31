@@ -43,6 +43,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 import androidx.compose.ui.text.style.TextAlign
@@ -214,14 +215,6 @@ private fun FavoritesList(
                     key = { stop -> stop.stopId }
                 ) { stop ->
                     ReorderableItem(reorderableLazyListState, key = stop.stopId) {
-                        val dragHandle: @Composable () -> Unit = {
-                            Icon(
-                                imageVector = Icons.Default.Menu,
-                                contentDescription = null,
-                                modifier = Modifier.draggableHandle().padding(start = 16.dp),
-                                tint = Gray60
-                            )
-                        }
                         val busInfos = favoriteBusInfo[stop.stopId]
                         if (busInfos != null) {
                             StopWithBusesCard(
@@ -229,14 +222,14 @@ private fun FavoritesList(
                                 busInfos = busInfos,
                                 onClick = onClickItem,
                                 onLongClick = { onLongClickItem(stop) },
-                                dragHandle = dragHandle
+                                dragHandle = { DragHandle() }
                             )
                         } else {
                             StopItem(
                                 stop = stop,
                                 onClick = onClickItem,
                                 onLongClick = { onLongClickItem(stop) },
-                                dragHandle = dragHandle
+                                dragHandle = { DragHandle() }
                             )
                         }
                     }
@@ -293,6 +286,16 @@ private fun StopItem(
             StopInfo(stop, modifier = Modifier.weight(1f))
         }
     }
+}
+
+@Composable
+private fun ReorderableCollectionItemScope.DragHandle() {
+    Icon(
+        imageVector = Icons.Default.Menu,
+        contentDescription = null,
+        modifier = Modifier.draggableHandle().padding(start = 16.dp),
+        tint = Gray60
+    )
 }
 
 @Composable
