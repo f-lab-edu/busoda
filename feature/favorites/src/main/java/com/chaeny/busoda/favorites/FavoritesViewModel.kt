@@ -204,9 +204,7 @@ internal class FavoritesViewModel @Inject constructor(
             }
             is FavoritesIntent.ReorderFavorites -> {
                 viewModelScope.launch {
-                    intent.stops.forEachIndexed { index, stop ->
-                        favoriteRepository.updateFavoriteOrder(stop.stopId, index)
-                    }
+                    favoriteRepository.updateFavoriteOrders(intent.stops)
                 }
             }
         }
