@@ -14,6 +14,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.Icon
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -29,6 +33,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -38,6 +43,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import sh.calvin.reorderable.ReorderableCollectionItemScope
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -94,7 +102,8 @@ fun FavoritesScreen(
                         favoriteBusInfo = uiState.favoriteBusInfo,
                         isLoading = uiState.isLoading,
                         onClickItem = { viewModel.onIntent(FavoritesIntent.NavigateToDetail(it)) },
-                        onLongClickItem = { viewModel.onIntent(FavoritesIntent.RequestDeleteFavorite(it)) }
+                        onLongClickItem = { viewModel.onIntent(FavoritesIntent.RequestDeleteFavorite(it)) },
+                        onReorder = { viewModel.onIntent(FavoritesIntent.ReorderFavorites(it)) }
                     )
                 }
             }
@@ -170,34 +179,59 @@ private fun FavoritesList(
     isLoading: Boolean,
     onClickItem: (String) -> Unit,
     onLongClickItem: (BusStop) -> Unit,
+    onReorder: (List<BusStop>) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var orderedStops by remember(favoriteStops) { mutableStateOf(favoriteStops) }
+    val lazyListState = rememberLazyListState()
+    val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
+        orderedStops = orderedStops.toMutableList().apply {
+            add(to.index, removeAt(from.index))
+        }
+    }
+    var hasDragged by remember { mutableStateOf(false) }
+
+    LaunchedEffect(reorderableLazyListState.isAnyItemDragging) {
+        if (reorderableLazyListState.isAnyItemDragging) {
+            hasDragged = true
+        } else if (hasDragged) {
+            hasDragged = false
+            onReorder(orderedStops)
+        }
+    }
+
     Box(
         modifier = modifier
             .fillMaxSize()
             .padding(top = 20.dp)
     ) {
         if (!isLoading) {
-            LazyColumn(contentPadding = PaddingValues(bottom = 90.dp)) {
+            LazyColumn(
+                state = lazyListState,
+                contentPadding = PaddingValues(bottom = 90.dp)
+            ) {
                 items(
-                    items = favoriteStops,
+                    items = orderedStops,
                     key = { stop -> stop.stopId }
                 ) { stop ->
-                    val busInfos = favoriteBusInfo[stop.stopId]
-
-                    if (busInfos != null) {
-                        StopWithBusesCard(
-                            stop = stop,
-                            busInfos = busInfos,
-                            onClick = onClickItem,
-                            onLongClick = { onLongClickItem(stop) }
-                        )
-                    } else {
-                        StopItem(
-                            stop = stop,
-                            onClick = onClickItem,
-                            onLongClick = { onLongClickItem(stop) }
-                        )
+                    ReorderableItem(reorderableLazyListState, key = stop.stopId) {
+                        val busInfos = favoriteBusInfo[stop.stopId]
+                        if (busInfos != null) {
+                            StopWithBusesCard(
+                                stop = stop,
+                                busInfos = busInfos,
+                                onClick = onClickItem,
+                                onLongClick = { onLongClickItem(stop) },
+                                dragHandle = { DragHandle() }
+                            )
+                        } else {
+                            StopItem(
+                                stop = stop,
+                                onClick = onClickItem,
+                                onLongClick = { onLongClickItem(stop) },
+                                dragHandle = { DragHandle() }
+                            )
+                        }
                     }
                 }
             }
@@ -216,15 +250,15 @@ private fun StopWithBusesCard(
     busInfos: List<BusInfo>,
     onClick: (String) -> Unit,
     onLongClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    dragHandle: @Composable () -> Unit = {}
 ) {
     FavoriteCard(
         onClick = { onClick(stop.stopId) },
         onLongClick = onLongClick,
         modifier = modifier
     ) {
-        StopInfo(stop)
-
+        StopHeader(stop, dragHandle)
         busInfos.forEach { busInfo ->
             FavoriteBusContent(busInfo = busInfo)
         }
@@ -236,15 +270,37 @@ private fun StopItem(
     stop: BusStop,
     onClick: (String) -> Unit,
     onLongClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    dragHandle: @Composable () -> Unit = {}
 ) {
     FavoriteCard(
         onClick = { onClick(stop.stopId) },
         onLongClick = onLongClick,
         modifier = modifier
     ) {
-        StopInfo(stop)
+        StopHeader(stop, dragHandle)
     }
+}
+
+@Composable
+private fun StopHeader(
+    stop: BusStop,
+    dragHandle: @Composable () -> Unit
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        dragHandle()
+        StopInfo(stop, modifier = Modifier.weight(1f))
+    }
+}
+
+@Composable
+private fun ReorderableCollectionItemScope.DragHandle() {
+    Icon(
+        imageVector = Icons.Default.Menu,
+        contentDescription = null,
+        modifier = Modifier.draggableHandle().padding(start = 16.dp),
+        tint = Gray60
+    )
 }
 
 @Composable

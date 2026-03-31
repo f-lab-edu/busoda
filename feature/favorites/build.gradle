@@ -43,6 +43,8 @@ dependencies {
     implementation libs.androidx.ui
     implementation libs.androidx.ui.tooling.preview
     implementation libs.compose.runtime.livedata
+    implementation libs.reorderable
+    implementation libs.androidx.material.icons.extended
 
     implementation libs.hilt.android
     implementation libs.hilt.navigation.compose
