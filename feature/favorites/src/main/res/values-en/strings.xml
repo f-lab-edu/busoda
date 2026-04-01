@@ -10,6 +10,10 @@
     <string name="tab_home">Home</string>
     <string name="tab_nearby_stops">Nearby Stops</string>
     <string name="way">Direction</string>
+    <string name="edit">Edit</string>
+    <string name="done">Done</string>
+    <string name="delete_favorite_bus">Delete Favorite Bus</string>
+    <string name="reorder">Reorder</string>
     <string name="no_internet">Please check your internet connection.</string>
     <string name="network_error">A network error has occurred.</string>
 </resources>

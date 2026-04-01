@@ -4,26 +4,30 @@ import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.Icon
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -43,9 +47,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import sh.calvin.reorderable.ReorderableCollectionItemScope
-import sh.calvin.reorderable.ReorderableItem
-import sh.calvin.reorderable.rememberReorderableLazyListState
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -64,6 +65,9 @@ import com.chaeny.busoda.ui.component.StopInfo
 import com.chaeny.busoda.ui.theme.DarkGreen
 import com.chaeny.busoda.ui.theme.Gray60
 import com.chaeny.busoda.ui.theme.White
+import sh.calvin.reorderable.ReorderableCollectionItemScope
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 
 @Composable
 fun FavoritesScreen(
@@ -74,6 +78,7 @@ fun FavoritesScreen(
     val viewModel: FavoritesViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var rotation by remember { mutableFloatStateOf(0f) }
+    var isEditMode by remember { mutableStateOf(false) }
 
     CollectEffect(
         viewModel = viewModel,
@@ -101,9 +106,14 @@ fun FavoritesScreen(
                         favoriteStops = uiState.favoriteStops,
                         favoriteBusInfo = uiState.favoriteBusInfo,
                         isLoading = uiState.isLoading,
+                        isEditMode = isEditMode,
                         onClickItem = { viewModel.onIntent(FavoritesIntent.NavigateToDetail(it)) },
                         onLongClickItem = { viewModel.onIntent(FavoritesIntent.RequestDeleteFavorite(it)) },
-                        onReorder = { viewModel.onIntent(FavoritesIntent.ReorderFavorites(it)) }
+                        onReorder = { viewModel.onIntent(FavoritesIntent.ReorderFavorites(it)) },
+                        onToggleEditMode = { isEditMode = !isEditMode },
+                        onDeleteBus = { stopId, busNumber ->
+                            viewModel.onIntent(FavoritesIntent.DeleteFavoriteBus(stopId, busNumber))
+                        }
                     )
                 }
             }
@@ -177,9 +187,12 @@ private fun FavoritesList(
     favoriteStops: List<BusStop>,
     favoriteBusInfo: Map<String, List<BusInfo>>,
     isLoading: Boolean,
+    isEditMode: Boolean,
     onClickItem: (String) -> Unit,
     onLongClickItem: (BusStop) -> Unit,
     onReorder: (List<BusStop>) -> Unit,
+    onToggleEditMode: () -> Unit,
+    onDeleteBus: (String, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var orderedStops by remember(favoriteStops) { mutableStateOf(favoriteStops) }
@@ -220,8 +233,10 @@ private fun FavoritesList(
                             StopWithBusesCard(
                                 stop = stop,
                                 busInfos = busInfos,
+                                isEditMode = isEditMode,
                                 onClick = onClickItem,
                                 onLongClick = { onLongClickItem(stop) },
+                                onDeleteBus = { busNumber -> onDeleteBus(stop.stopId, busNumber) },
                                 dragHandle = { DragHandle() }
                             )
                         } else {
@@ -231,6 +246,18 @@ private fun FavoritesList(
                                 onLongClick = { onLongClickItem(stop) },
                                 dragHandle = { DragHandle() }
                             )
+                        }
+                    }
+                }
+                if (favoriteBusInfo.isNotEmpty()) {
+                    item {
+                        TextButton(
+                            onClick = onToggleEditMode,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentWidth(Alignment.CenterHorizontally)
+                        ) {
+                            Text(if (isEditMode) stringResource(R.string.done) else stringResource(R.string.edit))
                         }
                     }
                 }
@@ -248,8 +275,10 @@ private fun FavoritesList(
 private fun StopWithBusesCard(
     stop: BusStop,
     busInfos: List<BusInfo>,
+    isEditMode: Boolean,
     onClick: (String) -> Unit,
     onLongClick: () -> Unit,
+    onDeleteBus: (String) -> Unit,
     modifier: Modifier = Modifier,
     dragHandle: @Composable () -> Unit = {}
 ) {
@@ -260,7 +289,11 @@ private fun StopWithBusesCard(
     ) {
         StopHeader(stop, dragHandle)
         busInfos.forEach { busInfo ->
-            FavoriteBusContent(busInfo = busInfo)
+            FavoriteBusContent(
+                busInfo = busInfo,
+                isEditMode = isEditMode,
+                onDelete = { onDeleteBus(busInfo.busNumber) }
+            )
         }
     }
 }
@@ -297,7 +330,7 @@ private fun StopHeader(
 private fun ReorderableCollectionItemScope.DragHandle() {
     Icon(
         imageVector = Icons.Default.Menu,
-        contentDescription = null,
+        contentDescription = stringResource(R.string.reorder),
         modifier = Modifier.draggableHandle().padding(start = 16.dp),
         tint = Gray60
     )
@@ -328,7 +361,9 @@ private fun FavoriteCard(
 
 @Composable
 private fun FavoriteBusContent(
-    busInfo: BusInfo
+    busInfo: BusInfo,
+    isEditMode: Boolean,
+    onDelete: () -> Unit
 ) {
     HorizontalDivider(
         color = Gray60.copy(alpha = 0.3f)
@@ -336,7 +371,9 @@ private fun FavoriteBusContent(
 
     BusInfoHeader(
         busNumber = busInfo.busNumber,
-        nextStopName = busInfo.nextStopName
+        nextStopName = busInfo.nextStopName,
+        isEditMode = isEditMode,
+        onDelete = onDelete
     )
 
     BusArrivalInfoList(busInfo = busInfo)
@@ -346,15 +383,26 @@ private fun FavoriteBusContent(
 private fun BusInfoHeader(
     busNumber: String,
     nextStopName: String,
+    isEditMode: Boolean,
+    onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp)
+            .padding(start = if (isEditMode) 10.dp else 20.dp, end = 20.dp)
             .padding(top = 15.dp),
         verticalAlignment = Alignment.Bottom
     ) {
+        if (isEditMode) {
+            IconButton(onClick = onDelete, modifier = Modifier.size(28.dp)) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = stringResource(R.string.delete_favorite_bus),
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        }
         Text(
             text = busNumber,
             modifier = Modifier.weight(0.3f),

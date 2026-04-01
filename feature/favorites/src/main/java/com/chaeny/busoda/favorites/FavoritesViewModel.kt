@@ -207,6 +207,11 @@ internal class FavoritesViewModel @Inject constructor(
                     favoriteRepository.updateFavoriteOrders(intent.stops)
                 }
             }
+            is FavoritesIntent.DeleteFavoriteBus -> {
+                viewModelScope.launch {
+                    favoriteBusRepository.deleteFavoriteBus(intent.stopId, intent.busNumber)
+                }
+            }
         }
     }
 
@@ -235,6 +240,7 @@ sealed class FavoritesIntent : UiIntent {
     data object ConfirmDeleteFavorite : FavoritesIntent()
     data object RefreshData : FavoritesIntent()
     data class ReorderFavorites(val stops: List<BusStop>) : FavoritesIntent()
+    data class DeleteFavoriteBus(val stopId: String, val busNumber: String) : FavoritesIntent()
 }
 
 sealed class FavoritesEffect : SideEffect {

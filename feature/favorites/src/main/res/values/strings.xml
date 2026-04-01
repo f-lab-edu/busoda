@@ -10,6 +10,10 @@
     <string name="tab_home">홈</string>
     <string name="tab_nearby_stops">주변정류소</string>
     <string name="way">방면</string>
+    <string name="edit">편집</string>
+    <string name="done">완료</string>
+    <string name="delete_favorite_bus">버스 즐겨찾기 삭제</string>
+    <string name="reorder">순서 변경</string>
     <string name="no_internet">인터넷 연결을 확인해주세요.</string>
     <string name="network_error">네트워크 오류가 발생했습니다.</string>
 </resources>
