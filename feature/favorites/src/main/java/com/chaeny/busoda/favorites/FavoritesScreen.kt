@@ -74,6 +74,7 @@ fun FavoritesScreen(
     val viewModel: FavoritesViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var rotation by remember { mutableFloatStateOf(0f) }
+    var isEditMode by remember { mutableStateOf(false) }
 
     CollectEffect(
         viewModel = viewModel,
@@ -101,9 +102,11 @@ fun FavoritesScreen(
                         favoriteStops = uiState.favoriteStops,
                         favoriteBusInfo = uiState.favoriteBusInfo,
                         isLoading = uiState.isLoading,
+                        isEditMode = isEditMode,
                         onClickItem = { viewModel.onIntent(FavoritesIntent.NavigateToDetail(it)) },
                         onLongClickItem = { viewModel.onIntent(FavoritesIntent.RequestDeleteFavorite(it)) },
-                        onReorder = { viewModel.onIntent(FavoritesIntent.ReorderFavorites(it)) }
+                        onReorder = { viewModel.onIntent(FavoritesIntent.ReorderFavorites(it)) },
+                        onToggleEditMode = { isEditMode = !isEditMode }
                     )
                 }
             }
@@ -177,9 +180,11 @@ private fun FavoritesList(
     favoriteStops: List<BusStop>,
     favoriteBusInfo: Map<String, List<BusInfo>>,
     isLoading: Boolean,
+    isEditMode: Boolean,
     onClickItem: (String) -> Unit,
     onLongClickItem: (BusStop) -> Unit,
     onReorder: (List<BusStop>) -> Unit,
+    onToggleEditMode: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var orderedStops by remember(favoriteStops) { mutableStateOf(favoriteStops) }
@@ -231,6 +236,16 @@ private fun FavoritesList(
                                 onLongClick = { onLongClickItem(stop) },
                                 dragHandle = { DragHandle() }
                             )
+                        }
+                    }
+                }
+                if (favoriteBusInfo.isNotEmpty()) {
+                    item {
+                        TextButton(
+                            onClick = onToggleEditMode,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(if (isEditMode) stringResource(R.string.done) else stringResource(R.string.edit))
                         }
                     }
                 }
