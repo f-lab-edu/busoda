@@ -12,18 +12,18 @@ class ApiNearbyBusStopsRepository @Inject constructor(
     private val busApiService: BusApiService
 ) : NearbyBusStopsRepository {
 
-    override suspend fun getNearbyBusStops(latitude: Double, longitude: Double, radius: Int): List<BusStopPosition> {
+    override suspend fun getNearbyBusStops(latitude: Double, longitude: Double, radius: Int): GetNearbyBusStopsResult {
         return try {
             val response = busApiService.getStationByPos(
                 longitude = longitude,
                 latitude = latitude,
                 radius = radius
             )
-            response.toBusStopPositionList()
+            GetNearbyBusStopsResult.Success(response.toBusStopPositionList())
         } catch (e: IOException) {
-            emptyList()
+            GetNearbyBusStopsResult.NoInternet
         } catch (e: Exception) {
-            emptyList()
+            GetNearbyBusStopsResult.NetworkError
         }
     }
 
