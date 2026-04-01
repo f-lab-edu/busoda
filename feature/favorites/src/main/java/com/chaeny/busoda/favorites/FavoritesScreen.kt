@@ -330,7 +330,7 @@ private fun StopHeader(
 private fun ReorderableCollectionItemScope.DragHandle() {
     Icon(
         imageVector = Icons.Default.Menu,
-        contentDescription = null,
+        contentDescription = stringResource(R.string.reorder),
         modifier = Modifier.draggableHandle().padding(start = 16.dp),
         tint = Gray60
     )
