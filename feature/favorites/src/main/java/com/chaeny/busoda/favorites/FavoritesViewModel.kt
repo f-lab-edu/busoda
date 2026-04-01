@@ -57,7 +57,6 @@ internal class FavoritesViewModel @Inject constructor(
                 favoriteBuses = busList.groupBy { it.stopId }
 
                 if (busList.isNotEmpty()) {
-                    startTimer()
                     loadBusInfo()
                 } else if (currentState.favoriteBusInfo.isNotEmpty()) {
                     stopTimer()
@@ -128,7 +127,7 @@ internal class FavoritesViewModel @Inject constructor(
     }
 
     private fun startTimer() {
-        if (timerJob?.isActive == true) return
+        if (timerJob?.isActive == true || currentState.isEditMode) return
         timerJob = viewModelScope.launch {
             while (true) {
                 setState { copy(currentTime = System.currentTimeMillis() / 1000) }
