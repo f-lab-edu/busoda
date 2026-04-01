@@ -171,10 +171,7 @@ internal class FavoritesViewModel @Inject constructor(
             }
             is FavoritesIntent.RequestDeleteFavorite -> {
                 setState {
-                    copy(
-                        popup = Popup.Delete(intent.stop),
-                        hasFavoriteBuses = intent.stop.stopId in favoriteBuses
-                    )
+                    copy(popup = Popup.Delete(intent.stop, intent.stop.stopId in favoriteBuses))
                 }
             }
             is FavoritesIntent.CancelDeleteFavorite -> {
@@ -224,7 +221,7 @@ internal class FavoritesViewModel @Inject constructor(
 }
 
 sealed class Popup {
-    data class Delete(val stop: BusStop) : Popup()
+    data class Delete(val stop: BusStop, val hasFavoriteBuses: Boolean) : Popup()
 }
 
 data class FavoritesUiState(
@@ -232,7 +229,6 @@ data class FavoritesUiState(
     val favoriteBusInfo: Map<String, List<BusInfo>> = emptyMap(),
     val currentTime: Long = 0L,
     val isLoading: Boolean = false,
-    val hasFavoriteBuses: Boolean = false,
     val popup: Popup? = null,
     val isEditMode: Boolean = false
 ) : UiState

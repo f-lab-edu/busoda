@@ -131,7 +131,7 @@ fun FavoritesScreen(
     if (popup is Popup.Delete) {
         DeletePopup(
             stopName = popup.stop.stopName,
-            hasFavoriteBuses = uiState.hasFavoriteBuses,
+            hasFavoriteBuses = popup.hasFavoriteBuses,
             onDismiss = {
                 viewModel.onIntent(FavoritesIntent.CancelDeleteFavorite)
             },
