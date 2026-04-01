@@ -78,7 +78,6 @@ fun FavoritesScreen(
     val viewModel: FavoritesViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var rotation by remember { mutableFloatStateOf(0f) }
-    var isEditMode by remember { mutableStateOf(false) }
 
     CollectEffect(
         viewModel = viewModel,
@@ -106,11 +105,11 @@ fun FavoritesScreen(
                         favoriteStops = uiState.favoriteStops,
                         favoriteBusInfo = uiState.favoriteBusInfo,
                         isLoading = uiState.isLoading,
-                        isEditMode = isEditMode,
+                        isEditMode = uiState.isEditMode,
                         onClickItem = { viewModel.onIntent(FavoritesIntent.NavigateToDetail(it)) },
                         onLongClickItem = { viewModel.onIntent(FavoritesIntent.RequestDeleteFavorite(it)) },
                         onReorder = { viewModel.onIntent(FavoritesIntent.ReorderFavorites(it)) },
-                        onToggleEditMode = { isEditMode = !isEditMode },
+                        onToggleEditMode = { viewModel.onIntent(FavoritesIntent.ToggleEditMode) },
                         onDeleteBus = { stopId, busNumber ->
                             viewModel.onIntent(FavoritesIntent.DeleteFavoriteBus(stopId, busNumber))
                         }
@@ -237,14 +236,14 @@ private fun FavoritesList(
                                 onClick = onClickItem,
                                 onLongClick = { onLongClickItem(stop) },
                                 onDeleteBus = { busNumber -> onDeleteBus(stop.stopId, busNumber) },
-                                dragHandle = { DragHandle() }
+                                dragHandle = { if (isEditMode) DragHandle() }
                             )
                         } else {
                             StopItem(
                                 stop = stop,
                                 onClick = onClickItem,
                                 onLongClick = { onLongClickItem(stop) },
-                                dragHandle = { DragHandle() }
+                                dragHandle = { if (isEditMode) DragHandle() }
                             )
                         }
                     }
