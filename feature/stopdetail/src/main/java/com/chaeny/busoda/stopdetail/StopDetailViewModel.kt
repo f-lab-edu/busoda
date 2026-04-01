@@ -15,6 +15,7 @@ import com.chaeny.busoda.mvi.SideEffect
 import com.chaeny.busoda.mvi.UiIntent
 import com.chaeny.busoda.mvi.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -32,6 +33,7 @@ internal class StopDetailViewModel @Inject constructor(
 ) {
 
     private var currentCount = 15
+    private var loadJob: Job? = null
 
     init {
         asyncDataLoad()
@@ -51,8 +53,9 @@ internal class StopDetailViewModel @Inject constructor(
     }
 
     private fun asyncDataLoad() {
-        setState { copy(isLoading = true) }
-        viewModelScope.launch {
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
+            setState { copy(isLoading = true) }
             val result = busStopDetailRepository.getBusStopDetail(currentState.stopId)
             if (result is GetBusStopDetailResult.Success) {
                 val busStopDetail = result.data
