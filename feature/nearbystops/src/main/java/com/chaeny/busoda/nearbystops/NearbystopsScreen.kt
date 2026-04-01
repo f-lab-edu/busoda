@@ -29,6 +29,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.toArgb
+import android.widget.Toast
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -169,10 +170,13 @@ private fun CollectEffects(
     navigateToStopDetail: (String) -> Unit,
     viewModel: NearbystopsViewModel
 ) {
+    val context = LocalContext.current
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collect { effect ->
             when (effect) {
                 is NearbystopsEffect.NavigateToStopDetail -> navigateToStopDetail(effect.stopId)
+                is NearbystopsEffect.ShowNoInternet -> showToast(context, R.string.no_internet)
+                is NearbystopsEffect.ShowNetworkError -> showToast(context, R.string.network_error)
             }
         }
     }
@@ -287,6 +291,10 @@ private fun MarkerInfoBottomSheet(
             }
         }
     }
+}
+
+private fun showToast(context: Context, messageResId: Int) {
+    Toast.makeText(context, context.getString(messageResId), Toast.LENGTH_SHORT).show()
 }
 
 private const val DEFAULT_ZOOM_LEVEL = 15f
