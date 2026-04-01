@@ -249,16 +249,14 @@ private fun FavoritesList(
                         }
                     }
                 }
-                if (favoriteBusInfo.isNotEmpty()) {
-                    item {
-                        TextButton(
-                            onClick = onToggleEditMode,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .wrapContentWidth(Alignment.CenterHorizontally)
-                        ) {
-                            Text(if (isEditMode) stringResource(R.string.done) else stringResource(R.string.edit))
-                        }
+                item {
+                    TextButton(
+                        onClick = onToggleEditMode,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentWidth(Alignment.CenterHorizontally)
+                    ) {
+                        Text(if (isEditMode) stringResource(R.string.done) else stringResource(R.string.edit))
                     }
                 }
             }
