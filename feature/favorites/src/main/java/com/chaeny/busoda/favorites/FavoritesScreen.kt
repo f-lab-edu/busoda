@@ -286,7 +286,7 @@ private fun StopWithBusesCard(
         isEditMode = isEditMode,
         modifier = modifier
     ) {
-        StopHeader(stop, dragHandle)
+        StopHeader(stop, isEditMode, onLongClick, dragHandle)
         busInfos.forEach { busInfo ->
             FavoriteBusContent(
                 busInfo = busInfo,
@@ -312,18 +312,28 @@ private fun StopItem(
         isEditMode = isEditMode,
         modifier = modifier
     ) {
-        StopHeader(stop, dragHandle)
+        StopHeader(stop, isEditMode, onLongClick, dragHandle)
     }
 }
 
 @Composable
 private fun StopHeader(
     stop: BusStop,
+    isEditMode: Boolean,
+    onDelete: () -> Unit,
     dragHandle: @Composable () -> Unit
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         dragHandle()
         StopInfo(stop, modifier = Modifier.weight(1f))
+        if (isEditMode) {
+            TextButton(onClick = onDelete) {
+                Text(
+                    text = stringResource(R.string.delete),
+                    color = Color.Red
+                )
+            }
+        }
     }
 }
 
