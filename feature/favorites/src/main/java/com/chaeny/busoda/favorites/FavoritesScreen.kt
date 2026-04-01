@@ -243,6 +243,7 @@ private fun FavoritesList(
                                 stop = stop,
                                 onClick = onClickItem,
                                 onLongClick = { onLongClickItem(stop) },
+                                isEditMode = isEditMode,
                                 dragHandle = { if (isEditMode) DragHandle() }
                             )
                         }
@@ -279,11 +280,12 @@ private fun StopWithBusesCard(
     onLongClick: () -> Unit,
     onDeleteBus: (String) -> Unit,
     modifier: Modifier = Modifier,
-    dragHandle: @Composable () -> Unit = {}
+    dragHandle: @Composable () -> Unit
 ) {
     FavoriteCard(
         onClick = { onClick(stop.stopId) },
         onLongClick = onLongClick,
+        isEditMode = isEditMode,
         modifier = modifier
     ) {
         StopHeader(stop, dragHandle)
@@ -302,12 +304,14 @@ private fun StopItem(
     stop: BusStop,
     onClick: (String) -> Unit,
     onLongClick: () -> Unit,
+    isEditMode: Boolean,
     modifier: Modifier = Modifier,
-    dragHandle: @Composable () -> Unit = {}
+    dragHandle: @Composable () -> Unit
 ) {
     FavoriteCard(
         onClick = { onClick(stop.stopId) },
         onLongClick = onLongClick,
+        isEditMode = isEditMode,
         modifier = modifier
     ) {
         StopHeader(stop, dragHandle)
@@ -339,6 +343,7 @@ private fun ReorderableCollectionItemScope.DragHandle() {
 private fun FavoriteCard(
     onClick: () -> Unit,
     onLongClick: () -> Unit,
+    isEditMode: Boolean,
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit
 ) {
@@ -347,12 +352,12 @@ private fun FavoriteCard(
             .padding(horizontal = 30.dp)
             .padding(bottom = 15.dp)
             .clip(RoundedCornerShape(15.dp))
-            .combinedClickable(
-                onClick = onClick,
-                onLongClick = onLongClick
+            .then(
+                if (isEditMode) Modifier
+                else Modifier.combinedClickable(onClick = onClick, onLongClick = onLongClick)
             ),
         shape = RoundedCornerShape(15.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = White),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         content = content
     )
