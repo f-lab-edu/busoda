@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -252,7 +253,9 @@ private fun FavoritesList(
                     item {
                         TextButton(
                             onClick = onToggleEditMode,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentWidth(Alignment.CenterHorizontally)
                         ) {
                             Text(if (isEditMode) stringResource(R.string.done) else stringResource(R.string.edit))
                         }
@@ -392,7 +395,7 @@ private fun BusInfoHeader(
         verticalAlignment = Alignment.Bottom
     ) {
         if (isEditMode) {
-            IconButton(onClick = onDelete, modifier = Modifier.size(30.dp)) {
+            IconButton(onClick = onDelete, modifier = Modifier.size(28.dp)) {
                 Icon(
                     imageVector = Icons.Default.Close,
                     contentDescription = stringResource(R.string.delete_favorite_bus),
