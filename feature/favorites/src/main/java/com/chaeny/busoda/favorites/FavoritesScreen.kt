@@ -117,7 +117,7 @@ fun FavoritesScreen(
                 }
             }
 
-            if (uiState.favoriteBusInfo.isNotEmpty()) {
+            if (uiState.favoriteBusInfo.isNotEmpty() && !uiState.isEditMode) {
                 RefreshButton(
                     rotation = rotation,
                     onClick = { viewModel.onIntent(FavoritesIntent.RefreshData) },
