@@ -3,6 +3,7 @@ package com.chaeny.busoda.nearbystops
 import androidx.lifecycle.viewModelScope
 import com.chaeny.busoda.data.repository.BusStopDetailRepository
 import com.chaeny.busoda.data.repository.GetBusStopDetailResult
+import com.chaeny.busoda.data.repository.GetNearbyBusStopsResult
 import com.chaeny.busoda.data.repository.NearbyBusStopsRepository
 import com.chaeny.busoda.model.BusStopPosition
 import com.chaeny.busoda.mvi.BaseViewModel
@@ -63,8 +64,11 @@ internal class NearbystopsViewModel @Inject constructor(
 
     private fun loadNearbyBusStops(latitude: Double, longitude: Double) {
         viewModelScope.launch {
-            val busStops = nearbyBusStopsRepository.getNearbyBusStops(latitude, longitude, DEFAULT_RADIUS)
-            setState { copy(busStops = busStops) }
+            when (val result = nearbyBusStopsRepository.getNearbyBusStops(latitude, longitude, DEFAULT_RADIUS)) {
+                is GetNearbyBusStopsResult.Success -> setState { copy(busStops = result.data) }
+                is GetNearbyBusStopsResult.NoInternet -> postSideEffect(NearbystopsEffect.ShowNoInternet)
+                is GetNearbyBusStopsResult.NetworkError -> postSideEffect(NearbystopsEffect.ShowNetworkError)
+            }
         }
     }
 
@@ -96,4 +100,6 @@ sealed class NearbystopsIntent : UiIntent {
 
 sealed class NearbystopsEffect : SideEffect {
     data class NavigateToStopDetail(val stopId: String) : NearbystopsEffect()
+    data object ShowNoInternet : NearbystopsEffect()
+    data object ShowNetworkError : NearbystopsEffect()
 }
