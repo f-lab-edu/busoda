@@ -212,6 +212,10 @@ internal class FavoritesViewModel @Inject constructor(
                     favoriteBusRepository.deleteFavoriteBus(intent.stopId, intent.busNumber)
                 }
             }
+            is FavoritesIntent.ToggleEditMode -> {
+                setState { copy(isEditMode = !isEditMode) }
+                if (currentState.isEditMode) stopTimer() else startTimer()
+            }
         }
     }
 
@@ -230,7 +234,8 @@ data class FavoritesUiState(
     val currentTime: Long = 0L,
     val isLoading: Boolean = false,
     val hasFavoriteBuses: Boolean = false,
-    val popup: Popup? = null
+    val popup: Popup? = null,
+    val isEditMode: Boolean = false
 ) : UiState
 
 sealed class FavoritesIntent : UiIntent {
@@ -241,6 +246,7 @@ sealed class FavoritesIntent : UiIntent {
     data object RefreshData : FavoritesIntent()
     data class ReorderFavorites(val stops: List<BusStop>) : FavoritesIntent()
     data class DeleteFavoriteBus(val stopId: String, val busNumber: String) : FavoritesIntent()
+    data object ToggleEditMode : FavoritesIntent()
 }
 
 sealed class FavoritesEffect : SideEffect {
