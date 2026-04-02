@@ -57,7 +57,6 @@ internal class FavoritesViewModel @Inject constructor(
                 favoriteBuses = busList.groupBy { it.stopId }
 
                 if (busList.isNotEmpty()) {
-                    startTimer()
                     loadBusInfo()
                 } else if (currentState.favoriteBusInfo.isNotEmpty()) {
                     stopTimer()
@@ -128,7 +127,7 @@ internal class FavoritesViewModel @Inject constructor(
     }
 
     private fun startTimer() {
-        if (timerJob?.isActive == true) return
+        if (timerJob?.isActive == true || currentState.isEditMode) return
         timerJob = viewModelScope.launch {
             while (true) {
                 setState { copy(currentTime = System.currentTimeMillis() / 1000) }
@@ -172,10 +171,7 @@ internal class FavoritesViewModel @Inject constructor(
             }
             is FavoritesIntent.RequestDeleteFavorite -> {
                 setState {
-                    copy(
-                        popup = Popup.Delete(intent.stop),
-                        hasFavoriteBuses = intent.stop.stopId in favoriteBuses
-                    )
+                    copy(popup = Popup.Delete(intent.stop, intent.stop.stopId in favoriteBuses))
                 }
             }
             is FavoritesIntent.CancelDeleteFavorite -> {
@@ -212,6 +208,10 @@ internal class FavoritesViewModel @Inject constructor(
                     favoriteBusRepository.deleteFavoriteBus(intent.stopId, intent.busNumber)
                 }
             }
+            is FavoritesIntent.ToggleEditMode -> {
+                setState { copy(isEditMode = !isEditMode) }
+                if (currentState.isEditMode) stopTimer() else startTimer()
+            }
         }
     }
 
@@ -221,7 +221,7 @@ internal class FavoritesViewModel @Inject constructor(
 }
 
 sealed class Popup {
-    data class Delete(val stop: BusStop) : Popup()
+    data class Delete(val stop: BusStop, val hasFavoriteBuses: Boolean) : Popup()
 }
 
 data class FavoritesUiState(
@@ -229,8 +229,8 @@ data class FavoritesUiState(
     val favoriteBusInfo: Map<String, List<BusInfo>> = emptyMap(),
     val currentTime: Long = 0L,
     val isLoading: Boolean = false,
-    val hasFavoriteBuses: Boolean = false,
-    val popup: Popup? = null
+    val popup: Popup? = null,
+    val isEditMode: Boolean = false
 ) : UiState
 
 sealed class FavoritesIntent : UiIntent {
@@ -241,6 +241,7 @@ sealed class FavoritesIntent : UiIntent {
     data object RefreshData : FavoritesIntent()
     data class ReorderFavorites(val stops: List<BusStop>) : FavoritesIntent()
     data class DeleteFavoriteBus(val stopId: String, val busNumber: String) : FavoritesIntent()
+    data object ToggleEditMode : FavoritesIntent()
 }
 
 sealed class FavoritesEffect : SideEffect {

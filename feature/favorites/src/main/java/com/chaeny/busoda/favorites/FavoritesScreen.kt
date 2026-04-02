@@ -78,7 +78,6 @@ fun FavoritesScreen(
     val viewModel: FavoritesViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var rotation by remember { mutableFloatStateOf(0f) }
-    var isEditMode by remember { mutableStateOf(false) }
 
     CollectEffect(
         viewModel = viewModel,
@@ -106,11 +105,11 @@ fun FavoritesScreen(
                         favoriteStops = uiState.favoriteStops,
                         favoriteBusInfo = uiState.favoriteBusInfo,
                         isLoading = uiState.isLoading,
-                        isEditMode = isEditMode,
+                        isEditMode = uiState.isEditMode,
                         onClickItem = { viewModel.onIntent(FavoritesIntent.NavigateToDetail(it)) },
                         onLongClickItem = { viewModel.onIntent(FavoritesIntent.RequestDeleteFavorite(it)) },
                         onReorder = { viewModel.onIntent(FavoritesIntent.ReorderFavorites(it)) },
-                        onToggleEditMode = { isEditMode = !isEditMode },
+                        onToggleEditMode = { viewModel.onIntent(FavoritesIntent.ToggleEditMode) },
                         onDeleteBus = { stopId, busNumber ->
                             viewModel.onIntent(FavoritesIntent.DeleteFavoriteBus(stopId, busNumber))
                         }
@@ -118,7 +117,7 @@ fun FavoritesScreen(
                 }
             }
 
-            if (uiState.favoriteBusInfo.isNotEmpty()) {
+            if (uiState.favoriteBusInfo.isNotEmpty() && !uiState.isEditMode) {
                 RefreshButton(
                     rotation = rotation,
                     onClick = { viewModel.onIntent(FavoritesIntent.RefreshData) },
@@ -132,7 +131,7 @@ fun FavoritesScreen(
     if (popup is Popup.Delete) {
         DeletePopup(
             stopName = popup.stop.stopName,
-            hasFavoriteBuses = uiState.hasFavoriteBuses,
+            hasFavoriteBuses = popup.hasFavoriteBuses,
             onDismiss = {
                 viewModel.onIntent(FavoritesIntent.CancelDeleteFavorite)
             },
@@ -237,28 +236,27 @@ private fun FavoritesList(
                                 onClick = onClickItem,
                                 onLongClick = { onLongClickItem(stop) },
                                 onDeleteBus = { busNumber -> onDeleteBus(stop.stopId, busNumber) },
-                                dragHandle = { DragHandle() }
+                                dragHandle = { if (isEditMode) DragHandle() }
                             )
                         } else {
                             StopItem(
                                 stop = stop,
                                 onClick = onClickItem,
                                 onLongClick = { onLongClickItem(stop) },
-                                dragHandle = { DragHandle() }
+                                isEditMode = isEditMode,
+                                dragHandle = { if (isEditMode) DragHandle() }
                             )
                         }
                     }
                 }
-                if (favoriteBusInfo.isNotEmpty()) {
-                    item {
-                        TextButton(
-                            onClick = onToggleEditMode,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .wrapContentWidth(Alignment.CenterHorizontally)
-                        ) {
-                            Text(if (isEditMode) stringResource(R.string.done) else stringResource(R.string.edit))
-                        }
+                item {
+                    TextButton(
+                        onClick = onToggleEditMode,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentWidth(Alignment.CenterHorizontally)
+                    ) {
+                        Text(if (isEditMode) stringResource(R.string.done) else stringResource(R.string.edit))
                     }
                 }
             }
@@ -280,14 +278,14 @@ private fun StopWithBusesCard(
     onLongClick: () -> Unit,
     onDeleteBus: (String) -> Unit,
     modifier: Modifier = Modifier,
-    dragHandle: @Composable () -> Unit = {}
+    dragHandle: @Composable () -> Unit
 ) {
     FavoriteCard(
-        onClick = { onClick(stop.stopId) },
-        onLongClick = onLongClick,
+        onClick = ({ onClick(stop.stopId) }).takeUnless { isEditMode },
+        onLongClick = onLongClick.takeUnless { isEditMode },
         modifier = modifier
     ) {
-        StopHeader(stop, dragHandle)
+        StopHeader(stop, isEditMode, onLongClick, dragHandle)
         busInfos.forEach { busInfo ->
             FavoriteBusContent(
                 busInfo = busInfo,
@@ -303,26 +301,37 @@ private fun StopItem(
     stop: BusStop,
     onClick: (String) -> Unit,
     onLongClick: () -> Unit,
+    isEditMode: Boolean,
     modifier: Modifier = Modifier,
-    dragHandle: @Composable () -> Unit = {}
+    dragHandle: @Composable () -> Unit
 ) {
     FavoriteCard(
-        onClick = { onClick(stop.stopId) },
-        onLongClick = onLongClick,
+        onClick = ({ onClick(stop.stopId) }).takeUnless { isEditMode },
+        onLongClick = onLongClick.takeUnless { isEditMode },
         modifier = modifier
     ) {
-        StopHeader(stop, dragHandle)
+        StopHeader(stop, isEditMode, onLongClick, dragHandle)
     }
 }
 
 @Composable
 private fun StopHeader(
     stop: BusStop,
+    isEditMode: Boolean,
+    onDelete: () -> Unit,
     dragHandle: @Composable () -> Unit
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         dragHandle()
         StopInfo(stop, modifier = Modifier.weight(1f))
+        if (isEditMode) {
+            TextButton(onClick = onDelete) {
+                Text(
+                    text = stringResource(R.string.delete),
+                    color = Color.Red
+                )
+            }
+        }
     }
 }
 
@@ -338,22 +347,24 @@ private fun ReorderableCollectionItemScope.DragHandle() {
 
 @Composable
 private fun FavoriteCard(
-    onClick: () -> Unit,
-    onLongClick: () -> Unit,
+    onClick: (() -> Unit)?,
+    onLongClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit
 ) {
+    val clickModifier = if (onClick != null) {
+        Modifier.combinedClickable(onClick = onClick, onLongClick = onLongClick)
+    } else {
+        Modifier
+    }
     Card(
         modifier = modifier
             .padding(horizontal = 30.dp)
             .padding(bottom = 15.dp)
             .clip(RoundedCornerShape(15.dp))
-            .combinedClickable(
-                onClick = onClick,
-                onLongClick = onLongClick
-            ),
+            .then(clickModifier),
         shape = RoundedCornerShape(15.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = White),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         content = content
     )
