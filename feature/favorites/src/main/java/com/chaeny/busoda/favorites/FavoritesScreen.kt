@@ -281,9 +281,8 @@ private fun StopWithBusesCard(
     dragHandle: @Composable () -> Unit
 ) {
     FavoriteCard(
-        onClick = { onClick(stop.stopId) },
-        onLongClick = onLongClick,
-        isEditMode = isEditMode,
+        onClick = ({ onClick(stop.stopId) }).takeUnless { isEditMode },
+        onLongClick = onLongClick.takeUnless { isEditMode },
         modifier = modifier
     ) {
         StopHeader(stop, isEditMode, onLongClick, dragHandle)
@@ -307,9 +306,8 @@ private fun StopItem(
     dragHandle: @Composable () -> Unit
 ) {
     FavoriteCard(
-        onClick = { onClick(stop.stopId) },
-        onLongClick = onLongClick,
-        isEditMode = isEditMode,
+        onClick = ({ onClick(stop.stopId) }).takeUnless { isEditMode },
+        onLongClick = onLongClick.takeUnless { isEditMode },
         modifier = modifier
     ) {
         StopHeader(stop, isEditMode, onLongClick, dragHandle)
@@ -349,21 +347,22 @@ private fun ReorderableCollectionItemScope.DragHandle() {
 
 @Composable
 private fun FavoriteCard(
-    onClick: () -> Unit,
-    onLongClick: () -> Unit,
-    isEditMode: Boolean,
+    onClick: (() -> Unit)?,
+    onLongClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit
 ) {
+    val clickModifier = if (onClick != null) {
+        Modifier.combinedClickable(onClick = onClick, onLongClick = onLongClick)
+    } else {
+        Modifier
+    }
     Card(
         modifier = modifier
             .padding(horizontal = 30.dp)
             .padding(bottom = 15.dp)
             .clip(RoundedCornerShape(15.dp))
-            .then(
-                if (isEditMode) Modifier
-                else Modifier.combinedClickable(onClick = onClick, onLongClick = onLongClick)
-            ),
+            .then(clickModifier),
         shape = RoundedCornerShape(15.dp),
         colors = CardDefaults.cardColors(containerColor = White),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
