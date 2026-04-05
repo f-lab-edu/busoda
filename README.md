@@ -1,21 +1,22 @@
 # 🚌 Busoda 🚏
 
 > **Modern Android Bus Stop Information App**  
-> Clean Architecture · Jetpack Compose · Multi-Module
+> Clean Architecture · Jetpack Compose · Multi-Module · MVI
 
 [![Android](https://img.shields.io/badge/Platform-Android-green.svg)](https://developer.android.com/)
 [![Kotlin](https://img.shields.io/badge/Language-Kotlin-purple.svg)](https://kotlinlang.org/)
 [![Compose](https://img.shields.io/badge/UI-Jetpack%20Compose-blue.svg)](https://developer.android.com/jetpack/compose)
 [![Architecture](https://img.shields.io/badge/Architecture-Clean%20Architecture-orange.svg)](#architecture)
 
-**버스오다**는 최신 Android 개발 기술과 모범 사례를 적용한 **버스 정류소 정보 조회 애플리케이션**입니다.  
+**버스오다**는 최신 Android 개발 기술과 모범 사례를 적용한 **버스 정류소 정보 조회 애플리케이션**입니다.
 사용자는 버스 정류소를 검색하고, 실시간 도착 정보를 확인하며, 자주 이용하는 정류소를 즐겨찾기에 추가할 수 있습니다.
 
 ## ✨ Key Features
 
 - 🔍 **실시간 정류소 검색** - 디바운스 최적화로 효율적인 검색
 - 📍 **상세 도착 정보** - 15초마다 자동 갱신되는 실시간 정보
-- ⭐ **즐겨찾기 관리** - 자주 이용하는 정류소 저장 및 관리
+- ⭐ **즐겨찾기 관리** - 자주 이용하는 정류소 및 버스 저장·편집·순서 변경
+- 🗺️ **주변 정류소 탐색** - 지도 기반 현재 위치 주변 정류소 확인
 - 🎨 **Material 3 Design** - 라이트/다크 모드 지원
 - 🔗 **딥링크 지원** - 외부에서 특정 정류소로 직접 접근
 
@@ -23,33 +24,36 @@
 
 <div align="center">
 
-| 즐겨찾기 화면 | 정류소 검색 | 상세 정보 |
-|:---:|:---:|:---:|
-| <img src="https://play-lh.googleusercontent.com/tTGu2UM9bN0DDTUJMguaqcwp_TfIUQnOaFikR-ASqeZZFqFblfFyEhBLlXOBJTCSOjw1hQongxz2zZig2AIQ=w1052-h592-rw" width="250"> | <img src="https://play-lh.googleusercontent.com/5M0ddr9NnzzReSRWZnS4YzzIDAVMetIhgUX0zyBOraRQklz_HbNfkKaiPQDRaG3aARzBp11T3DcxO9KfKO8L9Q=w1052-h592-rw" width="250"> | <img src="https://play-lh.googleusercontent.com/zX1cNpjF-bRe-S3q5KeK1sVlb08Cy7Isg544UJim90tjxQORjkEx9iz4-ah4xDbhGHWTATIXNyBY42pnG3Ba=w1052-h592-rw" width="250"> |
+| 즐겨찾기 화면 | 정류소 검색 | 상세 정보 | 주변 정류소 |
+|:---:|:---:|:---:|:---:|
+| <img src="https://play-lh.googleusercontent.com/Ia6IFiDWkzX6V0cDzqSEGtZVcfPFXecdSutEpwLFr8ozKEZB9zNI2_n-1-Nt1-Z0hxzTBcjRlxD2zS8nb8m6=w1052-h592-rw" width="250"> | <img src="https://play-lh.googleusercontent.com/5M0ddr9NnzzReSRWZnS4YzzIDAVMetIhgUX0zyBOraRQklz_HbNfkKaiPQDRaG3aARzBp11T3DcxO9KfKO8L9Q=w1052-h592-rw" width="250"> | <img src="https://play-lh.googleusercontent.com/zX1cNpjF-bRe-S3q5KeK1sVlb08Cy7Isg544UJim90tjxQORjkEx9iz4-ah4xDbhGHWTATIXNyBY42pnG3Ba=w1052-h592-rw" width="250"> | <img src="https://play-lh.googleusercontent.com/h5fsPl2c6xiKKONy3tJW85b39VxALpJIS5iUcu-XQ6wDXAVG--BxnInro9VT6S4TX16eNMvBoyY0fwOE_VQJiQ=w1052-h592-rw" width="250"> |
 
 </div>
 
 ## 🏗️ Architecture
 
-이 프로젝트는 **Multi-Module Clean Architecture**를 채택하여 관심사를 명확히 분리하고 확장성과 테스트 용이성을 확보했습니다.
+이 프로젝트는 **Multi-Module Clean Architecture**와 **MVI 패턴**을 채택하여 관심사를 명확히 분리하고 확장성과 테스트 용이성을 확보했습니다.
 
 ```
 app/
 ├── feature/
 │   ├── stoplist/      # 정류소 검색 기능
 │   ├── stopdetail/    # 정류소 상세 정보
-│   └── favorites/     # 즐겨찾기 관리
+│   ├── favorites/     # 즐겨찾기 관리
+│   └── nearbystops/   # 주변 정류소 지도
 └── core/
     ├── data/          # Repository 구현
     ├── database/      # Room 데이터베이스
+    ├── domain/        # UseCase
     ├── model/         # 데이터 모델
-    ├── ui/           # 디자인 시스템
-    └── testing/      # 테스트 유틸리티
+    ├── mvi/           # MVI 베이스 클래스
+    ├── ui/            # 디자인 시스템 & 공용 컴포넌트
+    └── testing/       # 테스트 유틸리티
 ```
 
 ### Architecture Principles
 
-- **🔄 Unidirectional Data Flow (UDF)** - 예측 가능한 상태 관리
+- **🔄 MVI (Model-View-Intent)** - 단방향 데이터 흐름으로 예측 가능한 상태 관리
 - **🎯 Single Responsibility** - 각 모듈과 클래스의 명확한 역할 분담
 - **📦 Dependency Inversion** - 인터페이스 기반의 느슨한 결합
 - **⚡ Reactive Streams** - Flow를 통한 반응형 데이터 처리
@@ -59,7 +63,7 @@ app/
 ### Core Technologies
 - **Language**: Kotlin 100%
 - **UI Framework**: Jetpack Compose
-- **Architecture**: Multi-Module Clean Architecture
+- **Architecture**: Multi-Module Clean Architecture + MVI
 - **Dependency Injection**: Hilt
 - **Asynchronous**: Coroutines + Flow
 
@@ -69,6 +73,7 @@ app/
 |----------|---------|---------|
 | **UI** | Jetpack Compose | 선언형 UI 프레임워크 |
 | **Navigation** | Navigation Compose | 화면 간 이동 관리 |
+| **Map** | Google Maps Compose | 지도 기반 주변 정류소 표시 |
 | **DI** | Hilt | 의존성 주입 |
 | **Network** | Retrofit + OkHttp | HTTP 통신 |
 | **Parsing** | TikXml | XML 응답 파싱 |
@@ -77,29 +82,45 @@ app/
 
 ## 🎯 Key Technical Highlights
 
-### 1. **Reactive Data Flow**
+### 1. **MVI Pattern**
 ```kotlin
-// Repository에서 UI까지 끊김없는 반응형 스트림
-@Dao
-interface FavoriteStopDao {
-    @Query("SELECT * FROM favorite_stops")
-    fun getFavorites(): Flow<List<FavoriteStop>>  // Room에서 Flow 반환
+// Intent → ViewModel → State/SideEffect 단방향 흐름
+sealed class FavoritesIntent : UiIntent {
+    data class NavigateToDetail(val stopId: String) : FavoritesIntent()
+    data object ToggleEditMode : FavoritesIntent()
+    data object RefreshData : FavoritesIntent()
 }
 
-// ViewModel에서 StateFlow로 변환
-val favorites = favoriteRepository.getFavorites()
-    .stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = emptyList()
-    )
+// BaseViewModel이 상태 관리 추상화
+abstract class BaseViewModel<INTENT, STATE, SIDE_EFFECT>(
+    initialState: STATE
+) : ViewModel() {
+    protected fun setState(reducer: STATE.() -> STATE) { ... }
+    protected fun postSideEffect(effect: SIDE_EFFECT) { ... }
+    abstract fun onIntent(intent: INTENT)
+}
 ```
 
-### 2. **Performance Optimized Search**
+### 2. **Reactive Data Flow**
+```kotlin
+// Room에서 Flow 반환 → ViewModel에서 수집 → UI 자동 갱신
+@Dao
+interface FavoriteStopDao {
+    @Query("SELECT * FROM favorite_stops ORDER BY `order`")
+    fun getFavorites(): Flow<List<FavoriteStop>>
+}
+
+// ViewModel에서 수집
+favoriteRepository.getFavoriteStops().collect { favoriteStops ->
+    setState { copy(favoriteStops = favoriteStops) }
+}
+```
+
+### 3. **Performance Optimized Search**
 ```kotlin
 // 검색어 입력 최적화 - 1초 디바운스로 불필요한 API 호출 방지
 searchQuery
-    .debounce(1000) // 1초 후에 검색 실행
+    .debounce(1000)
     .distinctUntilChanged()
     .collectLatest { query ->
         if (query.isNotBlank()) {
@@ -108,12 +129,12 @@ searchQuery
     }
 ```
 
-### 3. **Clean Dependency Injection**
+### 4. **Clean Dependency Injection**
 ```kotlin
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
-    
+
     @Binds
     abstract fun bindBusStopRepository(
         apiBusStopRepository: ApiBusStopRepository
@@ -135,10 +156,10 @@ fun `when keyword is updated then api is called only once after debounce time`()
     // Given: 검색어를 빠르게 연속 입력
     viewModel.updateSearchQuery("서울")
     viewModel.updateSearchQuery("서울역")
-    
+
     // When: 1초 경과
     advanceTimeBy(1000)
-    
+
     // Then: 마지막 검색어로 단 한번만 API 호출
     verify(exactly = 1) { repository.searchBusStops("서울역") }
 }
@@ -167,8 +188,13 @@ fun `when keyword is updated then api is called only once after debounce time`()
 - 15초 자동 갱신 타이머
 
 **:feature:favorites**
-- 즐겨찾기 정류소 관리
+- 즐겨찾기 정류소 및 버스 관리
+- 편집 모드, 순서 변경, 삭제 기능
 - 반응형 데이터베이스 연동
+
+**:feature:nearbystops**
+- Google Maps 기반 주변 정류소 탐색
+- 현재 위치 기반 자동 검색
 
 </details>
 
@@ -183,9 +209,14 @@ fun `when keyword is updated then api is called only once after debounce time`()
 - Room 데이터베이스 설정
 - DAO 및 Entity 정의
 
+**:core:domain**
+- UseCase 정의
+
 **:core:model**
 - 앱 전체 데이터 모델
-- DTO 및 Entity 클래스
+
+**:core:mvi**
+- BaseViewModel, UiState, UiIntent, SideEffect 추상화
 
 **:core:ui**
 - Material 3 디자인 시스템
