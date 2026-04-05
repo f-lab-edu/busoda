@@ -86,11 +86,13 @@ fun FavoritesScreen(
     )
 
     CompositionLocalProvider(LocalCurrentTime provides uiState.currentTime) {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .systemBarsPadding()
+        ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .systemBarsPadding()
+                modifier = Modifier.fillMaxSize()
             ) {
                 MainSearchBar(onSearchClick = navigateToStopList)
                 MainTabRow(
