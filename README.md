@@ -8,7 +8,7 @@
 [![Compose](https://img.shields.io/badge/UI-Jetpack%20Compose-blue.svg)](https://developer.android.com/jetpack/compose)
 [![Architecture](https://img.shields.io/badge/Architecture-Clean%20Architecture-orange.svg)](#architecture)
 
-**버스오다**는 최신 Android 개발 기술과 모범 사례를 적용한 **버스 정류소 정보 조회 애플리케이션**입니다.
+**버스오다**는 최신 Android 개발 기술과 모범 사례를 적용한 **버스 정류소 정보 조회 애플리케이션**입니다.  
 사용자는 버스 정류소를 검색하고, 실시간 도착 정보를 확인하며, 자주 이용하는 정류소를 즐겨찾기에 추가할 수 있습니다.
 
 ## ✨ Key Features
